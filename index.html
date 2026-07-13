@@ -520,12 +520,18 @@ var SISTEMAS=[
 ];
 
 var POCUS=[
-  {id:'fast',name:'FAST',icon:'🩸',desc:'Focused Assessment with Sonography for Trauma. Detecta líquido libre en trauma abdominal/torácico.',ventanas:['Hepatorrenal (Morison)','Esplenorrenal','Pelvis (Douglas / retrovesical)','Subxifoidea (pericardio)','Torácica bilateral (FAST extendido — neumo/hemotórax)']},
-  {id:'rush',name:'RUSH',icon:'💓',desc:'Rapid Ultrasound in Shock. Protocolo para el paciente en shock indiferenciado: "bomba, tanque y tuberías".',ventanas:['Bomba: pericardio, contractilidad VI, tamaño VD','Tanque: VCI y colapsabilidad, líneas B pulmonares, FAST','Tuberías: aorta (aneurisma/disección), TVP femoral/poplítea']},
-  {id:'blue',name:'BLUE',icon:'🫁',desc:'Bedside Lung Ultrasound in Emergency. Diagnóstico rápido de la disnea aguda.',ventanas:['Puntos BLUE anteriores (líneas A vs B)','Punto PLAPS (derrame/consolidación posterolateral)','Deslizamiento pleural (descartar neumotórax)','Perfil A/B/C según patrón']},
-  {id:'fate',name:'FATE',icon:'❤️',desc:'Focused Assessed Transthoracic Echo. Evaluación cardíaca dirigida y estado de volumen.',ventanas:['Subcostal 4 cámaras','Paraesternal eje largo','Paraesternal eje corto','Apical 4 cámaras','VCI (volemia)']},
-  {id:'aerea',name:'Vía aérea',icon:'🌬️',desc:'Ecografía de vía aérea: confirmación de intubación, identificación de membrana cricotiroidea.',ventanas:['Confirmación de tubo endotraqueal (vs esofágico)','Deslizamiento pulmonar bilateral post-intubación','Identificación de membrana cricotiroidea','Predicción de vía aérea difícil (distancia piel-epiglotis)']},
-  {id:'vascular',name:'Acceso vascular',icon:'💉',desc:'Guía ecográfica para canalización venosa/arterial, en tiempo real o estático.',ventanas:['Vena yugular interna (eje corto/largo)','Vena femoral','Vena axilar/subclavia','Arteria radial','Diferenciación vena vs arteria (compresibilidad, Doppler)']}
+  {id:'fast',name:'FAST / E-FAST',icon:'🩸',desc:'Focused Assessment with Sonography for Trauma. Detecta líquido libre en trauma/hipotensión.',ventanas:['Perihepatorrenal (Morrison)','Periesplenorrenal (Koller)','Pelviana (Douglas)','Pericárdica (subxifoidea)']},
+  {id:'rush',name:'RUSH',icon:'💓',desc:'Rapid Ultrasound in Shock: bomba, tanque y tuberías.',ventanas:['Bomba (corazón)','Tanque (VCI/volumen)','Tuberías (aorta/vasos)']},
+  {id:'blue',name:'BLUE',icon:'🫁',desc:'Bedside Lung Ultrasound in Emergency. Disnea aguda.',ventanas:['Anterior superior/inferior','PLAPS posterolateral','Perfiles A/B/C']},
+  {id:'fate',name:'FATE',icon:'❤️',desc:'Focus Assessed Transthoracic Echo. Evaluación cardíaca rápida.',ventanas:['Subxifoidea','Paraesternal eje largo/corto','Apical 4 cámaras']},
+  {id:'cardiaco',name:'Cardíaco',icon:'🫀',desc:'POCUS cardíaco específico: paro, taponamiento, TEP.',ventanas:['AESP / FV','Taponamiento','TEP con repercusión']},
+  {id:'vascular',name:'Vascular',icon:'💉',desc:'TVP por compresión y acceso vascular guiado.',ventanas:['Compresión venosa (TVP)','Acceso venoso central/femoral']},
+  {id:'renal',name:'Renal',icon:'🫘',desc:'Hidronefrosis, vejiga, IRA.',ventanas:['Hidronefrosis','Vejiga / retención','Riñón en IRA']},
+  {id:'pleural',name:'Pleural',icon:'🌊',desc:'Derrame pleural y neumotórax.',ventanas:['Derrame pleural','Neumotórax (sliding, punto pulmonar)']},
+  {id:'abdominal',name:'Abdominal',icon:'🩻',desc:'Vesícula/colecistitis y aorta (AAA).',ventanas:['Colelitiasis / colecistitis','Aorta abdominal (AAA)']},
+  {id:'obstetrico',name:'Obstétrico',icon:'🤰',desc:'1ºT con dolor/sangrado; vitalidad fetal.',ventanas:['Embarazo intrauterino','Sospecha de ectópico','Vitalidad fetal']},
+  {id:'ocular',name:'Ocular',icon:'👁️',desc:'Desprendimiento de retina, VNO/PIC, cuerpo extraño.',ventanas:['Desprendimiento de retina','Vaina del nervio óptico','Cuerpo extraño']},
+  {id:'aerea',name:'Vía aérea',icon:'🌬️',desc:'Ecografía de vía aérea: confirmación de intubación, membrana cricotiroidea.',ventanas:['Confirmación de tubo endotraqueal (vs esofágico)','Deslizamiento pulmonar bilateral post-intubación','Identificación de membrana cricotiroidea','Predicción de vía aérea difícil (distancia piel-epiglotis)']}
 ];
 
 /* Fármacos de emergencia (20) */
@@ -2270,11 +2276,189 @@ function showPocusSub(id,init){
   state.pocusSub=id; saveState();
   var p=POCUS.filter(function(x){return x.id===id;})[0];
   Array.prototype.forEach.call(document.querySelectorAll('#pocusSubnav .subtab'),function(b){ b.classList.toggle('active', b.textContent===p.icon+' '+p.name); });
-  document.getElementById('pocusContent').innerHTML=
-    '<div class="block"><h3>'+p.icon+' '+p.name+'</h3><p>'+p.desc+'</p>'+
-    '<h4>Ventanas / puntos a evaluar</h4><ul>'+p.ventanas.map(function(v){return '<li>'+v+'</li>';}).join('')+'</ul>'+
-    '<div class="callout">Contenido en desarrollo — descripción del protocolo y ventanas. Imágenes/loops en próxima versión.</div></div>';
+  var rich=pocusRich(id);
+  document.getElementById('pocusContent').innerHTML= rich ||
+    ('<div class="block"><h3>'+p.icon+' '+p.name+'</h3><p>'+p.desc+'</p>'+
+    '<h4>Ventanas / puntos a evaluar</h4><ul>'+p.ventanas.map(function(v){return '<li>'+v+'</li>';}).join('')+'</ul></div>');
   if(!init) resetSearch();
+}
+/* ═══════════════ v1.9 · POCUS — contenido clínico por protocolo ═══════════════ */
+function pocusRich(id){
+  var S=function(icon,title,body,open){ return pediSx(icon,title,body,open); };
+  if(id==='fast'){
+    return '<div class="callout"><strong>Indicación:</strong> trauma, hipotensión inexplicada, sospecha de líquido libre.</div>'+
+      S('🫁','4 ventanas FAST','<ul>'+
+        '<li><strong>Perihepatorrenal (Morrison):</strong> entre hígado y riñón derecho.</li>'+
+        '<li><strong>Periesplenorrenal (Koller):</strong> entre bazo y riñón izquierdo.</li>'+
+        '<li><strong>Pelviana (Douglas/Retzius):</strong> posterior a la vejiga.</li>'+
+        '<li><strong>Pericárdica</strong> (subxifoidea o paraesternal): líquido alrededor del corazón.</li></ul>',true)+
+      S('➕','E-FAST agrega','<ul>'+
+        '<li><strong>Pleural bilateral:</strong> neumotórax (ausencia de sliding + signo de la estratosfera en M-mode).</li>'+
+        '<li><strong>Pulmonar bilateral:</strong> contusión (líneas B focales).</li></ul>')+
+      S('🔎','Interpretación','<ul>'+
+        '<li><strong>Positivo:</strong> líquido anecoico en peritoneo/pericardio → urgencia quirúrgica.</li>'+
+        '<li><strong>Negativo:</strong> no excluye lesión — repetir si hay deterioro clínico.</li></ul>')+
+      S('⚠️','Pitfalls','<ul>'+
+        '<li>La grasa peritoneal puede simular líquido.</li>'+
+        '<li>El coágulo organizado es hiperecogénico (no anecoico).</li>'+
+        '<li>FAST negativo no excluye lesión de víscera sólida.</li>'+
+        '<li>Ventana limitada en obesos, enfisema subcutáneo o cirugías previas.</li></ul>');
+  }
+  if(id==='rush'){
+    return '<div class="callout"><strong>Indicación:</strong> shock de causa desconocida.</div>'+
+      S('💗','Fase 1 — The Pump (corazón)','<ul>'+
+        '<li>Función sistólica: normal / hiperdinámica / deprimida.</li>'+
+        '<li>Tamaño VD vs VI: VD dilatado → TEP, HTP.</li>'+
+        '<li>Derrame pericárdico + colapso AD/VD → taponamiento.</li>'+
+        '<li>Hiperdinámica con VD pequeño → shock distributivo/hipovolémico.</li></ul>',true)+
+      S('🛢️','Fase 2 — The Tank (volumen)','<ul>'+
+        '<li><strong>VCI:</strong> &lt;2.1 cm + colapso &gt;50% → PVC baja, responde a volumen.</li>'+
+        '<li><strong>VCI:</strong> &gt;2.1 cm + colapso &lt;50% → PVC alta, no dar volumen.</li>'+
+        '<li>Pleural: derrame bilateral → IC, sepsis, hipoalbuminemia.</li>'+
+        '<li>Peritoneal: líquido libre → trauma, rotura, ascitis.</li></ul>')+
+      S('🩸','Fase 3 — The Pipes (aorta y vasos)','<ul>'+
+        '<li>Aorta abdominal &gt;3 cm → AAA; &gt;5 cm o crecimiento rápido → urgencia quirúrgica.</li>'+
+        '<li>Venas femorales: sin compresión → TVP.</li></ul>')+
+      S('🧭','Patrones de shock por RUSH','<ul>'+
+        '<li><strong>Cardiogénico:</strong> bomba deprimida + VCI plétora + derrames.</li>'+
+        '<li><strong>Obstructivo (TEP):</strong> VD dilatado + VCI plétora + bomba hiperdinámica compensadora.</li>'+
+        '<li><strong>Distributivo (sepsis):</strong> bomba hiperdinámica + VCI colapsable.</li>'+
+        '<li><strong>Hipovolémico:</strong> bomba hiperdinámica + VCI colapsable + FAST positivo si hemorrágico.</li></ul>');
+  }
+  if(id==='blue'){
+    return '<div class="callout"><strong>Indicación:</strong> disnea aguda de causa desconocida.</div>'+
+      S('📍','6 puntos de exploración','<p>Anterior superior, anterior inferior y PLAPS point (posterolateral), bilateral.</p>',true)+
+      S('🗂️','Perfiles y diagnóstico','<ul>'+
+        '<li><strong>Perfil A</strong> (líneas A + sliding): pulmón aireado → TEP, asma, EPOC, hipovolemia.</li>'+
+        '<li><strong>Perfil A′</strong> (líneas A + sin sliding): → neumotórax (confirmar con punto pulmonar).</li>'+
+        '<li><strong>Perfil B</strong> (líneas B bilaterales ≥3/campo): → edema pulmonar, neumonitis.</li>'+
+        '<li><strong>Perfil B′</strong> (líneas B + sin sliding): → neumonía.</li>'+
+        '<li><strong>Perfil C</strong> (consolidación anterior): → neumonía.</li>'+
+        '<li><strong>Perfil A/B</strong> (asimétrico): → neumonía, contusión.</li></ul>')+
+      S('🚀','Líneas B (cohetes)','<p>Verticales, desde la pleura, borran las líneas A, llegan al borde de la pantalla y se mueven con la respiración → agua intersticial.</p>')+
+      S('🎯','Punto pulmonar','<p>Transición sliding/no sliding → <strong>patognomónico de neumotórax</strong> (especificidad 100%).</p>');
+  }
+  if(id==='fate'){
+    return '<div class="callout"><strong>Indicación:</strong> evaluación cardíaca rápida en urgencia / paciente crítico.</div>'+
+      S('🪟','4 ventanas estándar','<ul>'+
+        '<li><strong>Subxifoidea (4C):</strong> función global, derrame, tamaño relativo de cavidades.</li>'+
+        '<li><strong>Paraesternal eje largo:</strong> FEVI visual, válvulas, raíz aórtica.</li>'+
+        '<li><strong>Paraesternal eje corto:</strong> movimiento septal, VD/VI, "D-sign" (sobrecarga VD).</li>'+
+        '<li><strong>Apical 4C:</strong> asimetría de cavidades, función segmentaria visual.</li></ul>',true)+
+      S('👁️','FEVI visual (ojo de experto)','<ul>'+
+        '<li><strong>Normal &gt;50%:</strong> las paredes se juntan bien.</li>'+
+        '<li><strong>Moderadamente reducida 30-50%:</strong> movimiento reducido.</li>'+
+        '<li><strong>Severamente reducida &lt;30%:</strong> casi sin movimiento, VI dilatado.</li></ul>')+
+      S('🚨','Signos de alarma inmediata','<ul>'+
+        '<li>Derrame + colapso diastólico de AD → taponamiento → pericardiocentesis urgente.</li>'+
+        '<li>D-sign en eje corto → cor pulmonale agudo → TEP.</li>'+
+        '<li>FEVI severamente deprimida + shock → soporte inotrópico urgente.</li></ul>');
+  }
+  if(id==='cardiaco'){
+    return '<div class="callout"><strong>POCUS cardíaco específico</strong> — integrado a la RCP y al shock.</div>'+
+      S('⚡','AESP (actividad eléctrica sin pulso)','<ul>'+
+        '<li>Corazón inmóvil → confirma paro real → continuar RCP.</li>'+
+        '<li>Corazón en movimiento con AESP → causa tratable: hipovolemia, taponamiento, TEP masivo, neumotórax.</li></ul>',true)+
+      S('〰️','Fibrilación ventricular','<p>Movimiento caótico del miocardio sin contracción coordinada → continuar desfibrilación.</p>')+
+      S('💧','Taponamiento cardíaco','<ul>'+
+        '<li>Derrame circunferencial o posterior &gt;1 cm.</li>'+
+        '<li>Colapso diastólico de AD (signo más precoz).</li>'+
+        '<li>Colapso diastólico de VD (más específico).</li>'+
+        '<li>VCI plétora sin colapso inspiratorio.</li>'+
+        '<li>Variación respiratoria de flujos Doppler &gt;25%.</li></ul>'+
+        '<div class="callout crit">Manejo: pericardiocentesis guiada por eco (subxifoidea o apical).</div>')+
+      S('🫁','TEP con repercusión hemodinámica','<ul>'+
+        '<li>VD dilatado (VD/VI &gt;1 en apical 4C).</li>'+
+        '<li>D-sign en eje corto paraesternal.</li>'+
+        '<li>Movimiento paradójico del septum.</li>'+
+        '<li><strong>Signo de McConnell:</strong> aquinesia de pared libre del VD con ápex conservado (específico).</li>'+
+        '<li>TAPSE &lt;17 mm → disfunción del VD.</li></ul>');
+  }
+  if(id==='vascular'){
+    return S('🦵','TVP — compresión venosa','<ul>'+
+        '<li>Técnica: sonda lineal, compresión en 3 puntos (ingle, muslo medio, hueco poplíteo).</li>'+
+        '<li><strong>Normal:</strong> la vena se colapsa completamente con la compresión.</li>'+
+        '<li><strong>TVP:</strong> la vena no colapsa, luz anecoica persistente, a veces trombo hiperecogénico.</li>'+
+        '<li>Sensibilidad proximal ~95%: orienta en urgencia, no reemplaza la angioTC.</li></ul>',true)+
+      S('💉','Acceso vascular guiado','<ul>'+
+        '<li>Yugular interna: sonda lineal, vena lateral a la arteria, compresible.</li>'+
+        '<li>Femoral: vena medial a la arteria femoral.</li>'+
+        '<li>Confirmar la aguja dentro de la vena antes de dilatar.</li>'+
+        '<li>Post-procedimiento: descartar neumotórax (subclavia/yugular).</li></ul>');
+  }
+  if(id==='renal'){
+    return '<div class="callout"><strong>Indicaciones:</strong> cólico renal, IRA, sospecha de obstrucción, retención urinaria.</div>'+
+      S('💧','Hidronefrosis','<ul>'+
+        '<li><strong>Leve:</strong> separación leve del seno renal.</li>'+
+        '<li><strong>Moderada:</strong> pelvis dilatada &gt;10 mm, cálices visibles.</li>'+
+        '<li><strong>Severa:</strong> adelgazamiento cortical, pelvis &gt;20 mm.</li>'+
+        '<li>Cálculo ureteral: imagen hiperecogénica con sombra acústica en unión ureteropélvica o ureterovesical.</li></ul>',true)+
+      S('🚽','Vejiga','<ul>'+
+        '<li>Retención: vejiga distendida, globo vesical.</li>'+
+        '<li>Volumen estimado = largo × ancho × alto × 0.52; &gt;400 mL → cateterismo.</li></ul>')+
+      S('🫘','Riñón en IRA','<ul>'+
+        '<li>Tamaño aumentado + ecogenicidad cortical aumentada → IRA parenquimatosa.</li>'+
+        '<li>Hidronefrosis bilateral → obstrucción post-renal.</li></ul>');
+  }
+  if(id==='pleural'){
+    return S('🌊','Derrame pleural','<ul>'+
+        '<li>Ventana: posterolateral, por encima del diafragma.</li>'+
+        '<li>Espacio anecoico entre pulmón y pared/diafragma.</li>'+
+        '<li>Volumen: separación &gt;5 cm → &gt;500 mL.</li>'+
+        '<li>Tabicaciones/ecos internos → exudado, empiema.</li>'+
+        '<li>Guía de toracocentesis: marcar en espiración, &gt;1.5 cm de líquido.</li></ul>',true)+
+      S('🫧','Neumotórax','<ul>'+
+        '<li><strong>Normal:</strong> sliding pleural + signo de la orilla (seashore) en M-mode.</li>'+
+        '<li>Ausencia de sliding (inespecífico).</li>'+
+        '<li>Signo de la estratosfera (barcode) en M-mode.</li>'+
+        '<li><strong>Punto pulmonar:</strong> patognomónico (transición sliding/no sliding).</li>'+
+        '<li>Una sola línea B en un campo excluye neumotórax en ese punto.</li></ul>');
+  }
+  if(id==='abdominal'){
+    return S('🟡','Colelitiasis / colecistitis','<ul>'+
+        '<li>Cálculos: imagen hiperecogénica con sombra acústica posterior, móvil con la posición.</li>'+
+        '<li>Colecistitis aguda: pared &gt;3 mm, líquido pericolecístico, Murphy ecográfico, cálculo impactado en cuello.</li></ul>',true)+
+      S('🩸','Dilatación aórtica (AAA screening)','<ul>'+
+        '<li>Técnica: sonda curva, longitudinal y transversal desde xifoides hasta la bifurcación ilíaca.</li>'+
+        '<li><strong>Normal:</strong> &lt;3 cm de diámetro anteroposterior.</li>'+
+        '<li><strong>Aneurisma:</strong> ≥3 cm.</li>'+
+        '<li><strong>Urgencia quirúrgica:</strong> &gt;5 cm, crecimiento rápido o líquido periaórtico (rotura).</li>'+
+        '<li>Pitfall: el gas intestinal limita la ventana; el ayuno mejora la imagen.</li></ul>');
+  }
+  if(id==='obstetrico'){
+    return '<div class="callout"><strong>Indicación:</strong> 1ºT con dolor/sangrado, descartar embarazo ectópico.</div>'+
+      S('🍼','Embarazo intrauterino','<ul>'+
+        '<li>Saco gestacional con doble anillo decidual desde 4.5-5 semanas.</li>'+
+        '<li>Vesícula vitelina desde 5 semanas.</li>'+
+        '<li>Embrión con latido desde 6 semanas.</li>'+
+        '<li>Un SEIU prácticamente excluye ectópico (salvo heterotópico, muy raro).</li></ul>',true)+
+      S('⚠️','Sospecha de ectópico','<ul>'+
+        '<li>Útero vacío + β-hCG &gt;1500-2000 mUI/mL.</li>'+
+        '<li>Masa anexial (anillo tubárico).</li>'+
+        '<li>Líquido libre en Douglas.</li></ul>'+
+        '<div class="callout crit">→ Ginecología urgente.</div>')+
+      S('👶','Vitalidad fetal 2º/3º trimestre','<ul>'+
+        '<li>FCF normal 110-160 lpm.</li>'+
+        '<li>Movimientos fetales.</li>'+
+        '<li>Líquido amniótico (bolsillo &gt;2 cm = normal).</li></ul>');
+  }
+  if(id==='ocular'){
+    return '<div class="callout"><strong>Indicaciones:</strong> desprendimiento de retina, hipertensión endocraneana, cuerpo extraño ocular.<br><strong>Técnica:</strong> gel abundante sobre párpado cerrado, sonda lineal, mínima presión, cortes axial y sagital.</div>'+
+      S('👁️','Desprendimiento de retina','<ul>'+
+        '<li>Membrana hiperecogénica flotante en vítreo, anclada en papila y ora serrata.</li>'+
+        '<li>Móvil con el movimiento ocular.</li>'+
+        '<li>A diferencia del desprendimiento de vítreo posterior (DVP): membrana más fina, no anclada, sin urgencia.</li></ul>',true)+
+      S('🧠','Nervio óptico — presión intracraneal','<ul>'+
+        '<li>Medir la vaina del nervio óptico (VNO) a 3 mm por detrás del globo.</li>'+
+        '<li><strong>Normal:</strong> &lt;5 mm.</li>'+
+        '<li><strong>&gt;5 mm</strong> → PIC elevada (correlaciona con &gt;20 cmH₂O).</li>'+
+        '<li>Útil en TCE, sospecha de HTE, hidrocefalia. Sensibilidad ~90% para PIC &gt;20.</li></ul>')+
+      S('🔩','Cuerpo extraño intraocular','<ul>'+
+        '<li>Imagen hiperecogénica con sombra posterior.</li>'+
+        '<li>Localizar el cuadrante para el oftalmólogo.</li></ul>')+
+      '<div class="callout warn">Siempre consultar oftalmología para las decisiones terapéuticas definitivas.</div>';
+  }
+  return null;
 }
 
 /* ---- Fármacos ---- */
