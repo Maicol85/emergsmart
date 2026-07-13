@@ -131,6 +131,14 @@
   .callout{border-left:3px solid var(--teal);background:var(--teal-dim2);padding:.6rem .85rem;border-radius:0 var(--rs) var(--rs) 0;font-size:.87rem;margin:.6rem 0}
   .callout.warn{border-left-color:var(--amber);background:var(--amber-dim)}
   .callout.crit{border-left-color:var(--red);background:var(--red-dim)}
+  /* Expandable symptom / toxicology cards */
+  .block.sx .sx-head{cursor:pointer;justify-content:space-between;margin-bottom:0;user-select:none}
+  .block.sx .sx-arrow{color:var(--muted);font-size:.85rem;font-weight:400;transition:transform .15s}
+  .block.sx .sx-body{display:none;margin-top:.75rem}
+  .block.sx .sx-body.show{display:block}
+  .block.sx .sx-body>*:first-child{margin-top:0}
+  .sx-link{background:var(--surface2);border:1px solid var(--border2);color:var(--teal);border-radius:var(--rs);padding:.45rem .8rem;font-size:.83rem;font-weight:600;margin:.3rem .3rem 0 0;display:inline-block}
+  .sx-link:hover{border-color:var(--teal);background:var(--surface3)}
 
   /* Modal */
   .modal{display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.6);padding:1rem;overflow-y:auto}
@@ -265,11 +273,13 @@
 
   <nav class="main-nav" id="mainNav">
     <button class="main-tab active" data-tab="sistemas"    onclick="showMainTab('sistemas',this)">🫀 Sistemas</button>
+    <button class="main-tab"        data-tab="sintomas"    onclick="showMainTab('sintomas',this)">🔎 Síntomas</button>
     <button class="main-tab"        data-tab="herramientas" onclick="showMainTab('herramientas',this)">🧮 Herramientas</button>
     <button class="main-tab"        data-tab="pocus"       onclick="showMainTab('pocus',this)">📡 POCUS</button>
     <button class="main-tab"        data-tab="farmacos"    onclick="showMainTab('farmacos',this)">💊 Fármacos</button>
     <button class="main-tab"        data-tab="maniobras"   onclick="showMainTab('maniobras',this)">🩺 Maniobras</button>
     <button class="main-tab"        data-tab="guardia"     onclick="showMainTab('guardia',this)">📋 Guardia</button>
+    <button class="main-tab"        data-tab="toxicologia" onclick="showMainTab('toxicologia',this)">☠️ Toxicología</button>
   </nav>
 
   <main class="app-content">
@@ -278,6 +288,13 @@
     <section class="panel active" id="panel-sistemas">
       <div class="subnav" id="sysSubnav"></div>
       <div id="sysContent"></div>
+    </section>
+
+    <!-- ═════ SÍNTOMAS ═════ -->
+    <section class="panel" id="panel-sintomas">
+      <h2 class="sec">Síntomas — enfoque por presentación clínica</h2>
+      <p class="sec-desc">Buscá por lo que consulta el paciente, no por el diagnóstico. Tocá cada síntoma para desplegar enfoque inicial, diagnósticos diferenciales, banderas rojas y qué no perder.</p>
+      <div id="sintomasContent"></div>
     </section>
 
     <!-- ═════ HERRAMIENTAS ═════ -->
@@ -335,6 +352,14 @@
       <div id="guardiaHist"></div>
     </section>
 
+    <!-- ═════ TOXICOLOGÍA ═════ -->
+    <section class="panel" id="panel-toxicologia">
+      <h2 class="sec">Toxicología de emergencia</h2>
+      <p class="sec-desc">Enfoque del paciente intoxicado, toxidromos, intoxicaciones específicas, antídotos y calculadoras.</p>
+      <div class="subnav" id="toxSubnav"></div>
+      <div id="toxContent"></div>
+    </section>
+
   </main>
 
   <footer class="app-footer">EmergSmart © Dr. M. Dos Santos | EasyMed Suite</footer>
@@ -356,7 +381,7 @@ var LOGIN_KEY='emergsmart_login_expira', LOGIN_TTL=8*60*60*1000;
 var STATE_KEY='emergsmart_v1';
 var CONFIG_KEY='emergsmart_config';
 var GUARDIA_KEY='emergsmart_guardia';
-var state={tab:'sistemas',sysSub:'cardio',cardioSub:'sca',pocusSub:'fast',search:''};
+var state={tab:'sistemas',sysSub:'cardio',cardioSub:'sca',pocusSub:'fast',toxSub:'general',search:''};
 /* Config del médico */
 var medConfig={nombre:'',especialidad:'',registro:'',institucion:'',ciudad:''};
 /* Guardia: turno activo + historial de turnos archivados */
@@ -410,7 +435,9 @@ var SISTEMAS=[
   {id:'respiratorio',name:'Respiratorio', icon:'🫁', real:true},
   {id:'digestivo',   name:'Digestivo',    icon:'🩻', real:true},
   {id:'renal',       name:'Renal',        icon:'🫘', real:true},
+  {id:'urologia',    name:'Urología',     icon:'🚻', real:true},
   {id:'infeccioso',  name:'Infeccioso',   icon:'🦠', real:true},
+  {id:'alergias',    name:'Alergias',     icon:'🤧', real:true},
   {id:'cirugia',     name:'Cirugía',      icon:'🔪', real:true},
   {id:'politrauma',  name:'Politrauma',   icon:'🚑', real:true},
   {id:'trauma',      name:'Trauma',       icon:'🩹'},
@@ -853,12 +880,90 @@ var CALCS={
       var t='PBW (Devine) '+pbw+' kg. Vt protector 4–6 mL/kg PBW → '+lo+'–'+hi+' mL. Objetivos: Pmeseta <30, driving pressure <15 cmH₂O.';
       var c='blue';
       if(vt>0){ var vtkg=Math.round(vt/pbw*10)/10; t='PBW '+pbw+' kg · Vt '+vt+' mL = '+vtkg+' mL/kg PBW. '+(vtkg>8?'ALTO — reducir a 4–6 mL/kg.':vtkg>6?'Límite — ideal 4–6 mL/kg.':'En rango protector (4–6 mL/kg).')+' Rango 4–6 mL/kg: '+lo+'–'+hi+' mL.'; c=vtkg>8?'red':vtkg>6?'amber':'green'; }
-      return{score:'PBW '+pbw+' kg',interp:t,cls:c}; }}
+      return{score:'PBW '+pbw+' kg',interp:t,cls:c}; }},
+
+  adrenalina:{title:'Adrenalina — anafilaxia', icon:'💉', sub:'IM 0.01 mg/kg (máx 0.5 mg) por peso',
+    fields:[{id:'adr_peso',label:'Peso (kg)',type:'num',ph:'ej. 70'}],
+    calc:function(v){ var w=v.adr_peso||0;
+      if(!w){return{score:'—',interp:'Ingresá el peso.',cls:'amber'};}
+      var raw=0.01*w, mg=raw, capped=false; if(mg>0.5){mg=0.5;capped=true;}
+      var ml=mg; /* 1:1000 = 1 mg/mL */
+      var t='Adrenalina 1:1000 (1 mg/mL) IM en la cara ANTEROLATERAL DEL MUSLO. Volumen: '+(Math.round(ml*100)/100)+' mL. '+(capped?'⚠️ La dosis calculada ('+raw.toFixed(2)+' mg) SUPERA el máximo → se limita a 0.5 mg (0.5 mL). ':'')+'Segunda dosis: misma dosis a los 5–15 min si no hay respuesta. Paciente en decúbito con piernas elevadas.';
+      return{score:(Math.round(mg*100)/100)+' mg IM',interp:t,cls:capped?'red':'blue'}; }},
+
+  o2traslado:{title:'O₂ para traslado', icon:'🧯', sub:'Litros necesarios + cilindro recomendado',
+    fields:[
+      {id:'o2_flujo',label:'Flujo de O₂ (L/min)',type:'num',ph:'ej. 6'},
+      {id:'o2_min',label:'Duración del traslado (min)',type:'num',ph:'ej. 45'}
+    ],
+    calc:function(v){ var f=v.o2_flujo||0, m=v.o2_min||0;
+      if(!f||!m){return{score:'—',interp:'Ingresá flujo y duración.',cls:'amber'};}
+      var base=f*m, tot=Math.round(base*1.2), tubo, alerta='';
+      if(tot<=400)tubo='Cilindro D (~400 L)';
+      else if(tot<=680)tubo='Cilindro E (~680 L)';
+      else if(tot<=6900)tubo='Cilindro H/K (~6900 L)';
+      else {tubo='Ningún cilindro estándar alcanza'; alerta=' ⚠️ Requiere más de un cilindro H/K o recarga en ruta.';}
+      var t='Necesidad base: '+Math.round(base)+' L ('+f+' L/min × '+m+' min). Con margen de seguridad +20%: '+tot+' L. Cilindro recomendado: '+tubo+'.'+alerta;
+      return{score:tot+' L',interp:t,cls:alerta?'red':'blue'}; }},
+
+  carbonact:{title:'Carbón activado', icon:'⚫', sub:'Dosis 1 g/kg por peso',
+    fields:[{id:'ca_peso',label:'Peso (kg)',type:'num',ph:'ej. 70'}],
+    calc:function(v){ var w=v.ca_peso||0; if(!w){return{score:'—',interp:'Ingresá el peso.',cls:'amber'};}
+      var dosis=Math.round(w);
+      var t='Dosis: 1 g/kg = '+dosis+' g VO/SNG (rango habitual adulto 25–100 g). Máxima utilidad &lt;1 h de la ingesta. CONTRAINDICADO: vía aérea no protegida, íleo/obstrucción, cáusticos. NO adsorbe: alcoholes, litio, hierro, metales, hidrocarburos. Dosis múltiples (0.5 g/kg c/4–6 h): carbamazepina, dapsona, fenobarbital, quinina, teofilina.';
+      return{score:dosis+' g',interp:t,cls:'blue'}; }},
+
+  nac:{title:'N-acetilcisteína (21 h)', icon:'🧪', sub:'Paracetamol — protocolo IV por peso',
+    fields:[{id:'nac_peso',label:'Peso (kg)',type:'num',ph:'ej. 70'}],
+    calc:function(v){ var w=v.nac_peso||0; if(!w){return{score:'—',interp:'Ingresá el peso.',cls:'amber'};}
+      var c1=Math.round(150*w), c2=Math.round(50*w), c3=Math.round(100*w);
+      var t='Protocolo IV 21 h (diluir en SG5%): ① Carga '+c1+' mg (150 mg/kg) en 200 mL en 60 min. ② '+c2+' mg (50 mg/kg) en 500 mL en 4 h. ③ '+c3+' mg (100 mg/kg) en 1000 mL en 16 h. Total ≈ '+(c1+c2+c3)+' mg. Indicar según nomograma de Rumack-Matthew (nivel ≥4 h) o empíricamente si &gt;8 h de la ingesta o dosis tóxica. Máxima eficacia &lt;8–10 h.';
+      return{score:c1+' mg (carga)',interp:t,cls:'blue'}; }},
+
+  naloxonakg:{title:'Naloxona por peso', icon:'💉', sub:'Reversión de opioides',
+    fields:[{id:'nx_peso',label:'Peso (kg)',type:'num',ph:'ej. 70'}],
+    calc:function(v){ var w=v.nx_peso||0; if(!w){return{score:'—',interp:'Ingresá el peso.',cls:'amber'};}
+      var d=Math.round(0.01*w*100)/100, dmax=Math.round(0.1*w*100)/100;
+      var t='Por peso: 0.01 mg/kg = '+d+' mg IV/IM/IN; si no responde, 0.1 mg/kg = '+dmax+' mg. Adulto: 0.04–0.4 mg IV tituladas hasta 2 mg, repetir c/2–3 min. Vida media corta (30–90 min) &lt; la de muchos opioides → vigilar renarcotización; considerar infusión (⅔ de la dosis de respuesta por hora). Objetivo: ventilación adecuada, no despertar completo.';
+      return{score:d+' mg',interp:t,cls:'blue'}; }},
+
+  aniongap:{title:'Anión gap', icon:'⚗️', sub:'Na − (Cl + HCO₃), corrección por albúmina',
+    fields:[
+      {id:'ag_na',label:'Sodio (mEq/L)',type:'num',ph:'ej. 140'},
+      {id:'ag_cl',label:'Cloro (mEq/L)',type:'num',ph:'ej. 104'},
+      {id:'ag_hco3',label:'Bicarbonato (mEq/L)',type:'num',ph:'ej. 24'},
+      {id:'ag_alb',label:'Albúmina (g/dL) — opcional',type:'num',ph:'ej. 4'}
+    ],
+    calc:function(v){ var na=v.ag_na||0, cl=v.ag_cl||0, hco3=v.ag_hco3||0, alb=v.ag_alb||0;
+      if(!na||!cl||!hco3){return{score:'—',interp:'Ingresá Na, Cl y HCO₃.',cls:'amber'};}
+      var ag=na-(cl+hco3), agc=ag, corr='';
+      if(alb){ agc=ag+2.5*(4-alb); corr=' Corregido por albúmina: '+agc.toFixed(1)+' mEq/L.'; }
+      var t,c;
+      if(agc>12){t='AUMENTADO → acidosis metabólica con anión gap alto (MUDPILES: metanol, uremia, cetoacidosis, paraldehído, isoniazida/hierro, lactato, etilenglicol, salicilatos).';c='red';}
+      else if(agc<3){t='BAJO (hipoalbuminemia, paraproteínas, ↑Ca/Mg/Li).';c='amber';}
+      else {t='NORMAL (8–12). Con acidosis → anión gap normal/hiperclorémica (diarrea, ATR).';c='green';}
+      return{score:'AG '+ag.toFixed(1)+' mEq/L',interp:t+corr+' Fórmula: Na − (Cl + HCO₃); normal 8–12.',cls:c}; }},
+
+  osmolgap:{title:'Osmol gap', icon:'⚗️', sub:'Osm medida − calculada',
+    fields:[
+      {id:'og_med',label:'Osmolalidad medida (mOsm/kg)',type:'num',ph:'ej. 290'},
+      {id:'og_na',label:'Sodio (mEq/L)',type:'num',ph:'ej. 140'},
+      {id:'og_glu',label:'Glucosa (mg/dL)',type:'num',ph:'ej. 90'},
+      {id:'og_bun',label:'BUN (mg/dL)',type:'num',ph:'ej. 14'},
+      {id:'og_etoh',label:'Etanol (mg/dL) — opcional',type:'num',ph:'ej. 0'}
+    ],
+    calc:function(v){ var med=v.og_med||0, na=v.og_na||0, glu=v.og_glu||0, bun=v.og_bun||0, etoh=v.og_etoh||0;
+      if(!med||!na){return{score:'—',interp:'Ingresá osmolalidad medida y Na.',cls:'amber'};}
+      var calc=2*na + glu/18 + bun/2.8 + (etoh?etoh/3.7:0);
+      var gap=med-calc, t,c;
+      if(gap>10){t='ELEVADO (&gt;10) → sospechar alcoholes tóxicos: metanol, etilenglicol, isopropanol, propilenglicol. Con acidosis y anión gap alto orienta a metanol/etilenglicol.';c='red';}
+      else {t='Normal (&lt;10). No excluye ingesta precoz si el tóxico aún no se metabolizó.';c='green';}
+      return{score:'Gap '+gap.toFixed(1)+' mOsm/kg',interp:t+' Calculada = 2·Na + glucosa/18 + BUN/2.8 (+ etanol/3.7).',cls:c}; }}
 };
-var TOOLS_ORDER=['heart','wellstep','wellstvp','geneva','curb65','glasgow','nihss','sofa','qsofa','killip','alvarado','ranson','bisap','parkland','iss','rts','lrinec','apache2','stewart','sedoinf','vtpbw'];
+var TOOLS_ORDER=['heart','wellstep','wellstvp','geneva','curb65','glasgow','nihss','sofa','qsofa','killip','alvarado','ranson','bisap','parkland','iss','rts','lrinec','apache2','stewart','sedoinf','vtpbw','adrenalina','o2traslado'];
 
 /* ═══════════════ RENDER ═══════════════ */
-function buildAll(){ renderMedBadge(); buildSistemas(); buildTools(); buildPocus(); buildDrugs(); buildManiobras(); buildGuardia(); }
+function buildAll(){ renderMedBadge(); buildSistemas(); buildSintomas(); buildTools(); buildPocus(); buildDrugs(); buildManiobras(); buildGuardia(); buildToxicologia(); }
 
 /* ---- Sistemas ---- */
 function buildSistemas(){
@@ -880,6 +985,8 @@ function showSysSub(id,init){
   else if(id==='respiratorio'){ c.innerHTML=respHTML(); }
   else if(id==='digestivo'){ c.innerHTML=digestHTML(); }
   else if(id==='renal'){ c.innerHTML=renalHTML(); }
+  else if(id==='urologia'){ c.innerHTML=urologiaHTML(); }
+  else if(id==='alergias'){ c.innerHTML=alergiasHTML(); }
   else if(id==='infeccioso'){ c.innerHTML=infecHTML(); }
   else if(id==='cirugia'){ c.innerHTML=cirugiaHTML(); }
   else if(id==='politrauma'){ c.innerHTML=politraumaHTML(); wirePolitrauma(); }
@@ -888,7 +995,7 @@ function showSysSub(id,init){
 }
 
 /* ---- Cardio real ---- */
-var CARDIO_SUBS=[['sca','SCA'],['ica','IC aguda'],['arritmias','Arritmias'],['htacrisis','Crisis HTA']];
+var CARDIO_SUBS=[['sca','SCA'],['ica','IC aguda'],['shock','Shock cardiog.'],['arritmias','Arritmias'],['htacrisis','Crisis HTA'],['ecg','ECG'],['soplos','Soplos']];
 function cardioHTML(){
   var nav='<div class="subnav" id="cardioNav">'+CARDIO_SUBS.map(function(s){
     return '<button class="subtab'+(s[0]===state.cardioSub?' active':'')+'" data-cs="'+s[0]+'">'+s[1]+'</button>';
@@ -896,8 +1003,11 @@ function cardioHTML(){
   return nav+
     '<div class="subpanel'+(state.cardioSub==='sca'?' active':'')+'" data-csp="sca">'+cardioSCA()+'</div>'+
     '<div class="subpanel'+(state.cardioSub==='ica'?' active':'')+'" data-csp="ica">'+cardioICA()+'</div>'+
+    '<div class="subpanel'+(state.cardioSub==='shock'?' active':'')+'" data-csp="shock">'+cardioShock()+'</div>'+
     '<div class="subpanel'+(state.cardioSub==='arritmias'?' active':'')+'" data-csp="arritmias">'+cardioArr()+'</div>'+
-    '<div class="subpanel'+(state.cardioSub==='htacrisis'?' active':'')+'" data-csp="htacrisis">'+cardioHTA()+'</div>';
+    '<div class="subpanel'+(state.cardioSub==='htacrisis'?' active':'')+'" data-csp="htacrisis">'+cardioHTA()+'</div>'+
+    '<div class="subpanel'+(state.cardioSub==='ecg'?' active':'')+'" data-csp="ecg">'+cardioECG()+'</div>'+
+    '<div class="subpanel'+(state.cardioSub==='soplos'?' active':'')+'" data-csp="soplos">'+cardioSoplos()+'</div>';
 }
 function wireCardio(){
   Array.prototype.forEach.call(document.querySelectorAll('#cardioNav .subtab'),function(b){
@@ -912,6 +1022,23 @@ function cardioSCA(){ return ''+
   '<div class="block"><h3>❤️ Síndrome coronario agudo (SCA)</h3>'+
   '<p>Estratificación de riesgo con <strong>HEART score</strong> integrado (Historia, ECG, Edad, Factores de riesgo, Troponina).</p>'+
   '<button class="btn-calc" style="max-width:280px" onclick="openCalc(\'heart\')">🧮 Abrir HEART score</button></div>'+
+  '<div class="block"><h3>🩺 SCASEST — algoritmo 0h/1h (ESC 2023)</h3>'+
+  '<p>Troponina ultrasensible (Tn-us) seriada + estratificación <strong>GRACE/TIMI</strong>.</p><ul>'+
+  '<li><strong>Rule-out</strong>: Tn-us 0 h por debajo del límite de detección (con dolor &gt;3 h), o algoritmo 0/1 h con valor muy bajo y Δ pequeño.</li>'+
+  '<li><strong>Rule-in</strong>: Tn-us claramente elevada o Δ significativo a la 1 h.</li>'+
+  '<li><strong>Zona de observación</strong>: 3ª muestra a las 3 h + ecocardiograma.</li>'+
+  '<li><strong>Estrategia invasiva</strong>: &lt;2 h si muy alto riesgo (inestabilidad, angina refractaria, arritmia maligna, IC/shock); &lt;24 h si alto riesgo (Tn+, cambios dinámicos ST-T, GRACE &gt;140).</li></ul>'+
+  '<div class="callout warn">La troponina confirma necrosis, no su causa: integrar clínica + ECG + función renal (falsos positivos: IRA, TEP, miocarditis, sepsis).</div></div>'+
+  '<div class="block"><h3>⚡ IAMCEST — reperfusión y fibrinólisis</h3>'+
+  '<h4>Criterios ECG</h4><ul><li>Elevación del ST ≥1 mm en ≥2 derivaciones contiguas (≥2 mm en V2–V3 ♂ / ≥1.5 mm ♀), BRIHH nuevo con clínica, o equivalentes (posterior, De Winter, Sgarbossa).</li></ul>'+
+  '<h4>Fibrinolíticos (si ICP no disponible &lt;120 min)</h4><ul>'+
+  '<li><strong>Tenecteplasa (TNK) IV bolo por peso</strong>: &lt;60 kg 30 mg · 60–69 35 mg · 70–79 40 mg · 80–89 45 mg · ≥90 kg 50 mg. En ≥75 años usar <strong>media dosis</strong>.</li>'+
+  '<li><strong>Alteplasa</strong>: 15 mg bolo + 0.75 mg/kg (máx 50 mg) en 30 min + 0.5 mg/kg (máx 35 mg) en 60 min.</li>'+
+  '<li>Asociar AAS + clopidogrel + anticoagulación (enoxaparina/HNF).</li></ul>'+
+  '<h4>Contraindicaciones absolutas de fibrinólisis</h4><ul>'+
+  '<li>Hemorragia intracraneal previa (cualquier momento), ACV isquémico &lt;6 meses, neoplasia/MAV del SNC, TCE o cirugía mayor &lt;3 sem, HDA &lt;1 mes, sangrado activo, sospecha de disección aórtica, punción no compresible &lt;24 h.</li></ul>'+
+  '<h4>Reperfusión exitosa (60–90 min)</h4><ul><li>↓ ST &gt;50%, alivio del dolor, arritmias de reperfusión. Fallida → <strong>ICP de rescate</strong>.</li></ul>'+
+  '<div class="callout crit">ICP primaria preferida si &lt;120 min del dx a la guía. Fibrinólisis &lt;10 min del dx cuando la ICP no llega a tiempo.</div></div>'+
   '<div class="block"><h3>Manejo inicial</h3><ul>'+
   '<li><strong>AAS</strong> 160–325 mg VO masticable (si no contraindicado).</li>'+
   '<li><strong>Segundo antiagregante</strong> (ticagrelor/clopidogrel) según estrategia y guías.</li>'+
@@ -1056,6 +1183,29 @@ function neuroHTML(){ return ''+
 
 /* ---- Respiratorio ---- */
 function respHTML(){ return ''+
+  '<div class="block"><h3>🌬️ Oxigenoterapia — dispositivos</h3>'+
+  '<div class="table-wrap"><table style="min-width:620px"><thead><tr><th>Dispositivo</th><th>Flujo</th><th>FiO₂ aprox.</th><th>Notas</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Cánula nasal (CN)</td><td>1–6 L/min</td><td>24–44%</td><td>Cómoda; FiO₂ imprecisa (depende del patrón respiratorio).</td></tr>'+
+  '<tr><td class="drug-name">Máscara Venturi (MFL)</td><td>según válvula</td><td>24–60% controlada</td><td>FiO₂ fija y fiable; ideal en EPOC (evita hiperoxia).</td></tr>'+
+  '<tr><td class="drug-name">Máscara con reservorio (MFC)</td><td>10–15 L/min</td><td>60–90%</td><td>Alto flujo no humidificado; emergencia/preoxigenación.</td></tr>'+
+  '<tr><td class="drug-name">Cánula de alto flujo (OAF)</td><td>hasta 60 L/min</td><td>21–100%</td><td>Humidificada, PEEP leve, confort; insuf. respiratoria hipoxémica.</td></tr>'+
+  '<tr><td class="drug-name">Máscara simple (MCR)</td><td>5–10 L/min</td><td>40–60%</td><td>No usar &lt;5 L/min (reinhalación de CO₂).</td></tr>'+
+  '<tr><td class="drug-name">VNI (CPAP / BiPAP)</td><td>presión</td><td>ajustable</td><td>CPAP: EAP. BiPAP: EPOC hipercápnico. Contraind.: paro, ↓conciencia, vómitos, inestabilidad, no colaborador.</td></tr>'+
+  '<tr><td class="drug-name">VMI (invasiva)</td><td>—</td><td>21–100%</td><td>Fallo de VNI/vía aérea no protegida. Ver parámetros iniciales abajo.</td></tr>'+
+  '</tbody></table></div>'+
+  '<div class="callout warn">Objetivo general SatO₂ 94–98%; en riesgo de hipercapnia (EPOC) 88–92%.</div></div>'+
+  '<div class="block"><h3>🧯 O₂ para traslado</h3>'+
+  '<p>Calcular los litros necesarios y el cilindro adecuado según flujo y duración (margen +20%).</p>'+
+  '<button class="btn-calc" style="max-width:320px" onclick="openCalc(\'o2traslado\')">🧮 Calcular O₂ para traslado</button>'+
+  '<p style="margin-top:.6rem;font-size:.85rem;color:var(--muted)">Capacidad orientativa: cilindro D ~400 L · E ~680 L · H/K ~6900 L.</p></div>'+
+  '<div class="block"><h3>💨 Inhaladores y nebulización</h3>'+
+  '<h4>MDI (aerosol presurizado)</h4><ul><li>Agitar, espirar, sellar labios, disparar al inicio de una inspiración lenta y profunda, apnea 10 s. Esperar ~30 s entre puffs.</li></ul>'+
+  '<h4>Con cámara espaciadora</h4><ul><li>Preferible en agudos/niños/ancianos: 1 puff por vez, 4–5 respiraciones lentas por puff. Mejora el depósito pulmonar y reduce depósito orofaríngeo.</li></ul>'+
+  '<h4>Nebulización (dosis)</h4><ul>'+
+  '<li><strong>Salbutamol</strong> 2.5–5 mg; repetir/continuo en crisis.</li>'+
+  '<li><strong>Ipratropio</strong> 0.5 mg (asociar en crisis grave).</li>'+
+  '<li><strong>Budesonida</strong> nebulizada 0.5–1 mg (alternativa/laringitis).</li></ul>'+
+  '<h4>Polvo seco (DPI)</h4><ul><li>Requiere flujo inspiratorio alto y rápido (≠ MDI, que es lento). No usar cámara. Poco útil en crisis grave (flujo insuficiente).</li></ul></div>'+
   '<div class="block"><h3>🫁 Asma aguda grave</h3>'+
   '<h4>Criterios de gravedad</h4><ul>'+
   '<li><strong>Grave</strong>: no completa frases, FR &gt;25, FC &gt;110, PEF 33–50%.</li>'+
@@ -1065,8 +1215,9 @@ function respHTML(){ return ''+
   '<li>Salbutamol nebulizado 5 mg (o con cámara) repetido/continuo + ipratropio 0.5 mg.</li>'+
   '<li>Corticoide sistémico precoz (prednisona 40–50 mg VO o hidrocortisona 100 mg / metilprednisolona IV).</li>'+
   '<li>Sulfato de magnesio 2 g IV en 20 min si grave/refractaria.</li>'+
-  '<li>Valorar salbutamol IV / aminofilina en UCI.</li></ol>'+
-  '<div class="callout crit">Criterios de IOT: agotamiento, deterioro del sensorio, hipoxemia refractaria, PaCO₂ en ascenso, paro inminente.</div></div>'+
+  '<li>Valorar salbutamol IV / aminofilina en UCI.</li>'+
+  '<li>Refractaria: valorar <strong>ketamina</strong> (broncodilatador + sedante para IOT) y <strong>heliox</strong> (reduce resistencia en vía aérea). Adrenalina IM si anafilaxia asociada.</li></ol>'+
+  '<div class="callout crit">Criterios de IOT: agotamiento, deterioro del sensorio, hipoxemia refractaria, PaCO₂ que asciende/se normaliza en el asmático taquipneico, paro inminente. Ventilar con espiración prolongada (evitar auto-PEEP).</div></div>'+
   '<div class="block"><h3>🫁 EPOC exacerbado</h3><ul>'+
   '<li>Broncodilatadores (salbutamol + ipratropio), corticoide sistémico 5 días, ATB si esputo purulento + ↑disnea/volumen.</li>'+
   '<li><strong>O₂ controlado</strong>: objetivo SatO₂ 88–92% (evitar hiperoxia → hipercapnia).</li>'+
@@ -1747,6 +1898,365 @@ async function changePass(){
   PASS_HASH=await sha256(a); localStorage.setItem('emergsmart_passhash',PASS_HASH);
   res.style.borderColor='var(--green)'; msg.style.color='var(--green)'; msg.textContent='Contraseña actualizada.';
 }
+
+/* ---- Navegación entre secciones ---- */
+function irSistema(id,cardioSub){
+  if(cardioSub)state.cardioSub=cardioSub;
+  showMainTab('sistemas', document.querySelector('.main-tab[data-tab="sistemas"]'));
+  showSysSub(id);
+}
+function toggleSx(h){ var b=h.parentNode.querySelector('.sx-body'); if(b)b.classList.toggle('show'); var a=h.querySelector('.sx-arrow'); if(a)a.style.transform=b&&b.classList.contains('show')?'rotate(180deg)':''; }
+
+/* ---- Cardio: subpaneles nuevos ---- */
+function cardioShock(){ return ''+
+  '<div class="block"><h3>💔 Shock cardiogénico</h3>'+
+  '<p>Hipoperfusión tisular por fallo de bomba pese a volemia adecuada.</p>'+
+  '<h4>Definición hemodinámica</h4><ul>'+
+  '<li>PAS &lt;90 mmHg &gt;30 min (o vasopresores para mantenerla) + hipoperfusión (oliguria, frialdad, lactato &gt;2, alteración mental).</li>'+
+  '<li>Índice cardíaco &lt;2.2 L/min/m² y PCP &gt;18 mmHg.</li></ul>'+
+  '<h4>Clasificación SCAI</h4>'+
+  '<div class="table-wrap"><table style="min-width:520px"><thead><tr><th>Estadio</th><th>Descripción</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">A — At risk</td><td>En riesgo, sin signos de shock.</td></tr>'+
+  '<tr><td class="drug-name">B — Beginning</td><td>Hipotensión/taquicardia sin hipoperfusión.</td></tr>'+
+  '<tr><td class="drug-name">C — Classic</td><td>Hipoperfusión que requiere inotrópicos/vasopresores o soporte mecánico.</td></tr>'+
+  '<tr><td class="drug-name">D — Deteriorating</td><td>Empeora pese al soporte inicial.</td></tr>'+
+  '<tr><td class="drug-name">E — Extremis</td><td>Colapso circulatorio, PCR refractaria.</td></tr>'+
+  '</tbody></table></div></div>'+
+  '<div class="block"><h3>Manejo</h3><ul>'+
+  '<li><strong>Noradrenalina</strong>: vasopresor de 1ª línea (mejor perfil que la dopamina).</li>'+
+  '<li><strong>Dobutamina</strong>: inotrópico si bajo gasto con TA aceptable; asociar a NA si hipotenso.</li>'+
+  '<li><strong>Revascularización urgente</strong> (ICP) de la arteria culpable en el shock por IAM.</li>'+
+  '<li>Soporte mecánico: <strong>BCIA</strong> (uso selectivo, no rutinario en IAM), Impella/ECMO-VA en casos seleccionados.</li></ul>'+
+  '<h4>Causas mecánicas (buscar con eco)</h4><ul>'+
+  '<li>CIV posinfarto, insuficiencia mitral aguda (rotura de músculo papilar), rotura de pared libre/taponamiento, IAM de VD.</li></ul>'+
+  '<div class="callout crit">Shock cardiogénico + soplo nuevo = complicación mecánica hasta descartarla (eco urgente + cirugía).</div></div>'; }
+function cardioECG(){ return ''+
+  '<div class="block"><h3>📈 Lectura sistemática del ECG</h3><ol class="steps">'+
+  '<li><strong>Frecuencia</strong>: 300 / nº de cuadros grandes entre R-R (o 1500 / cuadros chicos).</li>'+
+  '<li><strong>Ritmo</strong>: sinusal (P antes de cada QRS, + en II) vs no sinusal; regular/irregular.</li>'+
+  '<li><strong>Eje</strong>: mirar I y aVF (ambos positivos = normal).</li>'+
+  '<li><strong>PR</strong>: 120–200 ms (bloqueos AV).</li>'+
+  '<li><strong>QRS</strong>: &lt;120 ms (ancho → bloqueo de rama, TV, hiperK⁺, preexcitación).</li>'+
+  '<li><strong>QT/QTc</strong>: Bazett QTc = QT/√RR; largo si &gt;450 ♂ / &gt;460 ♀.</li>'+
+  '<li><strong>ST-T y Q</strong>: elevación/descenso del ST, ondas T, ondas Q patológicas.</li></ol></div>'+
+  '<div class="block"><h3>🚨 Patrones de urgencia</h3>'+
+  '<div class="table-wrap"><table style="min-width:620px"><thead><tr><th>Patrón</th><th>Descripción / criterio</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">IAMCEST anterior</td><td>Elevación ST V1–V4 (DA). Extenso si además I-aVL-V5-V6.</td></tr>'+
+  '<tr><td class="drug-name">IAMCEST inferior</td><td>Elevación ST II, III, aVF (CD/Cx). Pedir derivadas derechas (V4R).</td></tr>'+
+  '<tr><td class="drug-name">IAM de VD</td><td>Elevación en V4R. Precarga-dependiente: NO nitratos.</td></tr>'+
+  '<tr><td class="drug-name">IAM posterior</td><td>Descenso ST V1–V3 + R alta en V1-V2; confirmar con V7–V9.</td></tr>'+
+  '<tr><td class="drug-name">BRI nuevo (Sgarbossa)</td><td>Elevación ST ≥1 mm concordante, descenso ≥1 mm V1–V3, o discordancia excesiva (≥25%, Smith).</td></tr>'+
+  '<tr><td class="drug-name">Wellens</td><td>T bifásicas (tipo A) o profundamente invertidas (tipo B) en V2–V3: estenosis crítica de DA.</td></tr>'+
+  '<tr><td class="drug-name">De Winter</td><td>Descenso ST ascendente + T picudas en precordiales: equivalente de oclusión de DA.</td></tr>'+
+  '<tr><td class="drug-name">Brugada</td><td>Tipo 1 (coved, ST↑ ≥2 mm + T neg V1–V2). Tipos 2–3 (silla de montar). Muerte súbita.</td></tr>'+
+  '<tr><td class="drug-name">QT largo</td><td>Riesgo de Torsade. Causas: fármacos, ↓K/Mg/Ca, congénito.</td></tr>'+
+  '<tr><td class="drug-name">Hiperpotasemia</td><td>T picudas → P aplanada / PR largo → QRS ancho → onda sinusoidal → FV.</td></tr>'+
+  '<tr><td class="drug-name">TEP</td><td>Taquicardia sinusal (lo más común), S1Q3T3, BRD nuevo, T invertidas V1–V4.</td></tr>'+
+  '<tr><td class="drug-name">Pericarditis</td><td>Elevación ST difusa cóncava + descenso del PR; sin imagen especular.</td></tr>'+
+  '<tr><td class="drug-name">Taponamiento</td><td>Bajo voltaje + alternancia eléctrica + taquicardia.</td></tr>'+
+  '</tbody></table></div>'+
+  '<div class="callout crit">Wellens, De Winter, BRI-Sgarbossa y el IAM posterior son equivalentes de IAMCEST: activar hemodinamia.</div></div>'; }
+function cardioSoplos(){ return ''+
+  '<div class="block"><h3>🔊 Soplos en emergencia</h3>'+
+  '<h4>Graduación de Levine (intensidad)</h4><ul>'+
+  '<li>I muy débil · II leve · III moderado sin frémito · IV fuerte con frémito · V muy fuerte (estetoscopio parcial) · VI audible sin estetoscopio.</li></ul>'+
+  '<h4>Funcional vs orgánico</h4>'+
+  '<div class="table-wrap"><table style="min-width:520px"><thead><tr><th></th><th>Funcional</th><th>Orgánico</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Momento</td><td>Sistólico proto-meso</td><td>Sistólico tardío / diastólico / continuo</td></tr>'+
+  '<tr><td class="drug-name">Intensidad</td><td>≤ II/VI, sin frémito</td><td>≥ III/VI, frémito</td></tr>'+
+  '<tr><td class="drug-name">Síntomas</td><td>Ausentes</td><td>Disnea, síncope, angina</td></tr>'+
+  '</tbody></table></div></div>'+
+  '<div class="block"><h3>Soplos de urgencia</h3><ul>'+
+  '<li><strong>IM aguda</strong> (rotura de cuerda/músculo papilar en SCA): soplo holosistólico apical + EAP; eco urgente.</li>'+
+  '<li><strong>CIV posinfarto</strong>: soplo holosistólico paraesternal + deterioro hemodinámico.</li>'+
+  '<li><strong>Estenosis aórtica crítica</strong>: soplo mesosistólico rudo irradiado a carótidas + síncope/angina/IC; riesgo con vasodilatadores.</li>'+
+  '<li><strong>Disección con insuf. aórtica</strong>: soplo diastólico + dolor transfixiante.</li></ul>'+
+  '<div class="callout warn">Soplo nuevo + inestabilidad o dolor torácico → ecocardiograma urgente.</div></div>'; }
+
+/* ---- Urología ---- */
+function urologiaHTML(){ return ''+
+  '<div class="block"><h3>🪨 Cólico renoureteral</h3><ul>'+
+  '<li><strong>Analgesia</strong>: AINE 1ª línea — ketorolaco 30 mg IV / diclofenaco 75 mg IM; opioide (tramadol, morfina 2–4 mg IV) si no cede o AINE contraindicado; antiemético.</li>'+
+  '<li>Terapia expulsiva con alfabloqueante (tamsulosina) en cálculos distales 5–10 mm; hidratación según tolerancia.</li>'+
+  '<li><strong>Derivación urgente / desobstrucción</strong> (catéter doble J o nefrostomía): urosepsis/obstrucción febril, IRA, riñón único o trasplantado, anuria, dolor incontrolable, cálculo &gt;10 mm.</li></ul>'+
+  '<div class="callout crit">Cálculo obstructivo + fiebre = urgencia urológica: descompresión + ATB inmediatos.</div></div>'+
+  '<div class="block"><h3>🚽 Retención aguda de orina</h3><ul>'+
+  '<li>Globo vesical doloroso e imposibilidad de orinar. Causas: HBP, fármacos (anticolinérgicos, opioides), fecaloma, posquirúrgica, neurogénica.</li>'+
+  '<li><strong>Sondaje vesical</strong> (ver Maniobras): Foley 14–16 Fr, lubricante anestésico, no forzar. Vaciamiento gradual.</li>'+
+  '<li><strong>Cistostomía suprapúbica</strong> si sondaje imposible (estenosis, próstata obstructiva), sospecha de trauma uretral (uretrorragia) o prostatitis aguda.</li></ul>'+
+  '<div class="callout warn">Vigilar poliuria posdesobstructiva y hematuria "ex vacuo" tras vaciar grandes volúmenes.</div></div>'+
+  '<div class="block"><h3>🔵 Torsión testicular</h3><ul>'+
+  '<li><strong>Ventana de oro &lt;6 h</strong> para salvar el teste. Dolor súbito intenso, teste ascendido y horizontalizado, reflejo cremastérico abolido, signo de Prehn negativo.</li>'+
+  '<li><strong>Eco-doppler</strong>: ausencia de flujo — pero NO debe retrasar la cirugía si la clínica es clara.</li>'+
+  '<li>Dx diferencial: <strong>orquiepididimitis</strong> (inicio gradual, fiebre, síntomas urinarios, Prehn positivo, cremastérico conservado).</li>'+
+  '<li><strong>Exploración quirúrgica urgente</strong> + orquidopexia bilateral; detorsión manual como puente ("abrir el libro").</li></ul>'+
+  '<div class="callout crit">Escroto agudo = torsión hasta que se demuestre lo contrario: cirugía sin demora.</div></div>'+
+  '<div class="block"><h3>🦠 Orquiepididimitis</h3><ul>'+
+  '<li><strong>&lt;35 años / sexualmente activo</strong> (ITS): ceftriaxona 500 mg IM + doxiciclina 100 mg c/12 h × 10 d.</li>'+
+  '<li><strong>&gt;35 años / enterobacterias</strong>: fluoroquinolona (ciprofloxacino/levofloxacino) o cefalosporina.</li>'+
+  '<li>Reposo, elevación escrotal, AINE y analgesia.</li></ul></div>'+
+  '<div class="block"><h3>🩸 Hematuria macroscópica</h3><ul>'+
+  '<li>Dx diferencial: litiasis, ITU, neoplasia (vejiga/riñón/próstata), traumatismo, HBP, causa glomerular (cilindros/proteinuria), anticoagulación.</li>'+
+  '<li>Estudio inicial: sedimento, función renal, coagulación, eco/TC uro; cistoscopia diferida.</li>'+
+  '<li><strong>Urgencia</strong>: retención por coágulos (sonda de triple vía + lavado vesical continuo), anemización/inestabilidad, trauma renal.</li></ul></div>'+
+  '<div class="block"><h3>🍆 Priapismo isquémico</h3><ul>'+
+  '<li>Erección dolorosa &gt;4 h, cuerpos cavernosos rígidos con glande blando (bajo flujo). <strong>Emergencia</strong> (riesgo de disfunción eréctil irreversible).</li>'+
+  '<li><strong>Manejo</strong>: aspiración de sangre cavernosa ± irrigación; <strong>fenilefrina intracavernosa</strong> 100–200 µg c/3–5 min (monitorizar TA/FC).</li>'+
+  '<li>Refractario → derivación quirúrgica (shunt). El priapismo de alto flujo (postraumático) NO es emergencia: embolización diferida.</li></ul>'+
+  '<div class="callout crit">Priapismo isquémico &gt;4 h: intervenir de inmediato; cada hora cuenta para preservar la función.</div></div>'; }
+
+/* ---- Alergias ---- */
+function alergiasHTML(){ return ''+
+  '<div class="block"><h3>🚨 Anafilaxia</h3>'+
+  '<button class="btn-calc" style="max-width:340px" onclick="openCalc(\'adrenalina\')">🧮 Calcular adrenalina IM por peso</button>'+
+  '<h4>Criterios diagnósticos (WAO 2020)</h4><ul>'+
+  '<li>Inicio agudo con afectación de piel/mucosas + compromiso respiratorio o hipotensión; <strong>o</strong></li>'+
+  '<li>Hipotensión, broncoespasmo o compromiso laríngeo tras exposición a un alérgeno probable, aunque no haya afectación cutánea.</li></ul>'+
+  '<h4>Tratamiento de 1ª línea</h4><ul>'+
+  '<li><strong>Adrenalina IM 0.01 mg/kg (máx 0.5 mg)</strong> 1:1000, cara anterolateral del muslo. Repetir c/5–15 min si no responde.</li>'+
+  '<li>Decúbito con piernas elevadas (no incorporar bruscamente: "síndrome del ventrículo vacío").</li>'+
+  '<li>O₂ alto flujo, acceso IV, cristaloides en bolo si hipotensión.</li>'+
+  '<li><strong>2ª línea</strong> (NO sustituyen a la adrenalina): antihistamínicos H1 (prurito/urticaria) y corticoides (fase tardía).</li></ul>'+
+  '<div class="callout crit">La adrenalina IM es el único tratamiento que salva la vida: no retrasarla por dar corticoides/antihistamínicos.</div></div>'+
+  '<div class="block"><h3>💔 Shock anafiláctico refractario</h3><ul>'+
+  '<li>Sin respuesta a 2–3 dosis IM → <strong>adrenalina IV en infusión</strong> 0.05–0.1 µg/kg/min titulada (monitorización).</li>'+
+  '<li><strong>Noradrenalina</strong>/vasopresina si persiste hipotenso; reposición agresiva de volumen (extravasación capilar).</li>'+
+  '<li>Betabloqueados que no responden: <strong>glucagón</strong> 1–5 mg IV.</li></ul></div>'+
+  '<div class="block"><h3>💧 Angioedema</h3>'+
+  '<h4>Hereditario (déficit de C1-inhibidor)</h4><ul>'+
+  '<li>Sin urticaria; NO responde a adrenalina/antihistamínicos/corticoides.</li>'+
+  '<li><strong>Concentrado de C1-inhibidor</strong>, <strong>icatibant</strong> (antagonista de bradicinina) o ecallantida; PFC si no hay disponibles.</li></ul>'+
+  '<h4>Por IECA</h4><ul>'+
+  '<li>Mediado por bradicinina (puede aparecer tras años). <strong>Suspender el IECA</strong> de forma definitiva; icatibant si disponible; vigilancia de vía aérea 24 h.</li></ul>'+
+  '<div class="callout warn">Angioedema con compromiso de vía aérea (lengua, laringe): priorizar la vía aérea (IOT precoz / quirúrgica).</div></div>'+
+  '<div class="block"><h3>🌡️ Urticaria aguda</h3><ul>'+
+  '<li>Antihistamínicos H1 no sedantes (cetirizina, loratadina); dosis altas si precisa.</li>'+
+  '<li>Corticoide oral corto en casos severos/refractarios. Identificar y retirar el desencadenante.</li></ul></div>'+
+  '<div class="block"><h3>📊 Reacción alérgica por grados</h3>'+
+  '<div class="table-wrap"><table style="min-width:520px"><thead><tr><th>Grado</th><th>Clínica</th><th>Manejo</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Leve</td><td>Cutánea (prurito, urticaria, eritema).</td><td>Antihistamínico H1 ± corticoide; observación.</td></tr>'+
+  '<tr><td class="drug-name">Moderada</td><td>Sistémica sin shock (angioedema, broncoespasmo leve, síntomas GI).</td><td>Adrenalina IM, antihistamínico + corticoide, broncodilatador.</td></tr>'+
+  '<tr><td class="drug-name">Grave (anafilaxia)</td><td>Hipotensión/shock, hipoxia, compromiso laríngeo.</td><td>Adrenalina IM/IV, volumen, vía aérea, monitorización.</td></tr>'+
+  '</tbody></table></div>'+
+  '<div class="callout warn">Observación ≥4–6 h (hasta 24 h en reacciones graves) por riesgo de reacción bifásica.</div></div>'; }
+
+/* ---- Síntomas (presentación clínica) ---- */
+var SINTOMAS=[
+  {ic:'💔',n:'Dolor torácico',b:''+
+    '<h4>Enfoque inicial</h4><ul><li>ECG de 12 derivaciones en &lt;10 min + monitorización, vía IV, SatO₂, TA en ambos brazos.</li><li>Diferenciar dolor coronario/isquémico de causas no coronarias; troponina seriada.</li></ul>'+
+    '<h4>Diferenciales por gravedad</h4><ul><li><span class="pill red">Letales</span> SCA, disección aórtica, TEP, neumotórax a tensión, taponamiento, rotura esofágica (Boerhaave).</li><li><span class="pill amber">Frecuentes</span> pericarditis, espasmo/reflujo esofágico, musculoesquelético, ansiedad, herpes zóster.</li></ul>'+
+    '<div class="callout crit">Banderas rojas: dolor transfixiante/migratorio (disección), síncope + hipoxia (TEP), asimetría de pulsos/TA, inestabilidad, ST elevado.</div>'+
+    '<div class="callout warn"><strong>Pensar siempre en:</strong> las 5 causas letales antes de etiquetar como "inespecífico".</div>'+
+    '<button class="sx-link" onclick="irSistema(\'cardio\',\'sca\')">→ Cardio · SCA</button>'+
+    '<button class="sx-link" onclick="irSistema(\'cardio\',\'ecg\')">→ Cardio · ECG</button>'+
+    '<button class="sx-link" onclick="irSistema(\'respiratorio\')">→ Respiratorio · TEP</button>'},
+  {ic:'🫁',n:'Disnea',b:''+
+    '<h4>Enfoque inicial</h4><ul><li>SatO₂ como guía + gasometría; O₂ para objetivo (94–98%, o 88–92% si riesgo de hipercapnia).</li><li>POCUS pulmonar/cardíaco (BLUE/FATE) para orientar rápido.</li></ul>'+
+    '<h4>Aguda vs crónica</h4><ul><li><strong>Aguda</strong>: EAP, asma/EPOC exacerbado, TEP, neumonía, neumotórax, anafilaxia, acidosis.</li><li><strong>Crónica agudizada</strong>: IC, EPOC, EPID, anemia, derrame.</li></ul>'+
+    '<div class="callout crit">Banderas rojas: SatO₂ &lt;90%, tiraje/uso de accesorios, silencio auscultatorio, hipotensión, alteración de conciencia, estridor.</div>'+
+    '<div class="callout warn"><strong>Pensar siempre en:</strong> TEP (puede tener auscultación normal) y anafilaxia.</div>'+
+    '<button class="sx-link" onclick="irSistema(\'respiratorio\')">→ Respiratorio</button>'+
+    '<button class="sx-link" onclick="irSistema(\'cardio\',\'ica\')">→ Cardio · IC aguda</button>'+
+    '<button class="sx-link" onclick="irSistema(\'alergias\')">→ Alergias · Anafilaxia</button>'},
+  {ic:'🤕',n:'Cefalea',b:''+
+    '<h4>Clasificación</h4><ul><li><strong>Primaria</strong>: migraña, tensional, en racimos.</li><li><strong>Secundaria</strong> (peligrosa): HSA, meningitis, trombosis venosa, HTIC, arteritis de la temporal, disección.</li></ul>'+
+    '<h4>Banderas rojas (SNOOP)</h4><ul><li><strong>Thunderclap</strong> (máxima en &lt;1 min) → HSA.</li><li>Fiebre + rigidez de nuca → meningitis.</li><li>Focalidad/edema de papila, inicio &gt;50 años, inmunodepresión, cáncer, embarazo/puerperio, trauma, patrón progresivo.</li></ul>'+
+    '<h4>Criterios de TC urgente</h4><ul><li>Thunderclap, focalidad, alteración de conciencia, papiledema, trauma, sospecha de HSA/meningitis (TC antes de PL).</li></ul>'+
+    '<div class="callout crit">La cefalea en trueno es HSA hasta que se demuestre lo contrario (TC &lt;6 h; si negativa, PL).</div>'+
+    '<button class="sx-link" onclick="irSistema(\'neuro\')">→ Neuro · Cefalea/HSA</button>'},
+  {ic:'🩻',n:'Dolor abdominal',b:''+
+    '<h4>Enfoque inicial</h4><ul><li>Signos vitales, abdomen (irritación peritoneal), test de embarazo en mujer fértil, ECG (IAM inferior simula epigastralgia).</li></ul>'+
+    '<h4>Diferencial por cuadrante</h4><ul><li><strong>HD</strong>: colecistitis, colangitis, úlcera. <strong>HI</strong>: rotura esplénica, pancreatitis.</li><li><strong>FID</strong>: apendicitis, ectópico/anexial. <strong>FII</strong>: diverticulitis. <strong>Difuso</strong>: peritonitis, obstrucción, isquemia mesentérica, aneurisma roto.</li></ul>'+
+    '<div class="callout crit">Banderas rojas: abdomen en tabla, inestabilidad, dolor desproporcionado (isquemia mesentérica), masa pulsátil (AAA), embarazo + shock (ectópico).</div>'+
+    '<div class="callout warn"><strong>Pensar siempre en:</strong> AAA roto, isquemia mesentérica, embarazo ectópico e IAM inferior.</div>'+
+    '<button class="sx-link" onclick="irSistema(\'cirugia\')">→ Cirugía · Abdomen agudo</button>'+
+    '<button class="sx-link" onclick="irSistema(\'digestivo\')">→ Digestivo</button>'},
+  {ic:'😵',n:'Alteración de conciencia',b:''+
+    '<h4>Enfoque inicial</h4><ul><li>ABCDE, glucemia capilar inmediata, Glasgow, pupilas, focalidad; "coma cocktail" según contexto (glucosa, tiamina, naloxona).</li></ul>'+
+    '<h4>AEIOU-TIPS</h4><ul><li><strong>A</strong>lcohol · <strong>E</strong>pilepsia/electrolitos/encefalopatía · <strong>I</strong>nsulina (gluco ↑↓) · <strong>O</strong>pioides/O₂(hipoxia) · <strong>U</strong>remia.</li><li><strong>T</strong>rauma/temperatura · <strong>I</strong>nfección · <strong>P</strong>siquiátrico/porfiria · <strong>S</strong>hock/ACV/HSA.</li></ul>'+
+    '<div class="callout crit">Banderas rojas: GCS ≤8 (proteger vía aérea/IOT), focalidad + midriasis (herniación), hipoglucemia, meningismo + fiebre.</div>'+
+    '<div class="callout warn"><strong>Pensar siempre en:</strong> hipoglucemia (tratar ya) y causas reversibles antes de asumir origen central.</div>'+
+    '<button class="sx-link" onclick="irSistema(\'neuro\')">→ Neuro</button>'+
+    '<button class="sx-link" onclick="openCalc(\'glasgow\')">🧮 Glasgow</button>'},
+  {ic:'🌡️',n:'Fiebre',b:''+
+    '<h4>Definición</h4><ul><li>Temperatura ≥38 °C; hiperpirexia &gt;41 °C. Buscar el foco (respiratorio, urinario, abdominal, SNC, piel, catéter).</li></ul>'+
+    '<h4>Diferencial por contexto</h4><ul><li><strong>Inmunodeprimido/neutropénico</strong>: emergencia — ATB de amplio espectro &lt;1 h.</li><li><strong>Viajero</strong>: malaria, dengue, fiebre tifoidea (nexo epidemiológico).</li><li><strong>Anciano/portador de dispositivos</strong>: presentación atípica, ITU, endocarditis.</li></ul>'+
+    '<div class="callout crit">Banderas rojas: hipotensión/qSOFA ≥2 (sepsis), petequias/púrpura (meningococemia), rigidez de nuca, neutropenia.</div>'+
+    '<div class="callout warn"><strong>Pensar siempre en:</strong> sepsis, neutropenia febril y meningococemia.</div>'+
+    '<button class="sx-link" onclick="irSistema(\'infeccioso\')">→ Infeccioso · Sepsis</button>'+
+    '<button class="sx-link" onclick="openCalc(\'qsofa\')">🧮 qSOFA</button>'},
+  {ic:'💫',n:'Síncope',b:''+
+    '<h4>Clasificación</h4><ul><li><strong>Reflejo/vasovagal</strong>: pródromos, gatillo (dolor, calor, bipedestación); benigno.</li><li><strong>Cardíaco</strong>: sin pródromos, esfuerzo, palpitaciones, cardiopatía → alto riesgo.</li><li><strong>Ortostático</strong>: fármacos, hipovolemia, disautonomía.</li></ul>'+
+    '<h4>Estratificación</h4><ul><li><strong>ROSE</strong> y <strong>San Francisco (SFSR — CHESS)</strong>: ICC, Hto &lt;30%, ECG anormal, disnea, PAS &lt;90.</li></ul>'+
+    '<div class="callout crit">Criterios de internación: síncope de esfuerzo o en decúbito, ECG anormal, cardiopatía estructural, palpitaciones previas, historia familiar de muerte súbita, anemia/hipotensión.</div>'+
+    '<div class="callout warn"><strong>Pensar siempre en:</strong> causa cardíaca (arritmia, EA, TEP, disección) — la más letal.</div>'+
+    '<button class="sx-link" onclick="irSistema(\'cardio\',\'arritmias\')">→ Cardio · Arritmias</button>'+
+    '<button class="sx-link" onclick="irSistema(\'cardio\',\'ecg\')">→ Cardio · ECG</button>'},
+  {ic:'💓',n:'Palpitaciones',b:''+
+    '<h4>Enfoque inicial</h4><ul><li><strong>ECG de 12 derivaciones</strong> es la primera herramienta (captar el ritmo durante el síntoma); ionograma, TSH, tóxicos.</li></ul>'+
+    '<h4>Diferencial</h4><ul><li>Taquiarritmias (FA/flutter, TSV, TV), extrasístoles, sinusal por causa secundaria (fiebre, anemia, hipertiroidismo, ansiedad, estimulantes).</li></ul>'+
+    '<div class="callout crit">Urgente si: inestabilidad (hipotensión, dolor torácico, disnea, síncope), QRS ancho (TV), preexcitación (WPW), QT largo.</div>'+
+    '<div class="callout warn"><strong>Pensar siempre en:</strong> TV en el paciente con cardiopatía y palpitaciones + síncope.</div>'+
+    '<button class="sx-link" onclick="irSistema(\'cardio\',\'arritmias\')">→ Cardio · Arritmias</button>'+
+    '<button class="sx-link" onclick="irSistema(\'cardio\',\'ecg\')">→ Cardio · ECG</button>'},
+  {ic:'🌀',n:'Vértigo',b:''+
+    '<h4>Central vs periférico — HINTS</h4><ul><li><strong>HINTS</strong> (en vértigo continuo con nistagmo): <em>Head-Impulse</em> normal, nistagmo que cambia de dirección o vertical, <em>Test of Skew</em> positivo → <span class="pill red">central</span>.</li><li>Periférico: head-impulse anormal (sacada correctora), nistagmo unidireccional horizontal, sin skew.</li></ul>'+
+    '<h4>Maniobras</h4><ul><li><strong>Dix-Hallpike</strong>: diagnóstica del VPPB (canal posterior) — nistagmo torsional con latencia y fatigable.</li><li><strong>Epley</strong>: reposición de otolitos, tratamiento del VPPB.</li></ul>'+
+    '<div class="callout crit">Banderas rojas (central): cefalea/cervicalgia, focalidad, ataxia que impide bipedestación, factores de riesgo vascular, HINTS central → imagen (RM, no TC).</div>'+
+    '<div class="callout warn"><strong>Pensar siempre en:</strong> ACV de fosa posterior (cerebelo) que simula un vértigo periférico.</div>'+
+    '<button class="sx-link" onclick="irSistema(\'neuro\')">→ Neuro</button>'},
+  {ic:'🦴',n:'Dolor lumbar',b:''+
+    '<h4>Enfoque inicial</h4><ul><li>La mayoría es lumbalgia mecánica benigna; el objetivo es descartar causas graves ("red flags").</li></ul>'+
+    '<h4>Banderas rojas</h4><ul><li><strong>Cauda equina</strong>: retención/incontinencia, anestesia en silla de montar, déficit motor bilateral → urgencia (RM + descompresión).</li><li><strong>Neoplasia/infección</strong>: dolor nocturno/progresivo, cáncer, pérdida de peso, fiebre, ADVP, inmunodepresión, corticoides.</li><li><strong>Fractura</strong>: trauma, osteoporosis, edad avanzada.</li><li><strong>Aneurisma</strong>: dolor + masa pulsátil/inestabilidad.</li></ul>'+
+    '<div class="callout crit">Sospecha de cauda equina o infección/AAA → imagen urgente; no demorar.</div>'+
+    '<div class="callout warn"><strong>Pensar siempre en:</strong> síndrome de cauda equina, espondilodiscitis/absceso epidural y AAA.</div>'+
+    '<button class="sx-link" onclick="irSistema(\'neuro\')">→ Neuro</button>'},
+  {ic:'🦵',n:'Edema de miembros inferiores',b:''+
+    '<h4>Diferencial</h4><ul><li><strong>Unilateral</strong>: TVP, celulitis, rotura de quiste de Baker, linfedema, insuf. venosa.</li><li><strong>Bilateral</strong>: IC, hepatopatía, síndrome nefrótico, fármacos (Ca-antagonistas), hipoalbuminemia.</li></ul>'+
+    '<h4>Sospecha de TVP</h4><ul><li>Edema unilateral, dolor en pantorrilla, calor, dilatación venosa. Estratificar con <strong>Wells TVP</strong> → dímero-D o eco-doppler.</li></ul>'+
+    '<div class="callout crit">TVP proximal + disnea/dolor torácico → descartar TEP. Pierna dolorosa, tensa y pálida/cianótica (flegmasia) es emergencia vascular.</div>'+
+    '<button class="sx-link" onclick="openCalc(\'wellstvp\')">🧮 Wells TVP</button>'+
+    '<button class="sx-link" onclick="irSistema(\'respiratorio\')">→ Respiratorio · TEP</button>'},
+  {ic:'🔴',n:'Rash / lesión cutánea urgente',b:''+
+    '<h4>Diferencial de urgencia</h4><ul><li><strong>Meningococemia</strong>: petequias/púrpura que no desaparecen a la digitopresión + fiebre + afectación general → ATB inmediato.</li><li><strong>Stevens-Johnson / NET</strong>: afectación mucosa, ampollas, Nikolsky +, desprendimiento; suspender fármaco causal, manejo tipo quemado.</li><li><strong>Anafilaxia</strong>: urticaria/angioedema + compromiso sistémico → adrenalina IM.</li><li><strong>Celulitis vs erisipela</strong>: erisipela (bordes netos, elevada, estreptococo) vs celulitis (bordes difusos); alarma de fascitis necrotizante.</li></ul>'+
+    '<div class="callout crit">Púrpura + fiebre = meningococemia hasta que se demuestre lo contrario: ATB sin demora. Nikolsky + / afectación mucosa → SJS/NET.</div>'+
+    '<button class="sx-link" onclick="irSistema(\'alergias\')">→ Alergias · Anafilaxia</button>'+
+    '<button class="sx-link" onclick="irSistema(\'infeccioso\')">→ Infeccioso · Celulitis/Fascitis</button>'+
+    '<button class="sx-link" onclick="openCalc(\'lrinec\')">🧮 LRINEC</button>'},
+  {ic:'🚑',n:'Trauma',b:''+
+    '<h4>Evaluación primaria ABCDE (rápida)</h4><ul>'+
+    '<li><strong>A</strong> vía aérea + control cervical (IOT si GCS ≤8).</li>'+
+    '<li><strong>B</strong> ventilación: descartar neumotórax a tensión, hemotórax masivo, tórax inestable.</li>'+
+    '<li><strong>C</strong> circulación + control de hemorragia: comprimir, 2 vías, FAST, ácido tranexámico precoz.</li>'+
+    '<li><strong>D</strong> déficit neurológico: GCS, pupilas, glucemia.</li>'+
+    '<li><strong>E</strong> exposición + prevención de hipotermia.</li></ul>'+
+    '<div class="callout crit">Tratar lo que mata primero, en orden. Neumotórax a tensión e hipovolemia se tratan sin esperar imágenes.</div>'+
+    '<button class="sx-link" onclick="irSistema(\'politrauma\')">→ Politrauma · ABCDE</button>'}
+];
+function buildSintomas(){
+  var c=document.getElementById('sintomasContent'); if(!c)return;
+  c.innerHTML=SINTOMAS.map(function(s){
+    return '<div class="block sx"><h3 class="sx-head" onclick="toggleSx(this)"><span>'+s.ic+' '+s.n+'</span><span class="sx-arrow">▾</span></h3>'+
+      '<div class="sx-body">'+s.b+'</div></div>';
+  }).join('');
+}
+
+/* ---- Toxicología ---- */
+var TOX_SUBS=[['general','⚕️ Enfoque general'],['especificas','💊 Intoxicaciones'],['antidotos','🧪 Antídotos'],['calcs','🧮 Calculadoras']];
+function buildToxicologia(){
+  var nav=document.getElementById('toxSubnav'); if(!nav)return; nav.innerHTML='';
+  TOX_SUBS.forEach(function(s){
+    var b=document.createElement('button'); b.className='subtab'+(s[0]===state.toxSub?' active':'');
+    b.textContent=s[1]; b.onclick=function(){showToxSub(s[0]);};
+    nav.appendChild(b);
+  });
+  showToxSub(state.toxSub,true);
+}
+function showToxSub(id,init){
+  state.toxSub=id; saveState();
+  Array.prototype.forEach.call(document.querySelectorAll('#toxSubnav .subtab'),function(b,i){ b.classList.toggle('active', TOX_SUBS[i][0]===id); });
+  var c=document.getElementById('toxContent'); if(!c)return;
+  if(id==='general')c.innerHTML=toxGeneral();
+  else if(id==='especificas')c.innerHTML=toxEspecificas();
+  else if(id==='antidotos')c.innerHTML=toxAntidotos();
+  else c.innerHTML=toxCalcs();
+  if(!init)resetSearch();
+}
+function toxGeneral(){ return ''+
+  '<div class="block"><h3>⚕️ Evaluación inicial del intoxicado</h3>'+
+  '<p><strong>ABCDE primero</strong>: estabilizar antes de identificar el tóxico. Anamnesis: sustancia, dosis, hora, vía, coingesta.</p><ul>'+
+  '<li><strong>A/B</strong>: proteger la vía aérea (GCS bajo), O₂; naloxona empírica si depresión respiratoria por opioides.</li>'+
+  '<li><strong>C</strong>: monitor + ECG (QRS/QT), acceso IV, glucemia; volumen/vasopresores si shock.</li>'+
+  '<li><strong>D</strong>: GCS, pupilas, "coma cocktail" según contexto (glucosa, tiamina, naloxona).</li>'+
+  '<li><strong>E</strong>: temperatura, piel, olores; descontaminación de ropa/piel.</li></ul>'+
+  '<h4>Estudios</h4><ul><li>Gasometría, anión gap y osmol gap, ECG, glucemia, función renal/hepática, niveles de paracetamol y salicilatos (cribado), test de embarazo.</li></ul></div>'+
+  '<div class="block"><h3>🧬 Toxidromos clásicos</h3>'+
+  '<div class="table-wrap"><table style="min-width:760px"><thead><tr><th>Toxidrome</th><th>Signos vitales</th><th>Pupilas</th><th>Piel</th><th>SNC</th><th>Clave / SNA</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Simpaticomimético</td><td>↑FC ↑TA ↑Tª ↑FR</td><td>Midriasis</td><td>Sudorosa</td><td>Agitación, psicosis</td><td>Cocaína, anfetaminas</td></tr>'+
+  '<tr><td class="drug-name">Colinérgico</td><td>↓FC ↓TA</td><td>Miosis</td><td>Húmeda (sudor)</td><td>Confusión, coma, fasciculaciones</td><td>SLUDGE; organofosforados</td></tr>'+
+  '<tr><td class="drug-name">Anticolinérgico</td><td>↑FC ↑Tª</td><td>Midriasis</td><td>Seca, roja, caliente</td><td>Delirio, alucinaciones</td><td>"Rojo, seco, caliente, ciego, loco"; retención</td></tr>'+
+  '<tr><td class="drug-name">Opiáceo</td><td>↓FR ↓TA ↓Tª</td><td>Miosis puntiforme</td><td>Normal</td><td>Depresión del SNC, coma</td><td>Tríada: miosis + coma + ↓FR</td></tr>'+
+  '<tr><td class="drug-name">Sedante-hipnótico</td><td>↓FR ↓TA</td><td>Variable</td><td>Normal</td><td>Sedación, coma</td><td>BZD, barbitúricos, alcohol</td></tr>'+
+  '<tr><td class="drug-name">Serotoninérgico</td><td>↑FC ↑TA ↑Tª</td><td>Midriasis</td><td>Sudorosa</td><td>Agitación</td><td>Clonus, hiperreflexia, rigidez</td></tr>'+
+  '</tbody></table></div>'+
+  '<div class="callout warn">SLUDGE (colinérgico): Salivación, Lagrimeo, Uresis, Defecación, malestar Gastrointestinal, Emesis (+ miosis, bradicardia, broncorrea).</div></div>'+
+  '<div class="block"><h3>🧹 Descontaminación</h3><ul>'+
+  '<li><strong>Carbón activado</strong> 1 g/kg (25–100 g) VO/SNG: máxima utilidad &lt;1 h. Contraindicado con vía aérea no protegida, íleo/obstrucción, cáusticos; no adsorbe alcoholes, litio, hierro, metales, hidrocarburos.</li>'+
+  '<li><strong>Lavado gástrico</strong>: solo ingesta potencialmente letal &lt;60 min con vía aérea protegida; riesgo de aspiración (uso excepcional).</li>'+
+  '<li><strong>Irrigación intestinal total</strong> (polietilenglicol): body packers, hierro/litio, fármacos de liberación prolongada.</li>'+
+  '<li>Descontaminación cutánea/ocular en tóxicos dérmicos (organofosforados) con EPP del personal.</li></ul>'+
+  '<button class="btn-calc" style="max-width:300px" onclick="openCalc(\'carbonact\')">🧮 Dosis de carbón activado</button></div>'; }
+function toxEspecificas(){
+  var items=[
+    ['🌾','Organofosforados','<ul><li>Síndrome colinérgico (SLUDGE) + miosis, broncorrea, bradicardia, fasciculaciones, debilidad.</li><li><strong>Atropina</strong> 1–3 mg IV, duplicar c/3–5 min hasta <strong>secar las secreciones bronquiales</strong> (objetivo pulmonar, no la FC ni las pupilas); puede requerir cientos de mg.</li><li><strong>Pralidoxima</strong> 30 mg/kg IV (reactivador de la colinesterasa) antes del "envejecimiento".</li><li>Descontaminación cutánea, EPP del personal, benzodiacepinas si convulsiones.</li></ul>'],
+    ['💊','Benzodiacepinas','<ul><li>Sedación, ataxia, depresión respiratoria (leve si es ingesta aislada).</li><li><strong>Flumazenil</strong> 0.2 mg IV, repetir hasta 1 mg. <strong>Contraindicado</strong> en dependencia crónica de BZD, coingesta de proconvulsivantes (tricíclicos) o epilepsia — riesgo de convulsiones/abstinencia. El soporte es la base.</li></ul>'],
+    ['💉','Opiáceos','<ul><li>Tríada: miosis, ↓conciencia, ↓FR.</li><li><strong>Naloxona</strong> 0.04–0.4 mg IV/IM/IN, repetir c/2–3 min hasta ventilación adecuada (hasta 2 mg). Infusión si recurre (metadona, opioides de vida media larga).</li></ul><button class="btn-calc" style="max-width:280px" onclick="openCalc(\'naloxonakg\')">🧮 Naloxona por peso</button>'],
+    ['🧴','Paracetamol','<ul><li>Fases: I (0–24 h asintomático/GI), II (24–72 h hepatotoxicidad), III (72–96 h fallo hepático), IV recuperación.</li><li><strong>Nomograma de Rumack-Matthew</strong>: nivel a las ≥4 h define el tratamiento.</li><li><strong>N-acetilcisteína</strong> protocolo 21 h; máxima eficacia &lt;8–10 h (iniciar empíricamente si &gt;8 h o dosis tóxica).</li></ul><button class="btn-calc" style="max-width:280px" onclick="openCalc(\'nac\')">🧮 N-acetilcisteína</button>'],
+    ['💊','Salicilatos','<ul><li>Alcalosis respiratoria + acidosis metabólica con anión gap alto; tinnitus, hipertermia, taquipnea.</li><li><strong>Alcalinización urinaria</strong>: bicarbonato IV (pH orina 7.5–8), reponer K⁺.</li><li><strong>Hemodiálisis</strong>: nivel &gt;100 mg/dL (agudo), deterioro neurológico, edema pulmonar/cerebral, IRA o refractariedad.</li></ul>'],
+    ['💊','Antidepresivos tricíclicos','<ul><li>Cardiotoxicidad (bloqueo del Na): <strong>QRS ancho &gt;100 ms</strong>, R en aVR, arritmias; efecto anticolinérgico, convulsiones, hipotensión.</li><li><strong>Bicarbonato de sodio</strong> 1–2 mEq/kg IV en bolo si QRS &gt;100 ms o arritmia/hipotensión; objetivo pH 7.45–7.55.</li><li><strong>UCI</strong> si QRS ancho, arritmia, hipotensión, convulsiones o alteración de conciencia. Evitar antiarrítmicos Ia/Ic.</li></ul>'],
+    ['❄️','Cocaína / estimulantes','<ul><li><strong>Benzodiacepinas</strong> son la base (agitación, HTA, taquicardia, convulsiones, dolor torácico).</li><li><strong>Evitar betabloqueantes</strong> (estimulación alfa sin oposición). SCA por cocaína: nitratos, BZD, fentolamina, aspirina.</li><li>Manejo de hipertermia (enfriamiento activo) y rabdomiólisis.</li></ul>'],
+    ['🍷','Alcohol etílico','<ul><li>Intoxicación aguda: depresión del SNC, hipoglucemia; soporte + glucosa (con <strong>tiamina previa</strong>).</li><li>Abstinencia: temblor, alucinaciones, convulsiones, delirium tremens → benzodiacepinas.</li><li><strong>Wernicke</strong> (confusión, ataxia, oftalmoplejía) → tiamina IV antes de la glucosa; Korsakoff (amnesia) es secuela.</li></ul>'],
+    ['💨','Monóxido de carbono','<ul><li>Cefalea, náuseas, confusión; la SatO₂ del pulsioxímetro es FALSAMENTE normal → medir <strong>COHb</strong>.</li><li><strong>O₂ 100%</strong> con máscara con reservorio (acelera la eliminación).</li><li><strong>Cámara hiperbárica</strong>: COHb &gt;25% (&gt;20% en embarazo), pérdida de conciencia, isquemia/ECG alterado, focalidad neurológica, acidosis grave.</li></ul>'],
+    ['💊','Betabloqueantes','<ul><li>Bradicardia, hipotensión, hipoglucemia, broncoespasmo.</li><li><strong>Glucagón</strong> 3–10 mg IV (bolo + infusión), <strong>insulina-glucosa hiperinsulinémica euglucémica</strong>, calcio; vasopresores, marcapasos; <strong>emulsión lipídica IV</strong> en refractario (liposolubles).</li></ul>'],
+    ['💊','Calcioantagonistas','<ul><li>Bradicardia/bloqueo (verapamilo, diltiazem), vasoplejía (dihidropiridinas), hiperglucemia.</li><li><strong>Calcio IV</strong>, <strong>insulina-glucosa a dosis altas</strong>, vasopresores (noradrenalina); glucagón; emulsión lipídica en refractario.</li></ul>'],
+    ['❤️','Digoxina','<ul><li>Náuseas, visión amarilla, arritmias (bradiarritmias, ESV, TV bidireccional), hiperK⁺ (agudo, marcador de gravedad).</li><li><strong>Anticuerpos antidigoxina (DigiFab)</strong>: arritmia grave/inestable, K⁺ &gt;5 (agudo), ingesta masiva o nivel muy alto. Evitar el calcio IV en la hiperK⁺ por digoxina.</li></ul>'],
+    ['⚗️','Metanol / etilenglicol','<ul><li>Acidosis metabólica con anión gap alto + <strong>osmol gap elevado</strong>; metanol → ceguera; etilenglicol → cristales de oxalato, IRA.</li><li><strong>Fomepizol</strong> (inhibidor de la alcohol-deshidrogenasa); etanol como alternativa. <strong>Hemodiálisis</strong> urgente si acidosis grave, nivel alto o daño de órgano.</li><li>Coadyuvantes: folato (metanol), tiamina/piridoxina (etilenglicol).</li></ul><button class="btn-calc" style="max-width:250px" onclick="openCalc(\'aniongap\')">🧮 Anión gap</button> <button class="btn-calc" style="max-width:250px" onclick="openCalc(\'osmolgap\')">🧮 Osmol gap</button>']
+  ];
+  return items.map(function(s){
+    return '<div class="block sx"><h3 class="sx-head" onclick="toggleSx(this)"><span>'+s[0]+' '+s[1]+'</span><span class="sx-arrow">▾</span></h3>'+
+      '<div class="sx-body">'+s[2]+'</div></div>';
+  }).join('');
+}
+var ANTIDOTOS=[
+  ['Paracetamol','N-acetilcisteína','150 → 50 → 100 mg/kg (protocolo IV 21 h)','Nomograma; eficaz &lt;8–10 h'],
+  ['Opioides','Naloxona','0.04–0.4 mg IV, repetir c/2–3 min (hasta 2 mg)','Vida media corta; valorar infusión'],
+  ['Benzodiacepinas','Flumazenil','0.2 mg IV, hasta 1 mg','Evitar en dependientes / proconvulsivantes'],
+  ['Organofosforados','Atropina + pralidoxima','Atropina 1–3 mg duplicando; pralidoxima 30 mg/kg','Objetivo: secar secreciones bronquiales'],
+  ['Antidepresivos tricíclicos','Bicarbonato de sodio','1–2 mEq/kg si QRS &gt;100 ms','Objetivo pH 7.45–7.55'],
+  ['Betabloqueantes','Glucagón + insulina-glucosa','Glucagón 3–10 mg IV','Emulsión lipídica si refractario'],
+  ['Calcioantagonistas','Calcio + insulina-glucosa','Calcio IV; insulina a dosis altas','Vasopresores; lípidos'],
+  ['Digoxina','Anticuerpos antidigoxina (DigiFab)','Según nivel / arritmia / K⁺','No dar calcio IV en la hiperK⁺'],
+  ['Metanol / etilenglicol','Fomepizol (o etanol)','Fomepizol 15 mg/kg carga','Hemodiálisis si grave'],
+  ['Heparina','Protamina','1 mg por cada 100 U de heparina','Riesgo de reacción anafiláctica'],
+  ['Warfarina','Vitamina K (+ CCP)','5–10 mg IV lento','CCP para reversión inmediata'],
+  ['Dabigatrán','Idarucizumab','5 g IV','ACOD anti-IIa'],
+  ['Anti-Xa (apixabán, rivaroxabán)','Andexanet alfa (o CCP)','Según protocolo','—'],
+  ['Metahemoglobinemia','Azul de metileno','1–2 mg/kg IV','Evitar en déficit de G6PD'],
+  ['Hierro','Desferoxamina','15 mg/kg/h IV','Nivel alto / sintomático'],
+  ['Cianuro','Hidroxocobalamina','5 g IV','± tiosulfato de sodio'],
+  ['Monóxido de carbono','Oxígeno 100% / hiperbárico','Máscara con reservorio','Medir COHb'],
+  ['Sulfonilureas','Octreótido (+ dextrosa)','50 µg SC c/6–8 h','Hipoglucemia recurrente'],
+  ['Isoniazida','Piridoxina (vitamina B6)','1 g por cada g ingerido','Convulsiones refractarias'],
+  ['Sulfato de magnesio (toxicidad)','Gluconato de calcio','1 g IV','Revierte la hipermagnesemia'],
+  ['Metotrexato','Ácido folínico (leucovorina)','Según nivel','± glucarpidasa'],
+  ['Anestésicos locales (LAST)','Emulsión lipídica 20%','1.5 mL/kg en bolo','Toxicidad sistémica']
+];
+function toxAntidotos(){
+  var rows=ANTIDOTOS.map(function(a){
+    return '<tr data-text="'+(a[0]+' '+a[1]).toLowerCase()+'"><td class="drug-name">'+a[0]+'</td><td>'+a[1]+'</td><td>'+a[2]+'</td><td>'+a[3]+'</td></tr>';
+  }).join('');
+  return '<div class="block"><h3>🧪 Antídotos — búsqueda rápida</h3>'+
+    '<div class="searchbox"><span class="ico">🔍</span><input id="antidotoSearch" placeholder="Buscar tóxico o antídoto…" oninput="filterAntidotos(this.value)"></div>'+
+    '<div class="table-wrap"><table style="min-width:640px"><thead><tr><th>Tóxico</th><th>Antídoto</th><th>Dosis</th><th>Observaciones</th></tr></thead><tbody id="antidotoBody">'+rows+'</tbody></table></div>'+
+    '<div class="no-results" id="antidoto-nores">Sin coincidencias.</div></div>';
+}
+function filterAntidotos(q){
+  q=(q||'').trim().toLowerCase(); var any=false;
+  Array.prototype.forEach.call(document.querySelectorAll('#antidotoBody tr'),function(tr){
+    var show=tr.getAttribute('data-text').indexOf(q)>-1; tr.style.display=show?'':'none'; if(show)any=true;
+  });
+  var n=document.getElementById('antidoto-nores'); if(n)n.style.display=any?'none':'block';
+}
+function toxCalcs(){ return ''+
+  '<div class="block"><h3>🧮 Calculadoras toxicológicas</h3>'+
+  '<p>Dosificación por peso y hiato aniónico/osmolar. Acceso rápido en 2 taps desde este tab.</p>'+
+  '<div class="grid">'+
+  '<button class="tool-card" data-text="carbon activado descontaminacion" onclick="openCalc(\'carbonact\')"><span class="tc-icon">⚫</span><span class="tc-title">Carbón activado</span><span class="tc-sub">1 g/kg por peso</span></button>'+
+  '<button class="tool-card" data-text="n-acetilcisteina nac paracetamol" onclick="openCalc(\'nac\')"><span class="tc-icon">🧪</span><span class="tc-title">N-acetilcisteína</span><span class="tc-sub">Protocolo 21 h por peso</span></button>'+
+  '<button class="tool-card" data-text="naloxona opioides" onclick="openCalc(\'naloxonakg\')"><span class="tc-icon">💉</span><span class="tc-title">Naloxona</span><span class="tc-sub">Dosis por peso</span></button>'+
+  '<button class="tool-card" data-text="anion gap acidosis" onclick="openCalc(\'aniongap\')"><span class="tc-icon">⚗️</span><span class="tc-title">Anión gap</span><span class="tc-sub">Na − (Cl + HCO₃)</span></button>'+
+  '<button class="tool-card" data-text="osmol gap alcoholes toxicos" onclick="openCalc(\'osmolgap\')"><span class="tc-icon">⚗️</span><span class="tc-title">Osmol gap</span><span class="tc-sub">Medida − calculada</span></button>'+
+  '</div></div>'; }
 
 /* ---- init ---- */
 document.addEventListener('keydown',function(e){
