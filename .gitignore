@@ -1,3 +1,9 @@
 .claude/
 .claude-flow/
 .DS_Store
+
+# SSH keys
+id_ed25519
+id_ed25519.pub
+*.pem
+*.key
