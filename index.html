@@ -487,7 +487,9 @@ var SISTEMAS=[
   {id:'trauma',      name:'Trauma',       icon:'🩹'},
   {id:'obstetricia', name:'Obstetricia',  icon:'🤰', real:true},
   {id:'gineco',      name:'Gineco',       icon:'👶'},
-  {id:'pediatria',   name:'Pediatría',    icon:'🧒', real:true}
+  {id:'pediatria',   name:'Pediatría',    icon:'🧒', real:true},
+  {id:'geriatria',   name:'Geriatría',    icon:'👴', real:true},
+  {id:'saludmental', name:'Salud Mental', icon:'💭', real:true}
 ];
 
 var POCUS=[
@@ -1201,6 +1203,8 @@ function showSysSub(id,init){
   else if(id==='cirugia'){ c.innerHTML=cirugiaHTML(); }
   else if(id==='politrauma'){ c.innerHTML=politraumaHTML(); wirePolitrauma(); }
   else if(id==='pediatria'){ c.innerHTML=pediatriaHTML(); calcWestley(); }
+  else if(id==='geriatria'){ c.innerHTML=geriatriaHTML(); }
+  else if(id==='saludmental'){ c.innerHTML=saludMentalHTML(); }
   else{ c.innerHTML='<div class="card placeholder-card"><div class="ph-icon">'+s.icon+'</div><h3>'+s.name+'</h3><p>Contenido en desarrollo</p></div>'; }
   if(!init) resetSearch();
 }
@@ -1309,6 +1313,151 @@ function pediatriaHTML(){
     pediSx('💧','5 · Deshidratación',s5)+
     pediSx('💉','6 · Dosis pediátricas de emergencia',s6)+
     pediSx('❤️','7 · RCP pediátrico',s7);
+}
+
+/* ═══════════════ v1.7 · Sistema Geriatría ═══════════════ */
+var BEERS=[
+  ['Benzodiacepinas (todas)','Caídas, delirio, dependencia','Melatonina o trazodona si insomnio'],
+  ['Antihistamínicos 1ª gen (difenhidramina, clorfeniramina)','Delirio anticolinérgico','Loratadina, cetirizina'],
+  ['AINEs &gt;5 días','HDA, IRA, HTA','Paracetamol'],
+  ['Antiespasmódicos (hioscina)','Retención urinaria, delirio','Reevaluar necesidad'],
+  ['Antipsicóticos típicos (haloperidol)','Exceso de sedación, caídas','Solo si agitación grave sin alternativa'],
+  ['Glibenclamida','Hipoglucemia prolongada','Glipizida; metformina si TFG &gt;30'],
+  ['Digoxina &gt;0.125 mg/día','Toxicidad aumentada','Dosis ≤0.125 mg/día + niveles'],
+  ['Amiodarona en FA','Tirotoxicosis, neuropatía','Betabloqueante o cardioversión'],
+  ['Metoclopramida','Parkinsonismo','Domperidona con precaución'],
+  ['Nitrofurantoína si TFG &lt;30','Ineficaz + toxicidad pulmonar','Fosfomicina u otra según cultivo']
+];
+function geriatriaHTML(){
+  var s1=''+
+    '<ul>'+
+    '<li><strong>↓ Función renal:</strong> ajustar dosis por aclaramiento (Cockcroft-Gault).</li>'+
+    '<li><strong>↓ Albúmina:</strong> mayor fracción libre de fármacos.</li>'+
+    '<li><strong>↓ Agua corporal:</strong> mayor concentración de fármacos hidrosolubles.</li>'+
+    '<li><strong>↑ Sensibilidad del SNC</strong> a benzodiacepinas y opioides.</li></ul>'+
+    '<div class="callout"><strong>Regla práctica:</strong> "start low, go slow" — dosis baja inicial y titulación lenta.</div>'+
+    '<h4>Monitoreo estrecho de niveles</h4><ul>'+
+    '<li>Digoxina, warfarina, aminoglucósidos, litio, fenitoína y vancomicina.</li></ul>';
+  var beersRows=BEERS.map(function(b){ return '<tr><td><span class="drug-name">'+b[0]+'</span></td><td>'+b[1]+'</td><td>'+b[2]+'</td></tr>'; }).join('');
+  var s2=''+
+    '<p>Fármacos a evitar (o usar con cautela) en &gt;65 años y su alternativa preferida.</p>'+
+    '<div class="table-wrap"><table style="min-width:640px"><thead><tr><th>Fármaco</th><th>Riesgo</th><th>Alternativa preferida</th></tr></thead><tbody>'+beersRows+'</tbody></table></div>';
+  var s3=''+
+    '<h4>Diagnóstico</h4><p>Inicio agudo + curso fluctuante + inatención + (pensamiento desorganizado o alteración del nivel de conciencia).</p>'+
+    '<div class="callout"><strong>CAM (Confusion Assessment Method):</strong> requiere criterios 1 + 2 + (3 o 4).</div>'+
+    '<h4>Causas frecuentes — "PINCH ME"</h4><ul>'+
+    '<li><strong>P</strong>ain · <strong>I</strong>nfection · <strong>N</strong>utrition · <strong>C</strong>onstipation · <strong>H</strong>ydration · <strong>M</strong>edication · <strong>E</strong>nvironment.</li></ul>'+
+    '<h4>Manejo NO farmacológico (1ª línea)</h4><ul>'+
+    '<li>Reorientación continua; reloj y calendario visibles.</li>'+
+    '<li>Movilización precoz y fisioterapia.</li>'+
+    '<li>Evitar la restricción física.</li>'+
+    '<li>Corregir déficits sensoriales (audífonos, lentes).</li>'+
+    '<li>Preservar el ciclo sueño-vigilia.</li></ul>'+
+    '<h4>Manejo farmacológico (solo si hay riesgo para sí mismo/otros)</h4><ul>'+
+    '<li>Haloperidol 0.5-1 mg VO/IM (mínima dosis eficaz).</li></ul>'+
+    '<div class="callout warn">Evitar benzodiacepinas (empeoran el delirio), salvo abstinencia alcohólica o epilepsia.</div>';
+  var s4=''+
+    '<h4>Evaluación del riesgo</h4><ul>'+
+    '<li>Test <strong>"Timed Up and Go"</strong> &gt;12 s = alto riesgo de caídas.</li>'+
+    '<li>Factores modificables: polifarmacia, hipotensión ortostática, déficit visual, calzado inadecuado, alfombras/pisos resbaladizos.</li></ul>'+
+    '<h4>Fractura de cadera</h4><ul>'+
+    '<li>Confirmar con RX; si es negativa y hay alta sospecha → <strong>RMN</strong>.</li>'+
+    '<li>Dolor: paracetamol IV + considerar <strong>bloqueo del nervio femoral</strong> (evitar AINEs y morfina en lo posible).</li>'+
+    '<li>Cirugía preferentemente en &lt;48 h (reduce mortalidad).</li>'+
+    '<li>Tromboprofilaxis desde el ingreso.</li></ul>'+
+    '<div class="callout warn">Delirio postoperatorio hasta en el 50%: prevención activa.</div>';
+  var s5=''+
+    '<h4>Definición</h4><p>Uso simultáneo de <strong>≥5 medicamentos</strong>.</p>'+
+    '<div class="callout"><strong>STOPP</strong> (fármacos a suspender) y <strong>START</strong> (fármacos a iniciar si faltan).</div>'+
+    '<h4>Revisión sistemática en urgencia</h4><ol class="steps">'+
+    '<li>Listar TODOS los fármacos (incluir OTC y suplementos).</li>'+
+    '<li>Identificar duplicidades, interacciones graves (ver <strong>Fármacos → Interacciones</strong>) y fármacos Beers.</li>'+
+    '<li>Confirmar la indicación actual de cada fármaco.</li>'+
+    '<li>Considerar deprescripción junto al médico de cabecera al alta.</li></ol>'+
+    '<h4>Frecuentemente deprescribibles</h4><ul>'+
+    '<li>Estatinas en &gt;80 años sin ECV establecida.</li>'+
+    '<li>IBP sin indicación formal.</li>'+
+    '<li>Calcio/vitamina D sin osteoporosis confirmada.</li>'+
+    '<li>Antihipertensivos múltiples si la PA está bien controlada.</li></ul>';
+  return pediSx('💊','1 · Particularidades farmacológicas del mayor',s1,true)+
+    pediSx('🚫','2 · Criterios de Beers',s2)+
+    pediSx('🌀','3 · Síndrome confusional agudo (delirio)',s3)+
+    pediSx('🦴','4 · Caídas y fractura de cadera',s4)+
+    pediSx('📋','5 · Polifarmacia',s5);
+}
+
+/* ═══════════════ v1.7 · Sistema Salud Mental ═══════════════ */
+function saludMentalHTML(){
+  var s1=''+
+    '<p>Síntomas compartidos: dolor/opresión torácica, disnea, palpitaciones, diaforesis y sensación de muerte inminente.</p>'+
+    '<div class="callout crit"><strong>Regla:</strong> SIEMPRE descartar SCA primero con ECG y troponinas.</div>'+
+    '<h4>A favor de crisis de pánico</h4><ul>'+
+    '<li>&lt;45 años, sin factores de riesgo cardiovascular.</li>'+
+    '<li>Inicio súbito con desencadenante psicológico.</li>'+
+    '<li>Parestesias periorales, despersonalización, ECG normal.</li></ul>'+
+    '<h4>A favor de SCA</h4><ul>'+
+    '<li>&gt;45 años, FRCV presentes, irradiación típica.</li>'+
+    '<li>Diaforesis fría, cambios en el ECG, troponinas positivas.</li></ul>'+
+    '<h4>Manejo de la crisis de pánico confirmada</h4><ul>'+
+    '<li>Técnica respiratoria: inspirar 4 s, apnea 4 s, espirar 6 s. <strong>No usar bolsa</strong> (hipercapnia peligrosa).</li>'+
+    '<li>Lorazepam 1 mg SL o alprazolam 0.25-0.5 mg VO si es necesario.</li>'+
+    '<li>Derivar a salud mental; no dar el alta sin plan de seguimiento.</li></ul>';
+  var s2=''+
+    '<div class="callout crit"><strong>Descartar causa orgánica SIEMPRE:</strong> hipoglucemia, hipoxia, intoxicación, TCE, ACV, encefalopatía, retención urinaria, fecaloma.</div>'+
+    '<h4>Abordaje NO farmacológico (siempre primero)</h4><ul>'+
+    '<li>Ambiente tranquilo, voz calmada y tono bajo.</li>'+
+    '<li>No confrontar ni invadir el espacio personal.</li>'+
+    '<li>Ofrecer una salida verbal ("¿qué le está pasando?").</li>'+
+    '<li>Seguridad visible pero no amenazante.</li></ul>'+
+    '<h4>Abordaje farmacológico — escalón</h4><ul>'+
+    '<li><strong>Leve:</strong> lorazepam 1-2 mg VO/IM O haloperidol 2.5-5 mg IM.</li>'+
+    '<li><strong>Moderado:</strong> haloperidol 5 mg IM + lorazepam 2 mg IM.</li>'+
+    '<li><strong>Grave/refractario:</strong> midazolam 5 mg IM (inicio rápido) o ketamina 4 mg/kg IM (disociativa, preserva vía aérea).</li>'+
+    '<li>Monitorizar FC, PA, SatO₂ y nivel de conciencia.</li></ul>'+
+    '<div class="callout warn">Evitar haloperidol en: QT largo, Parkinson e intoxicación por anticolinérgicos.</div>';
+  var s3=''+
+    '<div class="callout"><strong>Preguntar directamente NO aumenta el riesgo.</strong></div>'+
+    '<h4>Evaluación del riesgo</h4><ul>'+
+    '<li>¿Ha tenido pensamientos de hacerse daño o quitarse la vida?</li>'+
+    '<li>¿Tiene un plan concreto? ¿Acceso a los medios?</li>'+
+    '<li>¿Ha intentado antes? ¿Cuándo fue el último intento?</li></ul>'+
+    '<h4>Escala Columbia (C-SSRS) simplificada</h4><ul>'+
+    '<li><strong>Ideación pasiva</strong> (desear estar muerto): riesgo BAJO.</li>'+
+    '<li><strong>Ideación activa sin plan:</strong> MODERADO.</li>'+
+    '<li><strong>Ideación activa con plan:</strong> ALTO.</li>'+
+    '<li><strong>Con acceso a medios o intento reciente:</strong> URGENTE.</li></ul>'+
+    '<h4>Criterios de internación psiquiátrica</h4><ul>'+
+    '<li>Intento reciente (&lt;24-48 h).</li>'+
+    '<li>Plan concreto con acceso a medios letales.</li>'+
+    '<li>Agitación intensa o síntomas psicóticos activos.</li>'+
+    '<li>Sin red de contención social.</li>'+
+    '<li>Patología dual grave (psiquiátrica + sustancias).</li></ul>'+
+    '<h4>Manejo en urgencia</h4><ul>'+
+    '<li>No dejar solo al paciente; retirar objetos peligrosos.</li>'+
+    '<li>Contención farmacológica si está agitado (ver Agitación).</li>'+
+    '<li>Interconsulta psiquiátrica urgente; si no hay psiquiatra, internar hasta evaluación.</li></ul>';
+  var s4=''+
+    '<h4>🍷 Alcohol</h4><ul>'+
+    '<li><strong>Leve (0.5-1.5 g/L):</strong> desinhibición, ataxia leve → observación.</li>'+
+    '<li><strong>Moderada (1.5-3 g/L):</strong> disartria, ataxia, somnolencia → decúbito lateral, monitoreo.</li>'+
+    '<li><strong>Grave (&gt;3 g/L):</strong> coma, depresión respiratoria → vía aérea, glucosa IV y <strong>tiamina 100 mg IV ANTES de la glucosa</strong>.</li>'+
+    '<li><strong>Abstinencia</strong> (6-24 h del cese): temblor, sudoración, alucinaciones, convulsiones → diazepam 10-20 mg VO/IV titulado.</li></ul>'+
+    '<h4>💥 Cocaína / estimulantes</h4><ul>'+
+    '<li>Agitación + HTA + taquicardia + midriasis.</li>'+
+    '<li>Manejo con benzodiacepinas. <strong>No betabloqueantes puros</strong> (vasoespasmo coronario).</li>'+
+    '<li>Complicaciones: SCA, ACV, convulsiones, hipertermia.</li></ul>'+
+    '<h4>💤 Opioides</h4><ul>'+
+    '<li>Miosis puntiforme + bradipnea + conciencia reducida.</li>'+
+    '<li>Naloxona 0.4 mg IV/IM, repetir c/2-3 min hasta FR &gt;12. Infusión si vida media larga (metadona): 2/3 de la dosis efectiva por hora.</li></ul>'+
+    '<h4>😴 Benzodiacepinas</h4><ul>'+
+    '<li>Somnolencia, ataxia, depresión respiratoria leve.</li>'+
+    '<li>Flumazenil 0.2 mg IV — <strong>cautela</strong> (convulsiones en dependientes crónicos).</li></ul>'+
+    '<h4>🌿 Cannabis</h4><ul>'+
+    '<li>Ansiedad, taquicardia, alucinaciones ocasionales → ambiente tranquilo; lorazepam 1-2 mg si muy sintomático.</li></ul>';
+  return pediSx('😰','1 · Crisis de pánico — DX diferencial con SCA',s1,true)+
+    pediSx('🌪️','2 · Agitación psicomotriz',s2)+
+    pediSx('🆘','3 · Ideación suicida',s3)+
+    pediSx('🍷','4 · Intoxicación por alcohol y drogas',s4);
 }
 
 /* ---- Cardio real ---- */
