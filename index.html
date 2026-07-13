@@ -16,27 +16,27 @@
     --border:#334155; --border2:#3f4d63;
     --teal:#14b8a6; --teal-dim:rgba(20,184,166,.14); --teal-dim2:rgba(20,184,166,.07);
     --text:#e2e8f0; --muted:#94a3b8; --muted2:#64748b;
-    --red:#f43f5e; --red-dim:rgba(244,63,94,.14);
+    --red:#f87171; --red-dim:rgba(248,113,113,.14);
     --amber:#f59e0b; --amber-dim:rgba(245,158,11,.14);
     --green:#22c55e; --green-dim:rgba(34,197,94,.14);
     --blue:#3b82f6; --blue-dim:rgba(59,130,246,.14);
     --orange:#f97316; --orange-dim:rgba(249,115,22,.14);
     --purple:#a855f7; --purple-dim:rgba(168,85,247,.14);
-    --shadow:0 4px 14px rgba(0,0,0,.35);
+    --shadow:0 1px 3px rgba(0,0,0,.3);
     --font:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
-    --r:12px; --rs:8px;
+    --r:8px; --rs:8px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
   /* ═══ v1.5 · Tema claro (override de variables) ═══ */
   body.light{
     --bg:#eef2f7; --surface:#ffffff; --surface2:#f1f5f9; --surface3:#e2e8f0;
     --border:#e2e8f0; --border2:#cbd5e1;
     --text:#0f172a; --muted:#475569; --muted2:#64748b;
     --teal-dim:rgba(20,184,166,.14); --teal-dim2:rgba(20,184,166,.07);
-    --red-dim:rgba(244,63,94,.10); --amber-dim:rgba(245,158,11,.13); --green-dim:rgba(34,197,94,.13);
+    --red-dim:rgba(248,113,113,.12); --amber-dim:rgba(245,158,11,.13); --green-dim:rgba(34,197,94,.13);
     --blue-dim:rgba(59,130,246,.10); --orange-dim:rgba(249,115,22,.13); --purple-dim:rgba(168,85,247,.12);
-    --shadow:0 2px 10px rgba(15,23,42,.08);
+    --shadow:0 1px 3px rgba(15,23,42,.12);
   }
   /* ═══ v1.5 · Fármacos: badges y leyendas ═══ */
   .cell-sub{color:var(--muted2);font-size:.72rem;margin-top:.15rem}
@@ -120,6 +120,12 @@
   @media(max-width:640px){.med-badge{display:none!important}}
   .icon-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:var(--rs);width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;transition:border-color .15s,background .15s}
   .icon-btn:hover{border-color:var(--teal);background:var(--surface3)}
+  /* Botones del header con etiqueta (icono + texto) */
+  .hdr-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:var(--rs);min-width:48px;padding:4px 7px;font-size:18px;line-height:1;transition:border-color .15s,background .15s}
+  .hdr-btn:hover{border-color:var(--teal);background:var(--surface3)}
+  .hdr-btn .ib-label{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.01em}
+  .hdr-btn:hover .ib-label{color:var(--text)}
+  @media(max-width:480px){ .hdr-btn .ib-label{display:none} .hdr-btn{min-width:36px;padding:6px 5px} .app-header{padding:0 .6rem} .header-actions{gap:.25rem} }
 
   /* Global search bar */
   #searchBar{display:none;background:var(--surface2);border-bottom:1px solid var(--border);padding:.6rem 1.1rem;position:sticky;top:56px;z-index:99}
@@ -132,9 +138,9 @@
   /* Main tabs */
   .main-nav{position:sticky;top:56px;z-index:98;display:flex;gap:0;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;padding:0 .4rem}
   .main-nav.pushed{top:calc(56px + 53px)}
-  .main-tab{flex:0 0 auto;background:none;border:none;border-bottom:2.5px solid transparent;color:var(--muted);font-size:.9rem;font-weight:600;padding:.85rem 1rem;display:flex;align-items:center;gap:.4rem;white-space:nowrap;transition:color .15s}
-  .main-tab:hover{color:var(--text)}
-  .main-tab.active{color:var(--teal);border-bottom-color:var(--teal)}
+  .main-tab{flex:0 0 auto;background:none;border:none;border-bottom:2.5px solid transparent;color:var(--muted);font-size:.88rem;font-weight:600;padding:.7rem 1rem;margin:.25rem .1rem 0;display:flex;align-items:center;gap:.4rem;white-space:nowrap;border-radius:var(--rs) var(--rs) 0 0;transition:color .15s,background .15s}
+  .main-tab:hover{color:var(--text);border-bottom-color:var(--teal)}
+  .main-tab.active{background:var(--teal);color:#fff;border-bottom-color:var(--teal)}
 
   .app-content{flex:1;max-width:1100px;width:100%;margin:0 auto;padding:1.2rem 1.1rem 3rem}
   .panel{display:none}
@@ -143,35 +149,36 @@
 
   /* Sub tabs */
   .subnav{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.3rem}
-  .subtab{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);border-radius:999px;padding:.42rem .95rem;font-size:.85rem;font-weight:600;transition:all .15s}
+  .subtab{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);border-radius:999px;padding:.4rem .9rem;font-size:.8rem;font-weight:600;transition:all .15s}
   .subtab:hover{color:var(--text);border-color:var(--teal)}
-  .subtab.active{background:var(--teal-dim);color:var(--teal);border-color:var(--teal)}
+  .subtab.active{background:var(--teal);color:#fff;border-color:var(--teal)}
   .subpanel{display:none}
   .subpanel.active{display:block}
 
-  h2.sec{font-size:1.35rem;font-weight:800;margin-bottom:.2rem;letter-spacing:-.3px}
+  h2.sec{font-size:1rem;font-weight:600;margin-bottom:.2rem;letter-spacing:0}
   .sec-desc{color:var(--muted);font-size:.9rem;margin-bottom:1.2rem}
 
   /* Cards / grids */
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem 1.15rem;box-shadow:var(--shadow)}
+  .card{background:var(--surface);border:1px solid rgba(20,184,166,.14);border-radius:var(--r);padding:.85rem .9rem;box-shadow:var(--shadow)}
   .placeholder-card{text-align:center;padding:2.8rem 1.2rem;color:var(--muted)}
-  .placeholder-card .ph-icon{font-size:3rem;line-height:1;margin-bottom:.6rem}
-  .placeholder-card h3{font-size:1.25rem;color:var(--text);margin-bottom:.35rem}
+  .placeholder-card .ph-icon{font-size:1.25rem;line-height:1;margin-bottom:.6rem}
+  .placeholder-card h3{font-size:1rem;font-weight:600;color:var(--text);margin-bottom:.35rem}
   .placeholder-card p{font-size:.9rem}
 
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.85rem}
-  .tool-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.05rem;box-shadow:var(--shadow);text-align:left;transition:border-color .15s,transform .12s;display:flex;flex-direction:column;gap:.35rem}
+  .tool-card{background:var(--surface);border:1px solid rgba(20,184,166,.14);border-radius:var(--r);padding:.85rem;box-shadow:var(--shadow);text-align:left;transition:border-color .15s,transform .12s;display:flex;flex-direction:column;gap:.3rem}
   .tool-card:hover{border-color:var(--teal);transform:translateY(-2px)}
-  .tool-card .tc-icon{font-size:1.7rem;line-height:1}
-  .tool-card .tc-title{font-weight:700;font-size:1rem}
-  .tool-card .tc-sub{color:var(--muted);font-size:.82rem}
+  .tool-card .tc-icon{font-size:1.25rem;line-height:1}
+  .tool-card .tc-title{font-weight:600;font-size:.9rem}
+  .tool-card .tc-sub{color:var(--muted);font-size:.8rem}
 
   /* Tables */
   .table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r)}
   table{width:100%;border-collapse:collapse;font-size:.86rem;min-width:640px}
-  thead th{background:var(--surface2);text-align:left;padding:.7rem .8rem;font-weight:700;color:var(--teal);position:sticky;top:0;border-bottom:1px solid var(--border)}
-  tbody td{padding:.65rem .8rem;border-bottom:1px solid var(--border);vertical-align:top}
-  tbody tr:hover{background:var(--surface2)}
+  thead th{background:var(--surface2);text-align:left;padding:.55rem .8rem;font-weight:600;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;border-bottom:1px solid var(--border)}
+  tbody td{padding:.6rem .8rem;border-bottom:1px solid var(--border);vertical-align:top}
+  tbody tr:nth-child(even){background:rgba(148,163,184,.05)}
+  tbody tr:hover{background:var(--teal-dim2)}
   tbody tr:last-child td{border-bottom:none}
   td .drug-name{font-weight:700;color:var(--text)}
 
@@ -181,9 +188,9 @@
   .no-results{display:none;text-align:center;color:var(--muted);padding:1.5rem;font-size:.9rem}
 
   /* Clinical content blocks (Cardio) */
-  .block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem 1.2rem;box-shadow:var(--shadow);margin-bottom:1rem}
-  .block h3{font-size:1.05rem;font-weight:700;color:var(--teal);margin-bottom:.55rem;display:flex;align-items:center;gap:.4rem}
-  .block h4{font-size:.92rem;font-weight:700;margin:.8rem 0 .4rem}
+  .block{background:var(--surface);border:1px solid rgba(20,184,166,.14);border-radius:var(--r);padding:.9rem 1rem;box-shadow:var(--shadow);margin-bottom:1rem}
+  .block h3{font-size:.95rem;font-weight:600;color:var(--teal);margin-bottom:.55rem;display:flex;align-items:center;gap:.4rem}
+  .block h4{font-size:.9rem;font-weight:600;margin:.8rem 0 .4rem}
   .block p{font-size:.9rem;margin-bottom:.5rem}
   .block ul{margin:.3rem 0 .6rem 1.1rem;font-size:.9rem}
   .block li{margin-bottom:.28rem}
@@ -221,7 +228,7 @@
   .btn-calc:hover{filter:brightness(1.08)}
   .calc-res{display:none;margin-top:1rem;border-radius:var(--rs);padding:.9rem 1rem;border:1px solid var(--border2)}
   .calc-res.show{display:block}
-  .calc-res .score{font-size:1.5rem;font-weight:800}
+  .calc-res .score{font-size:1.25rem;font-weight:800}
   .calc-res .interp{font-size:.9rem;margin-top:.3rem}
 
   .steps{counter-reset:st;list-style:none;margin:.4rem 0}
@@ -335,14 +342,14 @@
     <div class="header-actions">
       <span id="medBadge" class="med-badge" title="Médico configurado"></span>
       <button id="installBtn" class="icon-btn" style="display:none;width:auto;padding:0 .7rem;gap:.35rem;background:var(--teal);color:#04211d;border-color:var(--teal);font-weight:700;font-size:.82rem" onclick="pwaInstall()" title="Instalar EmergSmart">📲 Instalar</button>
-      <button class="icon-btn" onclick="toggleSearch()" title="Buscar (Ctrl+F)">🔍</button>
-      <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Tema claro/oscuro">🌙</button>
-      <button class="icon-btn" onclick="openFavoritos()" title="Favoritos">⭐</button>
-      <button class="icon-btn" onclick="exportTabPDF()" title="Exportar PDF de esta pestaña">📄</button>
-      <button class="icon-btn" onclick="openConfig()" title="Configuración">⚙️</button>
-      <button class="icon-btn" onclick="exportData()" title="Exportar datos (JSON)">⬇️</button>
-      <button class="icon-btn" onclick="document.getElementById('importFile').click()" title="Importar datos (JSON)">⬆️</button>
-      <button class="icon-btn" onclick="logoutApp()" title="Cerrar sesión">🚪</button>
+      <button class="hdr-btn" onclick="toggleSearch()" title="Buscar (Ctrl+F)">🔍<span class="ib-label">Buscar</span></button>
+      <button class="hdr-btn" id="themeBtn" onclick="toggleTheme()" title="Tema claro/oscuro"><span class="ib-ico" id="themeIco">🌙</span><span class="ib-label">Tema</span></button>
+      <button class="hdr-btn" onclick="openFavoritos()" title="Favoritos">⭐<span class="ib-label">Favoritos</span></button>
+      <button class="hdr-btn" onclick="exportTabPDF()" title="Exportar PDF de esta pestaña">📄<span class="ib-label">PDF</span></button>
+      <button class="hdr-btn" onclick="openConfig()" title="Configuración">⚙️<span class="ib-label">Config</span></button>
+      <button class="hdr-btn" onclick="exportData()" title="Exportar datos (JSON)">⬇️<span class="ib-label">Exportar</span></button>
+      <button class="hdr-btn" onclick="document.getElementById('importFile').click()" title="Importar datos (JSON)">⬆️<span class="ib-label">Importar</span></button>
+      <button class="hdr-btn" onclick="logoutApp()" title="Cerrar sesión">🚪<span class="ib-label">Salir</span></button>
     </div>
   </header>
   <input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(this)">
@@ -3617,7 +3624,7 @@ var THEME_KEY='emergsmart_theme';
 function applyTheme(t){
   var light=(t==='light');
   document.body.classList.toggle('light',light);
-  var btn=document.getElementById('themeBtn'); if(btn){ btn.textContent=light?'☀️':'🌙'; btn.title=light?'Cambiar a modo oscuro':'Cambiar a modo claro'; }
+  var btn=document.getElementById('themeBtn'); if(btn){ var ico=document.getElementById('themeIco'); if(ico) ico.textContent=light?'☀️':'🌙'; btn.title=light?'Cambiar a modo oscuro':'Cambiar a modo claro'; }
 }
 function toggleTheme(){
   var cur=(localStorage.getItem(THEME_KEY)==='light')?'dark':'light';
