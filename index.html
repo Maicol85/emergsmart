@@ -441,7 +441,8 @@ var SISTEMAS=[
   {id:'cirugia',     name:'Cirugía',      icon:'🔪', real:true},
   {id:'politrauma',  name:'Politrauma',   icon:'🚑', real:true},
   {id:'trauma',      name:'Trauma',       icon:'🩹'},
-  {id:'gineco',      name:'Gineco',       icon:'🤰'}
+  {id:'obstetricia', name:'Obstetricia',  icon:'🤰', real:true},
+  {id:'gineco',      name:'Gineco',       icon:'👶'}
 ];
 
 var POCUS=[
@@ -958,9 +959,39 @@ var CALCS={
       var gap=med-calc, t,c;
       if(gap>10){t='ELEVADO (&gt;10) → sospechar alcoholes tóxicos: metanol, etilenglicol, isopropanol, propilenglicol. Con acidosis y anión gap alto orienta a metanol/etilenglicol.';c='red';}
       else {t='Normal (&lt;10). No excluye ingesta precoz si el tóxico aún no se metabolizó.';c='green';}
-      return{score:'Gap '+gap.toFixed(1)+' mOsm/kg',interp:t+' Calculada = 2·Na + glucosa/18 + BUN/2.8 (+ etanol/3.7).',cls:c}; }}
+      return{score:'Gap '+gap.toFixed(1)+' mOsm/kg',interp:t+' Calculada = 2·Na + glucosa/18 + BUN/2.8 (+ etanol/3.7).',cls:c}; }},
+
+  cthead:{title:'Canadian CT Head Rule', icon:'🧠', sub:'TC en TEC leve (GCS 13–15)',
+    fields:[
+      {id:'ct_gcs',label:'GCS <15 a las 2 h del trauma',opts:[['0','No'],['1','Sí']]},
+      {id:'ct_skull',label:'Sospecha de fractura abierta o hundida',opts:[['0','No'],['1','Sí']]},
+      {id:'ct_base',label:'Signos de fractura de base de cráneo (hemotímpano, ojos de mapache, Battle, otolicuorrea)',opts:[['0','No'],['1','Sí']]},
+      {id:'ct_vom',label:'≥2 episodios de vómitos',opts:[['0','No'],['1','Sí']]},
+      {id:'ct_age',label:'Edad ≥65 años',opts:[['0','No'],['1','Sí']]},
+      {id:'ct_amn',label:'Amnesia retrógrada ≥30 min (riesgo medio)',opts:[['0','No'],['1','Sí']]},
+      {id:'ct_mech',label:'Mecanismo peligroso: atropello, eyección, caída >3 pies/5 escalones (riesgo medio)',opts:[['0','No'],['1','Sí']]}
+    ],
+    calc:function(v){ var high=v.ct_gcs+v.ct_skull+v.ct_base+v.ct_vom+v.ct_age, med=v.ct_amn+v.ct_mech;
+      if(high>=1){return{score:'TC indicada',interp:'Factor de ALTO riesgo presente → riesgo de intervención neuroquirúrgica. Realizar TC de cráneo. Regla válida solo en TEC leve GCS 13–15; NO aplicar (hacer TC igual) con anticoagulación/coagulopatía, convulsión, déficit focal, &lt;16 años o embarazo.',cls:'red'};}
+      if(med>=1){return{score:'TC indicada',interp:'Factor de riesgo MEDIO presente → TC para descartar lesión clínicamente importante. NO aplicable a anticoagulados/coagulopatía.',cls:'amber'};}
+      return{score:'TC no requerida',interp:'Ningún criterio de la Canadian CT Head Rule presente: TC no indicada por esta regla. Reevaluar si cambia la clínica. No aplicable a anticoagulados/coagulopatía.',cls:'green'}; }},
+
+  centor:{title:'Centor / McIsaac', icon:'🦠', sub:'Faringitis estreptocócica — necesidad de test/ATB',
+    fields:[
+      {id:'ce_fever',label:'Fiebre >38 °C',opts:[['0','No'],['1','Sí']]},
+      {id:'ce_cough',label:'Ausencia de tos',opts:[['0','No'],['1','Sí']]},
+      {id:'ce_node',label:'Adenopatías cervicales anteriores dolorosas',opts:[['0','No'],['1','Sí']]},
+      {id:'ce_tons',label:'Exudado o tumefacción amigdalina',opts:[['0','No'],['1','Sí']]},
+      {id:'ce_age',label:'Edad',opts:[['1','3–14 años'],['0','15–44 años'],['-1','≥45 años']]}
+    ],
+    calc:function(v){ var s=v.ce_fever+v.ce_cough+v.ce_node+v.ce_tons+v.ce_age, t,c;
+      if(s<=0){t='Riesgo muy bajo (~1–2.5%): sin test ni ATB, manejo sintomático.';c='green';}
+      else if(s<=2){t='Riesgo bajo (~5–17%): test rápido/cultivo; ATB solo si es positivo.';c='amber';}
+      else if(s===3){t='Riesgo moderado (~28–35%): test rápido; ATB si es positivo.';c='amber';}
+      else {t='Riesgo alto (~50%): test rápido; valorar ATB empírico (penicilina/amoxicilina).';c='red';}
+      return{score:s+' pts',interp:t+' Faringitis viral no requiere ATB.',cls:c}; }}
 };
-var TOOLS_ORDER=['heart','wellstep','wellstvp','geneva','curb65','glasgow','nihss','sofa','qsofa','killip','alvarado','ranson','bisap','parkland','iss','rts','lrinec','apache2','stewart','sedoinf','vtpbw','adrenalina','o2traslado'];
+var TOOLS_ORDER=['heart','wellstep','wellstvp','geneva','curb65','glasgow','nihss','sofa','qsofa','killip','alvarado','ranson','bisap','parkland','iss','rts','lrinec','apache2','stewart','sedoinf','vtpbw','adrenalina','o2traslado','cthead','centor'];
 
 /* ═══════════════ RENDER ═══════════════ */
 function buildAll(){ renderMedBadge(); buildSistemas(); buildSintomas(); buildTools(); buildPocus(); buildDrugs(); buildManiobras(); buildGuardia(); buildToxicologia(); }
@@ -987,6 +1018,7 @@ function showSysSub(id,init){
   else if(id==='renal'){ c.innerHTML=renalHTML(); }
   else if(id==='urologia'){ c.innerHTML=urologiaHTML(); }
   else if(id==='alergias'){ c.innerHTML=alergiasHTML(); }
+  else if(id==='obstetricia'){ c.innerHTML=obstetriciaHTML(); }
   else if(id==='infeccioso'){ c.innerHTML=infecHTML(); }
   else if(id==='cirugia'){ c.innerHTML=cirugiaHTML(); }
   else if(id==='politrauma'){ c.innerHTML=politraumaHTML(); wirePolitrauma(); }
@@ -1178,7 +1210,76 @@ function neuroHTML(){ return ''+
   '<li>Hemorragia subaracnoidea, trombosis venosa cerebral, disección arterial cervical.</li>'+
   '<li>Síndrome de vasoconstricción cerebral reversible (SVCR), apoplejía hipofisaria, hipotensión intracraneal.</li></ul>'+
   '<h4>Estudio</h4><ul><li><strong>TC sin contraste urgente</strong> (sensibilidad muy alta &lt;6 h). Si negativa y sospecha → PL (xantocromía) o angio-TC.</li></ul>'+
-  '<div class="callout crit">La cefalea en trueno es HSA hasta que se demuestre lo contrario.</div></div>';
+  '<div class="callout crit">La cefalea en trueno es HSA hasta que se demuestre lo contrario.</div></div>'+
+  '<div class="block"><h3>🧠 ACV isquémico — ASPECTS y stroke mimics</h3>'+
+  '<h4>Manejo de la TA</h4><ul>'+
+  '<li><strong>Sin trombólisis</strong>: permisivo; tratar solo si &gt;220/120.</li>'+
+  '<li><strong>Con trombólisis / trombectomía</strong>: mantener &lt;185/110 antes y &lt;180/105 durante/24 h (labetalol o nicardipino).</li></ul>'+
+  '<h4>ASPECTS</h4><ul><li>Escala de 10 puntos en TC sin contraste del territorio de la ACM: se resta 1 por cada región con isquemia precoz. <strong>≥6</strong> orienta a mejor pronóstico/candidato a trombectomía; &lt;6 indica infarto extenso.</li></ul>'+
+  '<h4>Stroke mimics frecuentes</h4><ul><li>Hipoglucemia, crisis convulsiva con parálisis de Todd, migraña con aura, parálisis de Bell, encefalopatía/sepsis, tóxico-metabólico, trastorno funcional. Siempre glucemia capilar antes de asumir ACV.</li></ul></div>'+
+  '<div class="block"><h3>🩸 Hemorragia subaracnoidea (HSA)</h3>'+
+  '<h4>Escala de Hunt-Hess (clínica)</h4><ul>'+
+  '<li>I: asintomático/cefalea leve. II: cefalea intensa, rigidez, sin déficit (salvo par craneal). III: somnolencia/confusión, déficit focal leve. IV: estupor, hemiparesia. V: coma, descerebración.</li></ul>'+
+  '<h4>Escala de Fisher (TC — riesgo de vasoespasmo)</h4><ul>'+
+  '<li>1: sin sangre. 2: capa fina &lt;1 mm. 3: capa gruesa ≥1 mm (mayor riesgo). 4: hemorragia intraventricular o intraparenquimatosa.</li></ul>'+
+  '<h4>Manejo</h4><ul>'+
+  '<li><strong>Nimodipino</strong> 60 mg VO/SNG c/4 h (previene el déficit por vasoespasmo; no dejar de administrarlo por hipotensión, ajustar).</li>'+
+  '<li>Control de TA (evitar picos hasta asegurar el aneurisma), analgesia, reposo, laxantes; <strong>tratamiento del aneurisma</strong> precoz (coiling/clipaje).</li>'+
+  '<li>Vigilar vasoespasmo (día 4–14), hidrocefalia y resangrado.</li></ul></div>'+
+  '<div class="block"><h3>🪖 Traumatismo craneoencefálico (TEC)</h3>'+
+  '<button class="btn-calc" style="max-width:300px" onclick="openCalc(\'glasgow\')">🧮 Glasgow</button> '+
+  '<button class="btn-calc" style="max-width:320px" onclick="openCalc(\'cthead\')">🧮 Canadian CT Head Rule</button>'+
+  '<h4>Clasificación por Glasgow</h4><ul><li>Leve 13–15 · Moderado 9–12 · Grave ≤8 (indicación de IOT).</li></ul>'+
+  '<h4>TEC leve — criterios de TC</h4><ul><li><strong>Canadian CT Head Rule</strong> y <strong>New Orleans Criteria</strong> (cefalea, vómitos, &gt;60 años, intoxicación, amnesia anterógrada, trauma supraclavicular, convulsión). <strong>NEXUS II</strong> para bajo riesgo. Anticoagulados: TC siempre.</li></ul>'+
+  '<h4>TEC moderado</h4><ul><li>TC siempre + observación con reevaluación neurológica seriada; umbral bajo para neurocirugía.</li></ul>'+
+  '<h4>TEC grave</h4><ul>'+
+  '<li>ABC prioritario, <strong>IOT precoz</strong>; evitar <strong>hipotensión</strong> (PAS &gt;110) e <strong>hipoxia</strong> (SatO₂ ≥94%): duplican la mortalidad.</li>'+
+  '<li>Cabecera 30°, normocapnia (PaCO₂ 35–40), analgosedación, normotermia, normoglucemia.</li>'+
+  '<li>Signos de herniación: <strong>manitol 0.25–1 g/kg</strong> o <strong>suero salino hipertónico</strong>; hiperventilación transitoria solo como puente.</li></ul>'+
+  '<h4>Escala de Marshall (TC)</h4><ul><li>I normal · II cisternas presentes, desviación &lt;5 mm · III cisternas comprimidas (swelling) · IV desviación &gt;5 mm · V/VI masa evacuada/no evacuada.</li></ul>'+
+  '<h4>Lesiones específicas</h4>'+
+  '<div class="table-wrap"><table style="min-width:560px"><thead><tr><th>Lesión</th><th>TC</th><th>Clave</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Hematoma epidural</td><td>Biconvexo (lente), no cruza suturas</td><td>Arterial (meníngea media); intervalo lúcido → deterioro. Evacuación urgente.</td></tr>'+
+  '<tr><td class="drug-name">Hematoma subdural</td><td>Semilunar (cóncavo), cruza suturas</td><td>Venoso; agudo (denso) o crónico (anciano, anticoagulado).</td></tr>'+
+  '<tr><td class="drug-name">Contusión hemorrágica</td><td>Focos hiperdensos corticales</td><td>Puede crecer; TC de control.</td></tr>'+
+  '<tr><td class="drug-name">Daño axonal difuso (DAD)</td><td>Puede ser sutil; RM más sensible</td><td>Coma sin lesión masa proporcional; mecanismo de aceleración-desaceleración.</td></tr>'+
+  '</tbody></table></div>'+
+  '<h4>Hipertensión endocraneana</h4><ul><li>Cefalea, vómitos, deterioro de conciencia, papiledema. <strong>Tríada de Cushing</strong> (HTA + bradicardia + respiración irregular) = herniación inminente. Medidas: 30°, osmoterapia, drenaje ventricular, craniectomía.</li></ul>'+
+  '<div class="callout crit">En el TEC grave, un solo episodio de hipotensión o hipoxia empeora el pronóstico: prevenirlos es prioritario.</div></div>'+
+  '<div class="block"><h3>🦵 Síndrome de Guillain-Barré</h3>'+
+  '<p>Debilidad simétrica ascendente + arreflexia, tras infección (Campylobacter, virus). Disociación albúmino-citológica en LCR.</p>'+
+  '<h4>Criterios de Brighton</h4><ul><li>Debilidad bilateral y flácida + hiporreflexia/arreflexia + curso monofásico (nadir 12 h–28 d) + LCR (↑proteínas con células &lt;50) + electrofisiología compatible + exclusión de otras causas.</li></ul>'+
+  '<h4>Variantes</h4><ul><li>AIDP (desmielinizante, la clásica), <strong>AMAN</strong> (axonal motora), <strong>AMSAN</strong> (axonal motora-sensitiva), <strong>Miller-Fisher</strong> (oftalmoplejía, ataxia, arreflexia; anti-GQ1b).</li></ul>'+
+  '<h4>UCI y respiratorio — regla del 20/30/40</h4><ul><li>Ingreso a UCI si <strong>capacidad vital &lt;20 mL/kg</strong>, <strong>presión inspiratoria máxima &lt;30 cmH₂O</strong> o <strong>presión espiratoria máxima &lt;40 cmH₂O</strong> (o descenso &gt;30%). Espirometría bedside seriada; disautonomía.</li></ul>'+
+  '<h4>Tratamiento</h4><ul><li><strong>IVIG 0.4 g/kg/día × 5 días</strong> o <strong>plasmaféresis</strong> (equivalentes; no combinar). Los corticoides NO son eficaces.</li></ul>'+
+  '<div class="callout warn">No usar la SatO₂ como único parámetro: la insuficiencia ventilatoria neuromuscular precede a la desaturación. Guiarse por la capacidad vital.</div></div>'+
+  '<div class="block"><h3>💪 Miastenia gravis — crisis</h3>'+
+  '<h4>Crisis miasténica vs colinérgica</h4>'+
+  '<div class="table-wrap"><table style="min-width:520px"><thead><tr><th></th><th>Miasténica</th><th>Colinérgica</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Causa</td><td>Infra-tratamiento, infección, estrés</td><td>Exceso de anticolinesterásicos</td></tr>'+
+  '<tr><td class="drug-name">Pupilas/secreciones</td><td>Normales/midriasis</td><td>Miosis, sialorrea, SLUDGE</td></tr>'+
+  '<tr><td class="drug-name">Test de edrofonio</td><td>Mejora</td><td>Empeora</td></tr>'+
+  '</tbody></table></div>'+
+  '<h4>Precipitantes / fármacos a evitar</h4><ul><li>Infección, cirugía, embarazo; <strong>aminoglucósidos, fluoroquinolonas, macrólidos, betabloqueantes, magnesio, bloqueantes neuromusculares, contrastes yodados</strong>.</li></ul>'+
+  '<h4>Manejo de la crisis</h4><ul><li>Soporte ventilatorio (misma regla 20/30/40), <strong>IVIG o plasmaféresis</strong>, ajustar piridostigmina, corticoides con precaución (empeoramiento inicial), tratar el desencadenante.</li></ul></div>'+
+  '<div class="block"><h3>🌀 Vértigo — central vs periférico</h3>'+
+  '<h4>HINTS (en vértigo continuo con nistagmo espontáneo)</h4><ul>'+
+  '<li><strong>H</strong>ead-Impulse: normal (sin sacada correctora) → sospecha CENTRAL; anormal (sacada) → periférico.</li>'+
+  '<li><strong>N</strong>ystagmus: que cambia de dirección o vertical/torsional puro → CENTRAL; unidireccional horizontal → periférico.</li>'+
+  '<li><strong>T</strong>est of Skew (cover test): desviación vertical (skew) presente → CENTRAL.</li>'+
+  '<li><strong>HINTS "peligroso"</strong> (head-impulse normal, nistagmo cambiante o skew) = central → imagen (RM, no TC).</li></ul>'+
+  '<h4>Nistagmo</h4><ul><li>Periférico: unidireccional, horizonto-torsional, se inhibe con la fijación, fatigable. Central: bidireccional/vertical, no se inhibe con la fijación, no fatigable.</li></ul>'+
+  '<h4>Dix-Hallpike (diagnóstico del VPPB)</h4><ol class="steps">'+
+  '<li>Paciente sentado, girar la cabeza 45° hacia el lado a explorar.</li>'+
+  '<li>Reclinar rápido a decúbito supino con la cabeza en hiperextensión ~20° por fuera de la camilla.</li>'+
+  '<li>Observar nistagmo torsional-vertical con latencia (segundos), transitorio y fatigable (canal posterior).</li>'+
+  '<li>Repetir hacia el lado contrario.</li></ol>'+
+  '<h4>Maniobra de Epley (tratamiento del VPPB)</h4><ol class="steps">'+
+  '<li>Desde Dix-Hallpike positivo (cabeza 45° al lado afecto, en decúbito).</li>'+
+  '<li>Girar la cabeza 90° hacia el lado sano; mantener ~30 s.</li>'+
+  '<li>Girar cabeza + cuerpo otros 90° (cara hacia el suelo); mantener ~30 s.</li>'+
+  '<li>Sentar al paciente lentamente con la cabeza ligeramente flexionada.</li></ol>'+
+  '<div class="callout crit">No asumir vértigo periférico benigno sin HINTS: el ACV cerebeloso puede simular un vértigo periférico (cuidado con head-impulse normal + inestabilidad para la marcha).</div></div>';
 }
 
 /* ---- Respiratorio ---- */
@@ -1405,7 +1506,40 @@ function infecHTML(){ return ''+
   '<tr><td><strong>Neutropenia febril</strong></td><td>Monoterapia antipseudomónica: cefepime, pip-tazobactam o meropenem.</td><td>Vancomicina si catéter, mucositis grave, inestabilidad o colonización SAMR.</td></tr>'+
   '<tr><td><strong>Foco desconocido (shock séptico)</strong></td><td>Amplio espectro precoz (&lt;1 h): carbapenem o pip-tazobactam ± vancomicina.</td><td>Reevaluar y desescalar a las 48–72 h con cultivos.</td></tr>'+
   '</tbody></table></div>'+
-  '<div class="callout warn">ATB de amplio espectro en la 1ª hora del shock séptico. Tomar cultivos antes, pero sin retrasar la primera dosis.</div></div>';
+  '<div class="callout warn">ATB de amplio espectro en la 1ª hora del shock séptico. Tomar cultivos antes, pero sin retrasar la primera dosis.</div></div>'+
+  '<div class="block"><h3>🚻 Infección urinaria (ITU)</h3>'+
+  '<h4>Cistitis no complicada</h4><ul><li>Disuria, polaquiuria, urgencia, sin fiebre ni afectación sistémica (mujer no embarazada).</li><li>ATB: <strong>nitrofurantoína</strong> 100 mg c/12 h × 5 d, <strong>fosfomicina</strong> 3 g dosis única, o TMP-SMX (según resistencias locales).</li></ul>'+
+  '<h4>Pielonefritis aguda</h4><ul><li>Fiebre, dolor lumbar, puñopercusión +, ± síntomas urinarios. Urocultivo antes del ATB.</li><li><strong>Ingreso</strong>: sepsis, vómitos/intolerancia oral, embarazo, comorbilidad, obstrucción. IV: <strong>ceftriaxona</strong> 1–2 g/d o <strong>ciprofloxacino</strong>; aminoglucósido según riesgo.</li></ul>'+
+  '<h4>ITU complicada</h4><ul><li>Varón, sonda, obstrucción/litiasis, inmunodepresión, anomalía anatómica. Ampliar espectro (pip-tazobactam/carbapenem si MDR/BLEE) y resolver el factor obstructivo.</li></ul>'+
+  '<h4>Urosepsis</h4><ul><li>Aplicar el <strong>bundle de sepsis</strong> con foco urinario: lactato, hemocultivos + urocultivo, ATB amplio &lt;1 h, cristaloides, vasopresores; <strong>drenaje urgente</strong> si obstrucción (doble J/nefrostomía).</li></ul>'+
+  '<h4>ITU en el embarazo</h4><ul><li><strong>Tratar siempre la bacteriuria asintomática.</strong> ATB seguros: <strong>amoxicilina/amoxi-clav, cefalosporinas, fosfomicina</strong>; nitrofurantoína (evitar a término y en déficit de G6PD). Evitar fluoroquinolonas y TMP-SMX (1.º y 3.º trimestre).</li></ul></div>'+
+  '<div class="block"><h3>🤒 Infecciones respiratorias banales</h3>'+
+  '<button class="btn-calc" style="max-width:300px" onclick="openCalc(\'centor\')">🧮 Centor / McIsaac</button> '+
+  '<button class="btn-calc" style="max-width:260px" onclick="openCalc(\'curb65\')">🧮 CURB-65</button>'+
+  '<h4>Faringitis</h4><ul><li><strong>Centor/McIsaac</strong> para estimar el riesgo estreptocócico. ATB solo si probable/confirmada: <strong>penicilina V</strong> o <strong>amoxicilina</strong> (alergia: macrólido). La mayoría es viral.</li></ul>'+
+  '<h4>Sinusitis aguda</h4><ul><li>Mayoría viral. ATB si síntomas &gt;10 días sin mejorar, empeoramiento bifásico o cuadro grave (fiebre alta + dolor/secreción purulenta ≥3–4 días): amoxi-clav.</li></ul>'+
+  '<h4>Bronquitis aguda</h4><ul><li>Tos ± expectoración en inmunocompetente: <strong>no ATB</strong> (etiología viral); manejo sintomático. Descartar neumonía si fiebre alta, taquipnea, hipoxemia o foco auscultatorio.</li></ul>'+
+  '<h4>Neumonía adquirida en la comunidad</h4><ul><li>Estratificar con <strong>CURB-65</strong> / PSI. Ambulatorio: amoxicilina ± macrólido / doxiciclina. Ingreso: β-lactámico + macrólido o fluoroquinolona respiratoria.</li></ul></div>'+
+  '<div class="block"><h3>🌸 Infecciones ginecológicas</h3>'+
+  '<h4>Enfermedad pélvica inflamatoria (EPI)</h4><ul><li><strong>Criterios mínimos</strong> (iniciar ATB si ≥1 en mujer sexualmente activa con dolor pélvico): dolor a la movilización cervical, dolor uterino o dolor anexial.</li><li>ATB: <strong>ceftriaxona 500 mg IM</strong> + <strong>doxiciclina</strong> 100 mg c/12 h × 14 d + <strong>metronidazol</strong>. Ingreso si absceso, embarazo, intolerancia oral o fallo ambulatorio.</li></ul>'+
+  '<h4>Vulvovaginitis</h4>'+
+  '<div class="table-wrap"><table style="min-width:560px"><thead><tr><th>Tipo</th><th>Claves</th><th>Tratamiento</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Candidiásica</td><td>Prurito, flujo blanco grumoso, pH &lt;4.5</td><td>Fluconazol 150 mg VO única / azol tópico</td></tr>'+
+  '<tr><td class="drug-name">Vaginosis bacteriana</td><td>Flujo grisáceo, olor a pescado, clue cells, pH &gt;4.5</td><td>Metronidazol VO/vaginal</td></tr>'+
+  '<tr><td class="drug-name">Tricomoniasis</td><td>Flujo verdoso espumoso, cérvix en fresa (ITS)</td><td>Metronidazol; tratar a la pareja</td></tr>'+
+  '</tbody></table></div>'+
+  '<h4>Bartholinitis / absceso de Bartholino</h4><ul><li>Drenaje (marsupialización o catéter de Word) + ATB si celulitis asociada.</li></ul>'+
+  '<h4>Absceso tubo-ovárico</h4><ul><li>ATB de amplio espectro; <strong>cirugía/drenaje</strong> si no responde en 48–72 h, absceso grande (&gt;7–9 cm) o sospecha de rotura (abdomen agudo/sepsis).</li></ul></div>'+
+  '<div class="block"><h3>🚹 Infecciones urológicas</h3><ul>'+
+  '<li><strong>Orquiepididimitis</strong>: &lt;35 años/ITS → ceftriaxona 500 mg IM + doxiciclina × 10 d; &gt;35 años/gramnegativos → fluoroquinolona o cefalosporina.</li>'+
+  '<li><strong>Prostatitis aguda</strong>: fiebre, dolor perineal, síntomas obstructivos; <strong>NO masaje prostático</strong> (bacteriemia). ATB (fluoroquinolona o TMP-SMX 4–6 sem; IV + ingreso si sepsis/retención).</li>'+
+  '<li><strong>Balanopostitis</strong>: higiene + antifúngico/antibiótico tópico; sistémico si celulitis o inmunocompromiso (diabético).</li></ul></div>'+
+  '<div class="block"><h3>🦠 Piel y partes blandas</h3>'+
+  '<button class="btn-calc" style="max-width:280px" onclick="openCalc(\'lrinec\')">🧮 LRINEC</button>'+
+  '<h4>Celulitis vs erisipela</h4><ul><li><strong>Erisipela</strong>: dermis superficial, bordes netos y elevados, muy eritematosa (estreptococo). <strong>Celulitis</strong>: dermis profunda/TCS, bordes difusos (estrepto/S. aureus). ATB: cefazolina/cloxacilina (cubrir SAMR según riesgo).</li></ul>'+
+  '<h4>Fascitis necrotizante</h4><ul><li>Alarma: dolor desproporcionado, bullas/necrosis, crepitación, toxicidad sistémica, progresión rápida. <strong>Cirugía urgente</strong> + ATB combinado (<strong>carbapenem/pip-tazobactam + clindamicina</strong> como antitoxina ± vancomicina). No demorar por la imagen.</li></ul>'+
+  '<h4>Absceso cutáneo</h4><ul><li><strong>Drenaje siempre</strong> (incisión y drenaje). ATB solo si celulitis asociada, inmunocompromiso, signos sistémicos, localización de riesgo o falta de respuesta.</li></ul>'+
+  '<div class="callout crit">La fascitis necrotizante es una emergencia quirúrgica: la exploración/desbridamiento no debe esperar a la imagen.</div></div>';
 }
 
 /* ---- Cirugía de emergencia ---- */
@@ -1530,7 +1664,59 @@ function politraumaHTML(){
   '<li>La palma de la mano del paciente ≈ 1% (útil en quemaduras parcheadas).</li></ul>'+
   '<h4>Fórmula de Parkland</h4><ul>'+
   '<li><strong>4 mL × kg × %SCQ</strong> de Ringer lactato en 24 h; <strong>la mitad en las primeras 8 h</strong>, el resto en 16 h.</li>'+
-  '<li>Titular por diuresis (0.5–1 mL/kg/h). Valorar vía aérea si quemadura por inhalación.</li></ul></div>';
+  '<li>Titular por diuresis (0.5–1 mL/kg/h). Valorar vía aérea si quemadura por inhalación.</li></ul></div>'+
+  '<div class="block"><h3>🩸 Evaluación primaria XABCDE (PHTLS)</h3>'+
+  '<div class="table-wrap"><table style="min-width:600px"><thead><tr><th>Paso</th><th>Acción</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">X — Exanguinante</td><td>Hemorragia externa masiva: torniquete, presión directa, empaquetamiento con gasa hemostática ANTES de la vía aérea.</td></tr>'+
+  '<tr><td class="drug-name">A — Vía aérea + cervical</td><td>Jaw thrust (no maniobra frente-mentón), aspirar, cánula, DSG, IOT o cricotiroidotomía; control cervical manual/collarín.</td></tr>'+
+  '<tr><td class="drug-name">B — Ventilación</td><td>Neumotórax a tensión → descompresión con aguja (2.º EIC LMC o 4.º-5.º EIC LAA); hemotórax → tubo torácico.</td></tr>'+
+  '<tr><td class="drug-name">C — Circulación</td><td>Control de hemorragia, 2 vías gruesas, hemoderivados, FAST; ácido tranexámico precoz; faja pélvica.</td></tr>'+
+  '<tr><td class="drug-name">D — Déficit neurológico</td><td>GCS, pupilas, glucemia, lateralización.</td></tr>'+
+  '<tr><td class="drug-name">E — Exposición</td><td>Desvestir, log-roll, prevenir hipotermia (mantas, sueros calientes).</td></tr>'+
+  '</tbody></table></div></div>'+
+  '<div class="block"><h3>🩹 Control de hemorragia</h3><ul>'+
+  '<li><strong>Torniquete</strong>: hemorragia de miembro no controlable con presión. Colocar 5–7 cm proximal a la herida (no sobre articulación), apretar hasta detener el sangrado y desaparecer el pulso distal; <strong>registrar la hora</strong>. Tolerancia hasta ~2 h; no aflojar en prehospitalario. Si no cede, un 2.º torniquete proximal.</li>'+
+  '<li><strong>Empaquetamiento con gasa hemostática</strong>: heridas de unión (ingle, axila, cuello) donde no se puede aplicar torniquete; rellenar la herida contra el vaso + presión directa 3 min.</li>'+
+  '<li><strong>Presión directa</strong>: primera medida en cualquier sangrado; firme y sostenida sobre el punto.</li>'+
+  '<li><strong>Ácido tranexámico</strong> 1 g IV en 10 min dentro de las 3 h del trauma + 1 g en 8 h (CRASH-2).</li></ul></div>'+
+  '<div class="block"><h3>🩸 Protocolo de transfusión masiva</h3><ul>'+
+  '<li><strong>Definición</strong>: &gt;10 U de GR en 24 h, o &gt;3 U en 1 h, o reposición de la volemia.</li>'+
+  '<li><strong>Ratio 1:1:1</strong> (concentrados de hematíes : plasma : plaquetas).</li>'+
+  '<li>Activar el protocolo precozmente (scores ABC/shock index); comunicación con banco de sangre.</li>'+
+  '<li><strong>Calcio</strong>: 1 g IV por cada 4 U de GR (el citrato quela el calcio → hipocalcemia).</li>'+
+  '<li>Ácido tranexámico precoz; monitorizar con <strong>TEG/ROTEM</strong> si disponible, fibrinógeno y calcio iónico.</li>'+
+  '<li>Prevenir la <strong>tríada letal</strong>: hipotermia, acidosis, coagulopatía. Hipotensión permisiva (salvo TCE).</li></ul></div>'+
+  '<div class="block"><h3>🫁 Trauma torácico</h3>'+
+  '<div class="table-wrap"><table style="min-width:600px"><thead><tr><th>Entidad</th><th>Clínica</th><th>Manejo</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Neumotórax a tensión</td><td>Disnea, hipotensión, IY, timpanismo, MV ausente, desviación traqueal.</td><td>Descompresión con aguja (2.º EIC LMC o 4.º-5.º EIC LAA) → tubo torácico definitivo.</td></tr>'+
+  '<tr><td class="drug-name">Hemotórax masivo</td><td>&gt;1500 mL o &gt;200 mL/h; shock + matidez + MV ausente.</td><td>Tubo torácico + reposición; autotransfusión; toracotomía si sangrado persistente.</td></tr>'+
+  '<tr><td class="drug-name">Taponamiento cardíaco</td><td>Tríada de Beck (hipotensión, IY, ruidos apagados); eco +.</td><td>Pericardiocentesis de urgencia (subxifoidea, guiada por eco) / toracotomía.</td></tr>'+
+  '<tr><td class="drug-name">Tórax inestable (volet)</td><td>Segmento con movimiento paradójico; contusión pulmonar subyacente.</td><td>Analgesia (clave), O₂/soporte ventilatorio; NO ferulizar externamente.</td></tr>'+
+  '<tr><td class="drug-name">Neumotórax abierto</td><td>Herida soplante en tórax.</td><td>Apósito de 3 lados (válvula) → tubo torácico (en otro sitio).</td></tr>'+
+  '</tbody></table></div></div>'+
+  '<div class="block"><h3>🩻 Trauma abdominal — FAST</h3>'+
+  '<h4>Ventanas FAST</h4><ul><li>Pericárdica (subxifoidea), perihepática (Morison), periesplénica, pélvica (Douglas). <strong>eFAST</strong> añade ventanas pleurales (neumo/hemotórax).</li></ul>'+
+  '<h4>Conducta</h4><ul>'+
+  '<li><strong>Inestable + FAST positivo</strong> → laparotomía urgente.</li>'+
+  '<li><strong>Estable</strong> con sospecha → TC con contraste; manejo no operatorio de lesión de víscera sólida bajo monitorización estricta (± angioembolización).</li></ul>'+
+  '<h4>Grados AAST (víscera sólida)</h4><ul><li>Hígado y bazo se gradúan I–V (I laceración/hematoma menor → V estallido/avulsión vascular). A mayor grado, mayor probabilidad de fallo del manejo conservador.</li></ul>'+
+  '<div class="callout crit">Inestable + FAST positivo = laparotomía; no retrasar por la TC.</div></div>'+
+  '<div class="block"><h3>🦴 Trauma pélvico</h3><ul>'+
+  '<li><strong>Inestabilidad hemodinámica + fractura de pelvis = emergencia</strong> (sangrado del plexo venoso, arterial y hueso).</li>'+
+  '<li><strong>Faja pélvica</strong>: colocar a la altura de los <strong>trocánteres mayores</strong> (no en las crestas ilíacas), cerrando el anillo; medida precoz en el sangrado pélvico.</li>'+
+  '<li><strong>Fijación externa</strong>: control mecánico en fracturas inestables.</li>'+
+  '<li><strong>Hemorragia pélvica</strong>: sangrado arterial → <strong>angioembolización</strong>; venoso/óseo → <strong>packing preperitoneal</strong> ± fijación. Decidir según respuesta y recursos.</li></ul>'+
+  '<div class="callout warn">No hacer tacto/movilización repetida de una pelvis inestable: puede reactivar el sangrado. No usar la pelvis como sitio de acceso venoso femoral si hay lesión.</div></div>'+
+  '<div class="block"><h3>🔥 Quemaduras — profundidad y derivación</h3>'+
+  '<button class="btn-calc" style="max-width:300px" onclick="openCalc(\'parkland\')">🧮 Fórmula de Parkland</button>'+
+  '<h4>Clasificación por profundidad</h4>'+
+  '<div class="table-wrap"><table style="min-width:560px"><thead><tr><th>Tipo</th><th>Profundidad</th><th>Clínica</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">A (superficial)</td><td>Epidermis ± dermis papilar</td><td>Eritema/flictenas, dolorosa, blanquea, buen relleno. Cura sin secuela.</td></tr>'+
+  '<tr><td class="drug-name">AB (intermedia)</td><td>Dermis reticular</td><td>Rosada/pálida, hipoalgesia variable, relleno lento. Puede requerir injerto.</td></tr>'+
+  '<tr><td class="drug-name">B (profunda)</td><td>Espesor total</td><td>Blanca/acartonada/negra, indolora, seca, sin relleno. Requiere injerto.</td></tr>'+
+  '</tbody></table></div>'+
+  '<h4>Criterios de derivación a centro de quemados</h4><ul><li>SCQ &gt;10% (o &gt;5% en niños/ancianos), quemaduras de espesor total, cara/manos/pies/genitales/perineo/articulaciones, circunferenciales, eléctricas/químicas, inhalación, comorbilidad o trauma asociado.</li></ul>'+
+  '<div class="callout crit">Quemadura de cara/cuello o por inhalación (hollín, estridor, esputo carbonáceo): IOT precoz antes de que el edema cierre la vía aérea.</div></div>';
 }
 function wirePolitrauma(){
   Array.prototype.forEach.call(document.querySelectorAll('#abcdeChk li'),function(li){
@@ -1898,6 +2084,114 @@ async function changePass(){
   PASS_HASH=await sha256(a); localStorage.setItem('emergsmart_passhash',PASS_HASH);
   res.style.borderColor='var(--green)'; msg.style.color='var(--green)'; msg.textContent='Contraseña actualizada.';
 }
+
+/* ---- Obstetricia ---- */
+function obstetriciaHTML(){ return ''+
+  '<div class="block"><h3>🤰 Diagnóstico y emergencias tempranas</h3>'+
+  '<h4>Diagnóstico de embarazo en urgencia</h4><ul>'+
+  '<li>β-hCG cualitativa (orina) y cuantitativa (sangre). Toda mujer en edad fértil con dolor abdominal, sangrado o síncope: <strong>descartar embarazo</strong>.</li>'+
+  '<li>Saco gestacional visible por eco transvaginal con β-hCG ~1500–2000 mUI/mL (zona discriminatoria).</li></ul>'+
+  '<h4>Embarazo ectópico</h4><ul>'+
+  '<li><strong>Factores de riesgo</strong>: ectópico/EPI previos, cirugía tubárica, DIU, técnicas de reproducción, tabaquismo.</li>'+
+  '<li><strong>Clínica</strong>: dolor abdominal + amenorrea + sangrado; β-hCG que no duplica en 48 h, útero vacío con β-hCG sobre la zona discriminatoria.</li>'+
+  '<li><strong>Rotura</strong>: dolor brusco intenso, irritación peritoneal, shock, Douglas ocupado (líquido libre) → <strong>emergencia quirúrgica</strong>.</li>'+
+  '<li><strong>Manejo</strong>: metotrexato si estable, ectópico pequeño (&lt;3.5–4 cm), sin latido, β-hCG baja y sin rotura; <strong>cirugía</strong> (salpingectomía/salpingostomía) si inestabilidad, rotura o contraindicación del MTX.</li></ul>'+
+  '<h4>Aborto espontáneo</h4>'+
+  '<div class="table-wrap"><table style="min-width:560px"><thead><tr><th>Tipo</th><th>Cuello / hallazgos</th><th>Manejo</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Amenaza</td><td>Cerrado, embrión viable, sangrado leve</td><td>Reposo relativo, control; no requiere evacuación.</td></tr>'+
+  '<tr><td class="drug-name">Inevitable</td><td>Cuello abierto, sangrado/dolor</td><td>Evacuación (médica/quirúrgica) o expectante.</td></tr>'+
+  '<tr><td class="drug-name">Incompleto</td><td>Restos ovulares, cuello abierto</td><td>Misoprostol o legrado/AMEU.</td></tr>'+
+  '<tr><td class="drug-name">Completo</td><td>Útero vacío, cuello cerrado</td><td>Control; no requiere evacuación.</td></tr>'+
+  '<tr><td class="drug-name">Retenido (diferido)</td><td>Embrión sin latido, cuello cerrado</td><td>Misoprostol o evacuación quirúrgica.</td></tr>'+
+  '</tbody></table></div>'+
+  '<p style="margin-top:.5rem">Administrar <strong>inmunoglobulina anti-D</strong> a las gestantes Rh negativas con sangrado.</p>'+
+  '<h4>Hiperemesis gravídica</h4><ul>'+
+  '<li>Vómitos incoercibles + pérdida de peso &gt;5% + deshidratación/cetonuria + alteración hidroelectrolítica.</li>'+
+  '<li><strong>Ingreso</strong> si intolerancia oral, cetosis, trastorno electrolítico o pérdida de peso significativa.</li>'+
+  '<li>Hidratación IV (SF/Ringer), <strong>tiamina antes de sueros glucosados</strong> (prevención de Wernicke), antieméticos (doxilamina-piridoxina, metoclopramida, ondansetrón), reposición de K⁺.</li></ul></div>'+
+  '<div class="block"><h3>🩺 Estados hipertensivos del embarazo</h3>'+
+  '<h4>Clasificación</h4><ul>'+
+  '<li><strong>HTA crónica</strong>: previa o &lt;20 semanas. <strong>HTA gestacional</strong>: ≥20 sem sin proteinuria ni daño de órgano.</li>'+
+  '<li><strong>Preeclampsia</strong>: ≥20 sem, TA ≥140/90 + proteinuria o daño de órgano. <strong>Eclampsia</strong>: preeclampsia + convulsión. <strong>HELLP</strong>: hemólisis + enzimas hepáticas elevadas + plaquetopenia.</li></ul>'+
+  '<h4>Preeclampsia con criterios de severidad</h4><ul>'+
+  '<li>TA <strong>≥160/110</strong>, plaquetas &lt;100.000, transaminasas ×2, creatinina &gt;1.1 (o ×2), edema pulmonar, síntomas (cefalea, epigastralgia/HD, alteraciones visuales).</li></ul>'+
+  '<h4>Eclampsia — sulfato de magnesio</h4><ul>'+
+  '<li><strong>Carga 4–6 g IV en 15–20 min</strong>, luego <strong>mantenimiento 1–2 g/h</strong> (también profilaxis en preeclampsia grave); continuar 24 h posparto o pos-convulsión.</li>'+
+  '<li>Manejo de la convulsión: proteger vía aérea, decúbito lateral, O₂; el magnesio es 1.ª línea (no benzodiacepinas de rutina).</li>'+
+  '<li><strong>Toxicidad por Mg</strong> (hiporreflexia, ↓FR, ↓conciencia): suspender y dar <strong>gluconato de calcio</strong> 1 g IV. Vigilar reflejos, FR y diuresis.</li></ul>'+
+  '<h4>HELLP</h4><ul>'+
+  '<li>Criterios: hemólisis (LDH ↑, esquistocitos, bilirrubina ↑), AST/ALT elevadas, plaquetas &lt;100.000. Dolor en HD/epigastrio, náuseas.</li>'+
+  '<li>Manejo: estabilizar (Mg, control de TA), corticoides para maduración fetal, <strong>interrupción de la gestación</strong> (tratamiento definitivo) según edad gestacional y estado materno-fetal.</li></ul>'+
+  '<h4>Antihipertensivos seguros</h4>'+
+  '<div class="table-wrap"><table style="min-width:520px"><thead><tr><th>Fármaco</th><th>Dosis en la urgencia</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Labetalol IV</td><td>20 mg IV, repetir/duplicar c/10 min (máx 300 mg) o perfusión.</td></tr>'+
+  '<tr><td class="drug-name">Hidralazina IV</td><td>5–10 mg IV c/20 min.</td></tr>'+
+  '<tr><td class="drug-name">Nifedipina VO</td><td>10 mg VO, repetir c/20–30 min.</td></tr>'+
+  '</tbody></table></div>'+
+  '<div class="callout crit">CONTRAINDICADOS: IECA y ARA-II (teratógenos). Objetivo de TA: sistólica 140–155 y diastólica 90–105 (evitar descensos bruscos que comprometan la perfusión placentaria).</div></div>'+
+  '<div class="block"><h3>🩸 Hemorragia obstétrica</h3>'+
+  '<h4>Anteparto — Placenta previa</h4><ul>'+
+  '<li>Sangrado indoloro, rojo rutilante, en 2.º-3.er trimestre. <strong>NO realizar tacto vaginal</strong> hasta descartar previa por eco.</li>'+
+  '<li>Manejo según sangrado y edad gestacional: expectante con estabilidad; cesárea si hemorragia grave/inestabilidad o a término.</li></ul>'+
+  '<h4>Anteparto — DPPNI (abruptio)</h4><ul>'+
+  '<li>Dolor abdominal + sangrado (puede ser oculto) + <strong>hipertonía uterina</strong> + sufrimiento fetal. Asociado a HTA/preeclampsia, trauma, cocaína.</li>'+
+  '<li>Diferencia con previa: DPPNI es dolorosa con útero duro; previa es indolora. <strong>Urgencia</strong> si compromiso materno/fetal → extracción. Vigilar <strong>coagulopatía/CID</strong> (consumo).</li></ul>'+
+  '<h4>Hemorragia posparto (HPP)</h4><ul>'+
+  '<li><strong>Definición</strong>: &gt;500 mL (parto vaginal) o &gt;1000 mL (cesárea), o con repercusión hemodinámica.</li>'+
+  '<li><strong>Las 4 T</strong>: <strong>Tono</strong> (atonía, la más frecuente), <strong>Tejido</strong> (restos placentarios), <strong>Trauma</strong> (desgarros, rotura), <strong>Trombina</strong> (coagulopatía).</li></ul>'+
+  '<h4>Algoritmo de manejo de la HPP</h4><ol class="steps">'+
+  '<li><strong>Masaje uterino bimanual</strong> + 2 vías + cristaloides/hemoderivados; pedir ayuda.</li>'+
+  '<li><strong>Uterotónicos</strong>: oxitocina 10 UI IM o en perfusión; ergometrina (evitar en HTA); <strong>misoprostol</strong> 800 µg rectal/sublingual; carbetocina.</li>'+
+  '<li><strong>Ácido tranexámico 1 g IV</strong> precoz (repetir a los 30 min si persiste).</li>'+
+  '<li>Descartar restos (revisión/legrado) y desgarros (sutura).</li>'+
+  '<li><strong>Taponamiento</strong> con balón intrauterino (Bakri); traje antishock.</li>'+
+  '<li><strong>Cirugía</strong>: suturas de compresión (B-Lynch), ligadura/embolización de arterias, histerectomía como último recurso.</li></ol>'+
+  '<h4>Transfusión masiva obstétrica</h4><ul><li>Activación precoz, ratio <strong>1:1:1</strong>, ácido tranexámico, reposición de fibrinógeno (objetivo &gt;2 g/L, más alto que en otros contextos) y calcio; corregir la CID.</li></ul></div>'+
+  '<div class="block"><h3>👶 Trabajo de parto de urgencia</h3>'+
+  '<h4>Signos de parto inminente</h4><ul><li>Contracciones intensas y frecuentes, pujo involuntario, abombamiento perineal, coronación de la cabeza. No intentar retrasar la salida.</li></ul>'+
+  '<h4>Atención del parto precipitado (prehospitalario)</h4><ol class="steps">'+
+  '<li>Recibir la cabeza controlando la salida (evitar expulsivo brusco); NO traccionar.</li>'+
+  '<li>Comprobar <strong>circular de cordón</strong>: si está flojo, deslizarlo sobre la cabeza; si está apretado, pinzar y cortar entre dos pinzas.</li>'+
+  '<li>Desprender el <strong>hombro anterior</strong> con tracción suave hacia abajo, luego el posterior hacia arriba.</li>'+
+  '<li>Sostener el cuerpo (resbaladizo) y colocar al RN sobre el abdomen materno; secar y abrigar.</li>'+
+  '<li><strong>Alumbramiento</strong>: esperar signos de desprendimiento, tracción controlada del cordón + contrapresión suprapúbica; oxitocina 10 UI IM.</li></ol>'+
+  '<h4>Recién nacido inmediato</h4><ul>'+
+  '<li><strong>APGAR</strong> al 1.er y 5.º min (FC, respiración, tono, reflejos, color; 0–2 cada uno).</li>'+
+  '<li>Secar y estimular, <strong>calor</strong> (piel con piel, evitar hipotermia), vía aérea; si no respira/FC &lt;100 → ventilación con presión positiva (reanimación neonatal).</li>'+
+  '<li><strong>Pinzamiento del cordón</strong>: diferido 1–3 min si el RN está vigoroso (mejora reservas de hierro); inmediato si requiere reanimación.</li></ul></div>'+
+  '<div class="block"><h3>🚑 Trauma en la embarazada</h3><ul>'+
+  '<li><strong>La madre es la prioridad</strong>: reanimar a la madre es reanimar al feto.</li>'+
+  '<li><strong>Anatomía por trimestre</strong>: útero intrapélvico &lt;12 sem (protegido); a partir del 2.º trimestre asciende y es más vulnerable; desplazamiento de vísceras.</li>'+
+  '<li><strong>&gt;20 semanas</strong>: <strong>desplazamiento uterino a la izquierda</strong> (manual o cuña bajo la cadera derecha) para evitar la compresión de la cava (hipotensión supina).</li>'+
+  '<li><strong>FAST</strong>: útil, pero menos sensible por los cambios anatómicos; no descarta lesión.</li>'+
+  '<li><strong>Monitoreo fetal</strong> (cardiotocografía) ≥4–6 h tras trauma significativo (hasta 24 h): detecta desprendimiento y sufrimiento.</li>'+
+  '<li><strong>Desprendimiento traumático de placenta</strong>: puede ocurrir incluso con trauma menor; vigilar sangrado, dolor, hipertonía y CTG.</li>'+
+  '<li>Profilaxis anti-D en Rh negativas; test de Kleihauer-Betke.</li></ul>'+
+  '<h4>RCP en la embarazada</h4><ul>'+
+  '<li>Misma técnica (compresiones, desfibrilación, fármacos) + <strong>desplazamiento uterino manual a la izquierda</strong>.</li>'+
+  '<li><strong>Cesárea perimortem</strong>: iniciar si no hay retorno de circulación a los <strong>4 minutos</strong> de la parada (extracción hacia el 5.º min) en úteros ≥20 sem — mejora la supervivencia materna y fetal.</li></ul>'+
+  '<div class="callout crit">Parada cardíaca en gestante ≥20 sem sin RCE en 4 min → cesárea perimortem inmediata (no trasladar para hacerla).</div></div>'+
+  '<div class="block"><h3>💊 Fármacos en la emergencia y el embarazo</h3>'+
+  '<div class="table-wrap"><table style="min-width:680px"><thead><tr><th>Fármaco</th><th>Categoría</th><th>Uso en urgencia</th><th>Observaciones</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Paracetamol</td><td>B</td><td>Seguro</td><td>Analgésico/antipirético de elección.</td></tr>'+
+  '<tr><td class="drug-name">AINE</td><td>C (D 3.er trim.)</td><td>Evitar, sobre todo 3.er trim.</td><td>Cierre del ductus, oligoamnios.</td></tr>'+
+  '<tr><td class="drug-name">Morfina / opioides</td><td>C</td><td>Aceptable puntual</td><td>Depresión respiratoria neonatal si cerca del parto.</td></tr>'+
+  '<tr><td class="drug-name">Penicilinas / cefalosporinas</td><td>B</td><td>Seguros</td><td>ATB de elección.</td></tr>'+
+  '<tr><td class="drug-name">Azitromicina / eritromicina</td><td>B</td><td>Seguros</td><td>Alternativa en alergia.</td></tr>'+
+  '<tr><td class="drug-name">Nitrofurantoína</td><td>B</td><td>ITU (evitar a término)</td><td>Hemólisis en déficit de G6PD; no a término.</td></tr>'+
+  '<tr><td class="drug-name">Fluoroquinolonas</td><td>C</td><td>Evitar</td><td>Toxicidad cartílago (datos animales).</td></tr>'+
+  '<tr><td class="drug-name">TMP-SMX</td><td>C/D</td><td>Evitar 1.er y 3.er trim.</td><td>Antifolato; kernícterus a término.</td></tr>'+
+  '<tr><td class="drug-name">Metronidazol</td><td>B</td><td>Aceptable</td><td>Usado en EPI/vaginosis.</td></tr>'+
+  '<tr><td class="drug-name">Labetalol / hidralazina / nifedipina</td><td>C</td><td>Antihipertensivos de elección</td><td>Preeclampsia/emergencia HTA.</td></tr>'+
+  '<tr><td class="drug-name">IECA / ARA-II</td><td>D</td><td>CONTRAINDICADOS</td><td>Daño renal fetal, oligoamnios.</td></tr>'+
+  '<tr><td class="drug-name">Sulfato de magnesio</td><td>—</td><td>Eclampsia (1.ª línea)</td><td>Antídoto: gluconato de calcio.</td></tr>'+
+  '<tr><td class="drug-name">Levetiracetam</td><td>C</td><td>Anticonvulsivante preferible</td><td>Mejor perfil que valproato/fenitoína.</td></tr>'+
+  '<tr><td class="drug-name">Valproato</td><td>X (crónico)</td><td>Evitar</td><td>Alto riesgo teratógeno (tubo neural).</td></tr>'+
+  '<tr><td class="drug-name">Heparina / HBPM</td><td>B</td><td>Anticoagulante de elección</td><td>No cruza placenta.</td></tr>'+
+  '<tr><td class="drug-name">Warfarina</td><td>D/X</td><td>Evitar</td><td>Embriopatía; usar heparina.</td></tr>'+
+  '<tr><td class="drug-name">Corticoides (dexa/betametasona)</td><td>C</td><td>Maduración pulmonar fetal (24–34 sem)</td><td>Prednisolona para uso materno (menor paso).</td></tr>'+
+  '</tbody></table></div>'+
+  '<div class="callout warn">Las categorías son orientativas (clasificación FDA clásica/ADEC). Ante toda prescripción en el embarazo, valorar riesgo-beneficio y consultar la ficha técnica.</div></div>'; }
 
 /* ---- Navegación entre secciones ---- */
 function irSistema(id,cardioSub){
