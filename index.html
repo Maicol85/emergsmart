@@ -438,6 +438,10 @@ var SISTEMAS=[
   {id:'urologia',    name:'Urología',     icon:'🚻', real:true},
   {id:'infeccioso',  name:'Infeccioso',   icon:'🦠', real:true},
   {id:'alergias',    name:'Alergias',     icon:'🤧', real:true},
+  {id:'orl',         name:'ORL',          icon:'👂', real:true},
+  {id:'oftalmo',     name:'Oftalmología', icon:'👁️', real:true},
+  {id:'derma',       name:'Dermatología', icon:'🧴', real:true},
+  {id:'traumatologia',name:'Traumatología',icon:'🦴', real:true},
   {id:'cirugia',     name:'Cirugía',      icon:'🔪', real:true},
   {id:'politrauma',  name:'Politrauma',   icon:'🚑', real:true},
   {id:'trauma',      name:'Trauma',       icon:'🩹'},
@@ -1019,6 +1023,10 @@ function showSysSub(id,init){
   else if(id==='urologia'){ c.innerHTML=urologiaHTML(); }
   else if(id==='alergias'){ c.innerHTML=alergiasHTML(); }
   else if(id==='obstetricia'){ c.innerHTML=obstetriciaHTML(); }
+  else if(id==='orl'){ c.innerHTML=orlHTML(); }
+  else if(id==='oftalmo'){ c.innerHTML=oftalmoHTML(); }
+  else if(id==='derma'){ c.innerHTML=dermaHTML(); }
+  else if(id==='traumatologia'){ c.innerHTML=traumatologiaHTML(); }
   else if(id==='infeccioso'){ c.innerHTML=infecHTML(); }
   else if(id==='cirugia'){ c.innerHTML=cirugiaHTML(); }
   else if(id==='politrauma'){ c.innerHTML=politraumaHTML(); wirePolitrauma(); }
@@ -1602,7 +1610,38 @@ function cirugiaHTML(){ return ''+
   '<div class="block"><h3>🕳️ Hernia complicada</h3><ul>'+
   '<li><strong>Tipos</strong>: inguinal, femoral (mayor riesgo de complicación), umbilical, incisional, hiatal.</li>'+
   '<li><strong>Incarcerada</strong>: no reductible, sin isquemia. <strong>Estrangulada</strong>: compromiso vascular → urgencia.</li>'+
-  '<li><strong>Criterios de urgencia</strong>: dolor intenso, signos de obstrucción/isquemia (piel eritematosa, fiebre, leucocitosis), hernia no reductible dolorosa → cirugía urgente. No reducir a la fuerza una hernia estrangulada.</li></ul></div>';
+  '<li><strong>Criterios de urgencia</strong>: dolor intenso, signos de obstrucción/isquemia (piel eritematosa, fiebre, leucocitosis), hernia no reductible dolorosa → cirugía urgente. No reducir a la fuerza una hernia estrangulada.</li></ul></div>'+
+  '<div class="block"><h3>🖐️ Signos clínicos del abdomen agudo</h3>'+
+  '<div class="table-wrap"><table style="min-width:560px"><thead><tr><th>Signo</th><th>Maniobra</th><th>Sugiere</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Blumberg</td><td>Dolor a la descompresión brusca (rebote)</td><td>Irritación peritoneal</td></tr>'+
+  '<tr><td class="drug-name">Murphy</td><td>Interrupción de la inspiración a la palpación del HD</td><td>Colecistitis aguda</td></tr>'+
+  '<tr><td class="drug-name">McBurney</td><td>Dolor en el punto (⅓ externo línea ombligo-EIAS derecha)</td><td>Apendicitis</td></tr>'+
+  '<tr><td class="drug-name">Rovsing</td><td>Dolor en FID al palpar la FII</td><td>Apendicitis</td></tr>'+
+  '<tr><td class="drug-name">Psoas</td><td>Dolor a la extensión de la cadera derecha</td><td>Apéndice retrocecal</td></tr>'+
+  '<tr><td class="drug-name">Obturador</td><td>Dolor a la rotación interna de la cadera flexionada</td><td>Apéndice pélvico</td></tr>'+
+  '</tbody></table></div>'+
+  '<h4>Criterios de laparotomía urgente</h4><ul><li>Peritonitis difusa/abdomen en tabla, neumoperitoneo, inestabilidad por hemorragia intraabdominal, isquemia mesentérica, obstrucción con estrangulación.</li></ul>'+
+  '<h4>Abdomen agudo en la embarazada</h4><ul><li>El útero desplaza y "eleva" el apéndice (dolor más alto); leucocitosis fisiológica; preferir <strong>ecografía/RM</strong> (evitar radiación). No demorar la cirugía necesaria por el embarazo. Considerar causas obstétricas (ver Obstetricia).</li></ul></div>'+
+  '<div class="block"><h3>🩺 Apendicitis — scores</h3>'+
+  '<button class="btn-calc" style="max-width:300px" onclick="openCalc(\'alvarado\')">🧮 Score de Alvarado</button>'+
+  '<ul><li><strong>Alvarado</strong>: 0–4 baja probabilidad · 5–6 dudoso (observar/imagen) · 7–10 alta (valoración quirúrgica).</li>'+
+  '<li><strong>AIR (Appendicitis Inflammatory Response)</strong> como alternativa (usa PCR, además de clínica y leucocitos); útil para estratificar riesgo bajo/intermedio/alto.</li>'+
+  '<li><strong>ATB preoperatorio</strong>: ceftriaxona + metronidazol (o amoxi-clav). Complicada (perforación, absceso, plastrón): drenaje ± apendicectomía diferida en casos seleccionados.</li></ul></div>'+
+  '<div class="block"><h3>🩻 Pancreatitis — scores y Atlanta</h3>'+
+  '<button class="btn-calc" style="max-width:220px" onclick="openCalc(\'ranson\')">🧮 Ranson</button> '+
+  '<button class="btn-calc" style="max-width:220px" onclick="openCalc(\'bisap\')">🧮 BISAP</button>'+
+  '<h4>Clasificación de Atlanta revisada</h4><ul><li><strong>Leve</strong>: sin fallo orgánico ni complicaciones. <strong>Moderada</strong>: fallo orgánico transitorio (&lt;48 h) o complicaciones locales. <strong>Grave</strong>: fallo orgánico persistente (&gt;48 h).</li></ul>'+
+  '<h4>Manejo</h4><ul>'+
+  '<li><strong>Hidratación agresiva</strong> con Ringer lactato 250–500 mL/h las primeras 12–24 h, titulada por diuresis/hematocrito/BUN.</li>'+
+  '<li>Analgesia, antieméticos, <strong>nutrición enteral precoz</strong> (no reposo prolongado). ATB solo si necrosis infectada demostrada.</li>'+
+  '<li><strong>UCI</strong>: Ranson ≥3, BISAP ≥3, necrosis &gt;30% o fallo orgánico. CPRE precoz si colangitis/obstrucción biliar.</li></ul></div>'+
+  '<div class="block"><h3>🔄 Vólvulo de sigmoides</h3><ul>'+
+  '<li>Anciano/estreñido; distensión importante, Rx con asa en "grano de café". Sin signos de isquemia/peritonitis: <strong>descompresión endoscópica</strong> (colonoscopia + sonda rectal).</li>'+
+  '<li>Con isquemia, perforación o fracaso de la descompresión: <strong>cirugía</strong>. Alta recurrencia → sigmoidectomía electiva.</li></ul></div>'+
+  '<div class="block"><h3>🕳️ Reducción de hernia</h3><ul>'+
+  '<li><strong>Incarcerada sin estrangulación</strong>: intentar <strong>taxis</strong> — Trendelenburg, analgesia/sedación, hielo local, presión suave y sostenida en el eje del saco.</li>'+
+  '<li><strong>NO reducir</strong> si hay signos de estrangulación (dolor intenso, piel eritematosa, fiebre, leucocitosis, &gt;6–8 h): riesgo de reintroducir asa necrótica → <strong>cirugía urgente</strong>.</li></ul>'+
+  '<div class="callout crit">Hernia dolorosa, no reductible, con compromiso general = estrangulación: no forzar la reducción, cirugía urgente.</div></div>';
 }
 
 /* ---- Politraumatizado ---- */
@@ -2084,6 +2123,171 @@ async function changePass(){
   PASS_HASH=await sha256(a); localStorage.setItem('emergsmart_passhash',PASS_HASH);
   res.style.borderColor='var(--green)'; msg.style.color='var(--green)'; msg.textContent='Contraseña actualizada.';
 }
+
+/* ---- ORL ---- */
+function orlHTML(){ return ''+
+  '<div class="block"><h3>🩸 Epistaxis</h3>'+
+  '<h4>Anterior vs posterior</h4>'+
+  '<div class="table-wrap"><table style="min-width:520px"><thead><tr><th></th><th>Anterior (90%)</th><th>Posterior</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Origen</td><td>Plexo de Kiesselbach (tabique)</td><td>Arteria esfenopalatina</td></tr>'+
+  '<tr><td class="drug-name">Sangrado</td><td>Unilateral, visible, hacia afuera</td><td>Abundante, bilateral, a faringe; deglución de sangre</td></tr>'+
+  '<tr><td class="drug-name">Perfil</td><td>Joven, leve</td><td>Anciano/HTA/anticoagulado, grave</td></tr>'+
+  '</tbody></table></div>'+
+  '<h4>Manejo del sangrado anterior</h4><ol class="steps">'+
+  '<li>Compresión digital firme de las alas nasales 10–15 min, sentado e inclinado hacia adelante.</li>'+
+  '<li>Vasoconstrictor tópico (oximetazolina) ± anestésico.</li>'+
+  '<li>Si se ve el punto: <strong>cauterización química</strong> con nitrato de plata (no cauterizar ambos lados del tabique).</li>'+
+  '<li>Si persiste: <strong>taponamiento anterior</strong> (mecha/esponja expansible o gasa con vaselina en acordeón), retirar en 24–48 h.</li></ol>'+
+  '<h4>Sangrado posterior</h4><ul>'+
+  '<li>Taponamiento posterior (balón doble o sonda de <strong>Foley</strong>: introducir, inflar el balón en cavum, traccionar y fijar) + taponamiento anterior.</li>'+
+  '<li><strong>Internación</strong> (riesgo de hipoxia/reflejo vagal, obstrucción); valorar ATB, embolización/ligadura si refractario.</li></ul>'+
+  '<h4>Epistaxis en anticoagulado</h4><ul><li>Priorizar la compresión y el taponamiento; medir INR; revertir solo si sangrado grave/inestable (no suspender de rutina). Ácido tranexámico tópico útil.</li></ul>'+
+  '<h4>Causas</h4><ul><li>HTA, trauma/digital, sequedad ambiental, cuerpos extraños, coagulopatía/antiagregación, telangiectasias (Rendu-Osler), tumores.</li></ul></div>'+
+  '<div class="block"><h3>😷 Angina de Ludwig</h3>'+
+  '<p>Celulitis rápidamente progresiva del espacio submandibular/sublingual (origen dental).</p>'+
+  '<h4>Clínica</h4><ul><li><strong>Trismus</strong>, disfagia, odinofagia, <strong>protrusión/elevación de la lengua</strong>, edema submandibular indurado, sialorrea, <strong>estridor</strong> (obstrucción inminente).</li></ul>'+
+  '<h4>Vía aérea</h4><ul><li>Alto riesgo de obstrucción: <strong>IOT despierto con fibroscopio</strong> o <strong>traqueotomía/vía quirúrgica</strong> con el paciente despierto. NO secuencia rápida sin plan (la relajación puede colapsar la vía y la anatomía impide ventilar/intubar).</li></ul>'+
+  '<h4>Tratamiento</h4><ul><li>ATB IV: <strong>ampicilina-sulbactam</strong> (o clindamicina) + <strong>metronidazol</strong>; drenaje quirúrgico del espacio y control del foco dental.</li></ul>'+
+  '<div class="callout crit">Asegurar la vía aérea es la prioridad: no manipular la faringe sin plan quirúrgico disponible.</div></div>'+
+  '<div class="block"><h3>🗣️ Epiglotitis (supraglotitis)</h3>'+
+  '<h4>Adulto vs niño</h4><ul><li><strong>Niño</strong>: aspecto tóxico, postura en trípode, babeo, evolución fulminante. <strong>Adulto</strong>: más indolente, odinofagia intensa desproporcionada al examen faríngeo.</li></ul>'+
+  '<h4>Tríada</h4><ul><li><strong>Odinofagia + disfagia + babeo</strong> (las "3 D": disfagia, disfonía, distrés). Estridor = alarma.</li></ul>'+
+  '<div class="callout crit">NO examinar la faringe ni acostar al paciente sin recursos de vía aérea (riesgo de laringoespasmo/obstrucción). Asegurar la vía aérea idealmente en quirófano (IOT con ORL/anestesia y plan quirúrgico).</div>'+
+  '<h4>Tratamiento</h4><ul><li><strong>Ceftriaxona</strong> IV (± cobertura de S. aureus según medio) + <strong>dexametasona</strong>; O₂ humidificado; evitar agitar al niño.</li></ul></div>'+
+  '<div class="block"><h3>👂 Otitis</h3><ul>'+
+  '<li><strong>OMA</strong>: ATB si &lt;6 meses, otorrea, otalgia grave/&gt;48 h o fiebre ≥39 (o &lt;2 años bilateral). <strong>Amoxicilina</strong> alta dosis 1.ª línea (amoxi-clav si fracaso/reciente). Complicaciones: <strong>mastoiditis</strong> (dolor/eritema retroauricular, pabellón protruido), meningitis, parálisis facial.</li>'+
+  '<li><strong>Otitis externa</strong>: dolor a la tracción del trago, otorrea; gotas óticas ATB ± corticoide (ciprofloxacino), analgesia, mantener seco. "Otitis externa maligna" (diabético/anciano): emergencia, ATB antipseudomónico + imagen.</li></ul></div>'+
+  '<div class="block"><h3>🫁 Laringitis obstructiva / crup</h3>'+
+  '<h4>Score de Westley</h4>'+
+  '<div class="table-wrap"><table style="min-width:520px"><thead><tr><th>Ítem</th><th>Puntos</th></tr></thead><tbody>'+
+  '<tr><td>Estridor</td><td>0 no · 1 con agitación · 2 en reposo</td></tr>'+
+  '<tr><td>Tiraje</td><td>0 no · 1 leve · 2 moderado · 3 grave</td></tr>'+
+  '<tr><td>Entrada de aire</td><td>0 normal · 1 disminuida · 2 muy disminuida</td></tr>'+
+  '<tr><td>Cianosis</td><td>0 no · 4 con agitación · 5 en reposo</td></tr>'+
+  '<tr><td>Conciencia</td><td>0 normal · 5 alterada</td></tr>'+
+  '</tbody></table></div>'+
+  '<p style="margin-top:.4rem"><strong>≤2</strong> leve · <strong>3–7</strong> moderado · <strong>≥8</strong> grave.</p>'+
+  '<h4>Manejo</h4><ul>'+
+  '<li><strong>Dexametasona 0.15–0.6 mg/kg</strong> (VO/IM/IV) en todos los grados.</li>'+
+  '<li><strong>Adrenalina nebulizada</strong> (L-adrenalina) en moderado-grave; observar ≥2–4 h por efecto rebote.</li>'+
+  '<li><strong>Internación</strong>: estridor en reposo persistente, distrés, hipoxia, mala respuesta, &lt;6 meses.</li></ul></div>'+
+  '<div class="block"><h3>🧩 Cuerpo extraño</h3>'+
+  '<h4>Vía aérea</h4><ul><li>Obstrucción completa consciente: <strong>Heimlich</strong> (compresiones abdominales) en adulto/niño &gt;1 año; en <strong>lactante</strong> 5 golpes interescapulares + 5 compresiones torácicas. Inconsciente → RCP + revisar boca. Parcial con buena tos: no interferir. Laringoscopia/pinzas de Magill; broncoscopia si distal.</li></ul>'+
+  '<h4>Oído</h4><ul><li>Extracción bajo visión (gancho/pinza/irrigación). <strong>NO irrigar</strong> si es material vegetal (se expande) ni pila de botón (urgente por quemadura). Insecto: instilar lidocaína/aceite antes de extraer.</li></ul>'+
+  '<h4>Nariz</h4><ul><li><strong>Técnica del "beso materno"</strong>: ocluir la fosa sana y soplar por la boca del niño. Extracción con gancho por detrás del cuerpo extraño. <strong>Pila de botón/imán</strong>: extracción urgente (necrosis del tabique).</li></ul>'+
+  '<div class="callout warn">Pilas de botón (nariz/oído/esófago) e imanes múltiples: extracción urgente por riesgo de necrosis/perforación.</div></div>'+
+  '<div class="block"><h3>🔴 Faringoamigdalitis grave</h3>'+
+  '<h4>Absceso periamigdalino</h4><ul><li>Odinofagia unilateral intensa, <strong>trismus</strong>, voz "de papa caliente", úvula desviada, abombamiento del pilar. Manejo: <strong>drenaje</strong> (punción/incisión) + ATB (amoxi-clav o clindamicina) + corticoide + analgesia. Amigdalectomía si recurrente/complicado.</li></ul>'+
+  '<h4>Absceso retrofaríngeo</h4><ul><li>Más en niños; disfagia, rigidez cervical, fiebre. <strong>TC de cuello con contraste</strong>; drenaje quirúrgico + ATB IV. Riesgo de extensión al mediastino y compromiso de vía aérea.</li></ul></div>'; }
+
+/* ---- Oftalmología ---- */
+function oftalmoHTML(){ return ''+
+  '<div class="block"><h3>🔴 Ojo rojo — algoritmo</h3>'+
+  '<div class="table-wrap"><table style="min-width:640px"><thead><tr><th>Entidad</th><th>Claves</th><th>Manejo</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Conjuntivitis viral</td><td>Secreción acuosa, adenopatía preauricular, bilateral, muy contagiosa</td><td>Sintomático, higiene; autolimitada</td></tr>'+
+  '<tr><td class="drug-name">Conjuntivitis bacteriana</td><td>Secreción purulenta, párpados pegados</td><td>Colirio ATB (tobramicina, fluoroquinolona)</td></tr>'+
+  '<tr><td class="drug-name">Conjuntivitis alérgica</td><td>Prurito, quemosis, bilateral, atopia</td><td>Antihistamínico tópico, evitar alérgeno</td></tr>'+
+  '<tr><td class="drug-name">Uveítis anterior</td><td>Dolor, fotofobia, miosis, inyección ciliar, Tyndall</td><td>Derivación urgente; ciclopléjico + corticoide (por oftalmo)</td></tr>'+
+  '<tr><td class="drug-name">Queratitis / úlcera corneal</td><td>Dolor, fotofobia, tinción con fluoresceína +, portador de LC</td><td>Colirio ATB intensivo; NO corticoides ni parche; derivar</td></tr>'+
+  '<tr><td class="drug-name">Epiescleritis</td><td>Enrojecimiento sectorial, poco/nada de dolor, blanquea con fenilefrina</td><td>Autolimitada, AINE</td></tr>'+
+  '<tr><td class="drug-name">Escleritis</td><td>Dolor intenso profundo, no blanquea, enf. sistémica</td><td>Derivación; AINE/inmunosupresión</td></tr>'+
+  '</tbody></table></div>'+
+  '<div class="callout warn">Banderas rojas del ojo rojo: dolor intenso, pérdida de visión, fotofobia marcada, pupila anormal, portador de lentes de contacto, tinción corneal → derivación urgente.</div></div>'+
+  '<div class="block"><h3>💢 Glaucoma agudo de ángulo cerrado</h3>'+
+  '<h4>Clínica</h4><ul><li>Dolor ocular intenso, cefalea, náuseas/vómitos, visión borrosa con <strong>halos</strong>, <strong>ojo duro</strong> (pétreo), <strong>midriasis media arreactiva</strong>, córnea turbia. PIO muy elevada.</li></ul>'+
+  '<h4>Manejo urgente</h4><ul>'+
+  '<li><strong>Acetazolamida 500 mg IV</strong> (luego VO), <strong>timolol</strong> colirio, <strong>pilocarpina</strong> colirio (2%), corticoide tópico.</li>'+
+  '<li><strong>Manitol 20% IV</strong> si no responde.</li>'+
+  '<li><strong>Derivación urgente</strong> a oftalmología (iridotomía láser definitiva).</li></ul>'+
+  '<div class="callout crit">Emergencia: la PIO elevada mantenida produce pérdida visual irreversible en horas.</div></div>'+
+  '<div class="block"><h3>🥊 Trauma ocular</h3><ul>'+
+  '<li><strong>Contuso</strong>: <strong>hifema</strong> (sangre en cámara anterior, "prune-juice"): reposo semisentado, protección, control de PIO; vigilar resangrado. Descartar estallido orbitario (diplopía, enoftalmos, atrapamiento).</li>'+
+  '<li><strong>Penetrante / estallido</strong>: <strong>NO presionar el ojo</strong>, <strong>protección con cobertor rígido</strong> (no parche compresivo), antieméticos (evitar Valsalva), analgesia, ATB, ayuno; <strong>NO manipular</strong> ni retirar cuerpos extraños enclavados; profilaxis antitetánica; derivación quirúrgica urgente.</li>'+
+  '<li><strong>Quemadura química</strong>: <strong>irrigación copiosa INMEDIATA</strong> con SF/agua ≥30 min (antes que nada, incluso antes de la evaluación); medir <strong>pH hasta neutralizar</strong> (7.0–7.4); evertir párpados y retirar partículas; derivación urgente (los álcalis son peores que los ácidos).</li>'+
+  '<li><strong>Abrasión corneal</strong>: fluoresceína +; colirio/pomada ATB, analgesia; <strong>NO parche oclusivo</strong> (sobre todo en portadores de LC o abrasión vegetal/por uñas).</li></ul>'+
+  '<div class="callout crit">Quemadura química ocular: irrigar de inmediato, sin esperar. El tiempo hasta la irrigación determina el pronóstico.</div></div>'+
+  '<div class="block"><h3>👁️ Pérdida visual súbita</h3><ul>'+
+  '<li><strong>Oclusión de la arteria central de la retina (OACR)</strong>: pérdida indolora brusca, "mancha rojo cereza". Emergencia (ventana &lt;6 h): masaje ocular digital, <strong>acetazolamida</strong>, O₂/hipercapnia, paracentesis por oftalmo; estudiar como un ACV (descartar arteritis de la temporal → VSG/PCR, corticoides si sospecha).</li>'+
+  '<li><strong>Oclusión de la vena central (OVCR)</strong>: hemorragias "en llamarada" difusas; derivación (tratamiento de complicaciones: anti-VEGF).</li>'+
+  '<li><strong>Desprendimiento de retina</strong>: <strong>miodesopsias</strong>, <strong>fotopsias</strong> y "cortina/velo"; derivación urgente (mácula-on es tiempo-dependiente).</li>'+
+  '<li><strong>Neuritis óptica</strong>: pérdida subaguda + dolor con los movimientos + defecto pupilar aferente; asociación con <strong>esclerosis múltiple</strong>; corticoides IV (metilprednisolona).</li>'+
+  '<li><strong>Amaurosis fugaz</strong>: pérdida monocular transitoria = <strong>AIT ocular</strong> → estudio vascular urgente (carótidas, fuente embólica), antiagregación.</li></ul></div>'; }
+
+/* ---- Dermatología ---- */
+function dermaHTML(){ return ''+
+  '<div class="block"><h3>🧴 Stevens-Johnson / NET</h3>'+
+  '<h4>Diferencia por superficie desprendida</h4><ul><li><strong>SJS &lt;10% SCQ</strong> · solapamiento 10–30% · <strong>NET &gt;30%</strong>. Afectación de mucosas, Nikolsky +, ampollas y desprendimiento epidérmico.</li></ul>'+
+  '<h4>Causas</h4><ul><li>Fármacos: <strong>alopurinol</strong>, antiepilépticos (lamotrigina, carbamazepina, fenitoína), <strong>sulfamidas</strong>, algunos ATB, AINE oxicam, nevirapina.</li></ul>'+
+  '<h4>Manejo</h4><ul><li><strong>Suspender de inmediato el fármaco causal</strong>; manejo tipo gran quemado en <strong>UCI/unidad de quemados</strong> (líquidos, temperatura, cuidado de piel/mucosas, analgesia, prevención de infección); valorar IVIG/ciclosporina/etanercept (evidencia variable).</li></ul>'+
+  '<h4>SCORTEN (pronóstico)</h4><ul><li>Edad &gt;40, FC &gt;120, cáncer, SCQ desprendida &gt;10%, urea &gt;10 mmol/L, glucosa &gt;14 mmol/L (252 mg/dL), bicarbonato &lt;20. A mayor puntaje, mayor mortalidad.</li></ul>'+
+  '<div class="callout crit">Ampollas + afectación de mucosas + Nikolsky positivo tras un fármaco: sospechar SJS/NET, suspender el fármaco y derivar de urgencia.</div></div>'+
+  '<div class="block"><h3>🟣 Meningococemia</h3><ul>'+
+  '<li><strong>Petequias/púrpura + fiebre = meningococo</strong> hasta que se demuestre lo contrario. Aspecto tóxico, rápida progresión.</li>'+
+  '<li><strong>Púrpura fulminans</strong>: CID con necrosis cutánea; shock.</li>'+
+  '<li><strong>ATB inmediato</strong>: <strong>ceftriaxona 2 g IV sin demora</strong> (incluso prehospitalario/antes de la PL). Aislamiento respiratorio de gotas; profilaxis a contactos.</li></ul>'+
+  '<div class="callout crit">No esperar la punción lumbar ni los cultivos para administrar el antibiótico: la demora aumenta la mortalidad.</div></div>'+
+  '<div class="block"><h3>🌡️ Urticaria y angioedema</h3>'+
+  '<p>Ronchas pruriginosas evanescentes ± angioedema. Manejo con antihistamínicos H1; adrenalina IM si hay compromiso sistémico/anafilaxia.</p>'+
+  '<button class="sx-link" onclick="irSistema(\'alergias\')">→ Ver Alergias (anafilaxia/angioedema)</button></div>'+
+  '<div class="block"><h3>🦠 Erisipela vs celulitis</h3>'+
+  '<p>Erisipela: dermis superficial, bordes netos elevados, muy eritematosa (estreptococo). Celulitis: dermis profunda, bordes difusos.</p>'+
+  '<button class="sx-link" onclick="irSistema(\'infeccioso\')">→ Ver Infeccioso (piel y partes blandas / LRINEC)</button></div>'+
+  '<div class="block"><h3>🔬 Exantemas de urgencia</h3>'+
+  '<div class="table-wrap"><table style="min-width:600px"><thead><tr><th>Tipo</th><th>Claves</th><th>Ejemplos</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Viral</td><td>Maculopapular, pródromo, autolimitado</td><td>Sarampión, rubéola, exantema súbito, enterovirus</td></tr>'+
+  '<tr><td class="drug-name">Bacteriano/toxina</td><td>Escarlatiniforme, aspecto tóxico</td><td>Escarlatina, SST, síndrome de shock tóxico</td></tr>'+
+  '<tr><td class="drug-name">Medicamentoso</td><td>Simétrico, tras fármaco; alarma si mucosas/ampollas</td><td>Exantema fijo, DRESS, SJS/NET</td></tr>'+
+  '<tr><td class="drug-name">Vasculítico</td><td>Púrpura palpable en zonas declives</td><td>Schönlein-Henoch, vasculitis leucocitoclástica</td></tr>'+
+  '</tbody></table></div>'+
+  '<div class="callout crit">Banderas rojas del exantema: petequias/púrpura, afectación de mucosas, Nikolsky +, fiebre alta con aspecto tóxico, dolor cutáneo desproporcionado → descartar meningococemia, SJS/NET, SST y fascitis.</div></div>'+
+  '<div class="block"><h3>👶 Síndrome de piel escaldada estafilocócica (SSSS)</h3><ul>'+
+  '<li>Sobre todo en <strong>niños pequeños</strong>; toxina exfoliativa de S. aureus. Eritema + ampollas flácidas + descamación, Nikolsky +, <strong>mucosas respetadas</strong> (a diferencia de SJS/NET).</li>'+
+  '<li>Manejo: <strong>ATB antiestafilocócico</strong> (cloxacilina/cefazolina; vancomicina si SAMR), líquidos, cuidado de la piel, analgesia.</li></ul></div>'; }
+
+/* ---- Traumatología ---- */
+function traumatologiaHTML(){ return ''+
+  '<div class="block"><h3>🦴 Fracturas frecuentes</h3>'+
+  '<div class="table-wrap"><table style="min-width:640px"><thead><tr><th>Fractura</th><th>Claves</th><th>Manejo</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Colles (radio distal)</td><td>Caída con mano extendida, "dorso de tenedor"</td><td>Reducción cerrada + férula antebraquial; cirugía si intraarticular/inestable/desplazada.</td></tr>'+
+  '<tr><td class="drug-name">Escafoides</td><td>Dolor en tabaquera anatómica; Rx puede ser normal</td><td>Inmovilizar (incluye pulgar) y repetir Rx/TC/RM en 10–14 d. Riesgo de necrosis avascular.</td></tr>'+
+  '<tr><td class="drug-name">5.º metatarsiano</td><td>Avulsión (base, buena consolidación) vs Jones (unión metafiso-diafisaria, mala unión)</td><td>Avulsión: funcional. Jones: bota/descarga; valorar cirugía.</td></tr>'+
+  '<tr><td class="drug-name">Tobillo</td><td>Reglas de Ottawa para decidir Rx</td><td>Según estabilidad; férula/cirugía si inestable.</td></tr>'+
+  '<tr><td class="drug-name">Rodilla</td><td>Reglas de Ottawa de rodilla</td><td>Inmovilización según lesión.</td></tr>'+
+  '<tr><td class="drug-name">Cadera</td><td>Anciano, MI acortado y en rotación externa; clasificación de Garden</td><td>Casi siempre <strong>quirúrgica</strong> (precoz); analgesia, profilaxis de TEV.</td></tr>'+
+  '<tr><td class="drug-name">Clavícula</td><td>Tercio medio la más frecuente</td><td>Cabestrillo; cirugía si acortamiento/desplazamiento marcado o abierta.</td></tr>'+
+  '<tr><td class="drug-name">Costillas</td><td>Fractura de 1.ª-2.ª costilla = trauma de alta energía; múltiples = volet</td><td>Analgesia (clave), fisioterapia respiratoria; vigilar contusión/neumotórax.</td></tr>'+
+  '</tbody></table></div>'+
+  '<h4>Reglas de Ottawa</h4><ul>'+
+  '<li><strong>Tobillo</strong>: Rx si dolor en la zona maleolar + dolor óseo en el borde posterior/punta de un maléolo o incapacidad para cargar 4 pasos.</li>'+
+  '<li><strong>Pie</strong>: dolor en el mediopié + dolor en base del 5.º MTT o navicular o incapacidad de carga.</li>'+
+  '<li><strong>Rodilla</strong>: edad ≥55, dolor en cabeza del peroné o rótula, imposibilidad de flexionar 90° o de cargar 4 pasos.</li></ul>'+
+  '<button class="sx-link" onclick="irSistema(\'politrauma\')">→ Trauma pélvico (ver Politrauma)</button></div>'+
+  '<div class="block"><h3>🔩 Luxaciones</h3><ul>'+
+  '<li><strong>Hombro (anterior)</strong>, la más frecuente: brazo en abducción/rotación externa, hombro "en charretera". Reducir con analgesia/sedación: <strong>Cunningham</strong> (masaje, sin tracción), <strong>Milch</strong>, tracción-contratracción, Stimson. Rx pre y post; explorar el nervio axilar.</li>'+
+  '<li><strong>Cadera</strong> (posterior, la típica): MI acortado, aducido y en rotación interna. <strong>Emergencia</strong>: reducir &lt;6 h (necrosis avascular); bajo sedación/anestesia.</li>'+
+  '<li><strong>Rodilla</strong>: <strong>emergencia vascular</strong> (lesión de la arteria poplítea); explorar pulsos, ITB y <strong>eco-doppler/angio-TC</strong> aunque se reduzca; alto riesgo aun con pulsos presentes.</li>'+
+  '<li><strong>Tobillo</strong>: reducir de urgencia si hay compromiso vasculonervioso o de la piel (no esperar la Rx).</li>'+
+  '<li><strong>Codo</strong>: reducción con tracción longitudinal + flexión; Rx post y control neurovascular (nervio cubital/braquial).</li></ul></div>'+
+  '<div class="block"><h3>⏱️ Síndrome compartimental</h3>'+
+  '<h4>Las 6 P</h4><ul><li><strong>Pain</strong> (dolor desproporcionado y con el estiramiento pasivo — el más precoz y sensible), <strong>Pressure</strong> (tensión), <strong>Paresthesia</strong>, <strong>Paralysis</strong>, <strong>Pallor</strong>, <strong>Pulselessness</strong> (tardío).</li></ul>'+
+  '<h4>Diagnóstico y manejo</h4><ul>'+
+  '<li>Presión compartimental <strong>&gt;30 mmHg</strong>, o presión diferencial (PAD − Pcompartimental) <strong>&lt;30 mmHg</strong> → <strong>fasciotomía urgente</strong>.</li>'+
+  '<li>Causas: fractura, <strong>yeso/vendaje apretado</strong> (abrir/retirar), reperfusión, aplastamiento, quemadura circunferencial.</li>'+
+  '<li><strong>NO elevar</strong> el miembro (mantener a la altura del corazón), retirar constricciones, analgesia; fasciotomía sin demora.</li></ul>'+
+  '<div class="callout crit">El dolor desproporcionado y con el estiramiento pasivo precede a la ausencia de pulso: no esperar a las 6 P completas para la fasciotomía.</div></div>'+
+  '<div class="block"><h3>✂️ Amputaciones traumáticas</h3><ul>'+
+  '<li><strong>Muñón</strong>: presión directa; torniquete si hemorragia no controlable (registrar la hora).</li>'+
+  '<li><strong>Segmento amputado</strong>: limpiar suavemente con SF, <strong>envolver en gasa húmeda (SF)</strong>, meter en <strong>bolsa plástica sellada</strong> y esta sobre hielo/agua fría. <strong>NO contacto directo con hielo</strong> (congelación) ni sumergir en agua.</li>'+
+  '<li><strong>Ventana de reimplante</strong>: isquemia caliente dedos &lt;12 h / mano-antebrazo &lt;6 h (se prolonga con isquemia fría). Derivación urgente a centro de reimplante.</li></ul></div>'+
+  '<div class="block"><h3>🩹 Lesiones de partes blandas</h3>'+
+  '<h4>Heridas</h4><ul><li>Irrigación abundante, exploración (tendón/vaso/nervio/cuerpo extraño). Cierre primario &lt;6–12 h en heridas limpias; <strong>cierre diferido/segunda intención</strong> si contaminada, mordedura o &gt;12–24 h.</li></ul>'+
+  '<h4>Mordeduras</h4><ul><li><strong>No sutura primaria</strong> (salvo cara por estética), lavado profuso; <strong>amoxicilina-clavulánico</strong> profiláctico (Pasteurella/anaerobios/Eikenella en humanas); valorar <strong>profilaxis antirrábica</strong> y antitetánica.</li></ul>'+
+  '<h4>Profilaxis antitetánica</h4>'+
+  '<div class="table-wrap"><table style="min-width:560px"><thead><tr><th>Vacunación</th><th>Herida limpia menor</th><th>Herida tetanígena</th></tr></thead><tbody>'+
+  '<tr><td class="drug-name">Desconocida o &lt;3 dosis</td><td>Vacuna (dTpa/dT)</td><td>Vacuna + <strong>inmunoglobulina antitetánica</strong></td></tr>'+
+  '<tr><td class="drug-name">≥3 dosis</td><td>Vacuna solo si &gt;10 años de la última</td><td>Vacuna solo si &gt;5 años; IG no necesaria</td></tr>'+
+  '</tbody></table></div>'+
+  '<h4>Lesiones tendinosas</h4><ul><li><strong>Aquiles</strong>: dolor, brecha palpable, <strong>test de Thompson</strong> + (no flexión plantar al comprimir la pantorrilla); inmovilizar en equino y derivar. <strong>Manguito rotador</strong>: dolor y debilidad a la abducción/rotación; cirugía en roturas agudas funcionales del paciente activo.</li></ul></div>'; }
 
 /* ---- Obstetricia ---- */
 function obstetriciaHTML(){ return ''+
