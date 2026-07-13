@@ -486,7 +486,8 @@ var SISTEMAS=[
   {id:'politrauma',  name:'Politrauma',   icon:'🚑', real:true},
   {id:'trauma',      name:'Trauma',       icon:'🩹'},
   {id:'obstetricia', name:'Obstetricia',  icon:'🤰', real:true},
-  {id:'gineco',      name:'Gineco',       icon:'👶'}
+  {id:'gineco',      name:'Gineco',       icon:'👶'},
+  {id:'pediatria',   name:'Pediatría',    icon:'🧒', real:true}
 ];
 
 var POCUS=[
@@ -1199,8 +1200,115 @@ function showSysSub(id,init){
   else if(id==='infeccioso'){ c.innerHTML=infecHTML(); }
   else if(id==='cirugia'){ c.innerHTML=cirugiaHTML(); }
   else if(id==='politrauma'){ c.innerHTML=politraumaHTML(); wirePolitrauma(); }
+  else if(id==='pediatria'){ c.innerHTML=pediatriaHTML(); calcWestley(); }
   else{ c.innerHTML='<div class="card placeholder-card"><div class="ph-icon">'+s.icon+'</div><h3>'+s.name+'</h3><p>Contenido en desarrollo</p></div>'; }
   if(!init) resetSearch();
+}
+
+/* ═══════════════ v1.6 · Sistema Pediatría ═══════════════ */
+var PEDI_WT=[5,10,15,20,25,30,40,50];
+var PEDI_DOSES=[
+  {n:'Adrenalina (PCR)',unit:'mg',perkg:0.01,max:1,via:'IV/IO',obs:'1:10.000 (0.1 mL/kg). Repetir c/3-5 min.'},
+  {n:'Adrenalina (anafilaxia)',unit:'mg',perkg:0.01,max:0.5,via:'IM',obs:'1:1.000, cara anterolateral del muslo.'},
+  {n:'Atropina',unit:'mg',perkg:0.02,min:0.1,max:0.5,via:'IV/IO',obs:'Mín 0.1 mg (evita bradicardia paradójica).'},
+  {n:'Diazepam',unit:'mg',perkg:0.3,max:10,via:'IV',obs:'Convulsión. Rectal 0.5 mg/kg.'},
+  {n:'Midazolam intranasal',unit:'mg',perkg:0.2,max:10,via:'IN',obs:'Alternativa sin acceso IV.'},
+  {n:'Adenosina (1ª dosis)',unit:'mg',perkg:0.1,max:6,via:'IV rápido',obs:'TPSV. 2ª dosis 0.2 mg/kg (máx 12 mg).'},
+  {n:'Amiodarona (PCR)',unit:'mg',perkg:5,via:'IV/IO',obs:'FV/TV sin pulso refractaria.'},
+  {n:'Bicarbonato de sodio',unit:'mEq',perkg:1,via:'IV',obs:'Solo acidosis grave documentada / PCR prolongado.'},
+  {n:'Glucosa 25%',unit:'mL',perkg:2,via:'IV',obs:'Hipoglucemia (= 0.5 g/kg).'},
+  {n:'Morfina',unit:'mg',perkg:0.1,max:5,via:'IV',obs:'Analgesia. Titular.'},
+  {n:'Ibuprofeno',unit:'mg',perkg:10,max:400,via:'VO',obs:'Antitérmico/analgésico. >6 meses.'},
+  {n:'Paracetamol',unit:'mg',perkg:15,max:1000,via:'VO/IV',obs:'Antitérmico/analgésico.'}
+];
+function pdFmt(v){ v=Math.round(v*100)/100; return String(v); }
+function pediDoseTable(){
+  var head='<tr><th>Fármaco</th>'+PEDI_WT.map(function(w){return '<th>'+w+' kg</th>';}).join('')+'<th>Vía</th><th>Observaciones</th></tr>';
+  var rows=PEDI_DOSES.map(function(d){
+    var cells=PEDI_WT.map(function(w){ var v=d.perkg*w, cap=false; if(d.min&&v<d.min)v=d.min; if(d.max&&v>d.max){v=d.max;cap=true;} return '<td>'+pdFmt(v)+(cap?'<span style="color:var(--amber)"> máx</span>':'')+'</td>'; }).join('');
+    return '<tr><td><span class="drug-name">'+d.n+'</span><div class="cell-sub">'+d.unit+'</div></td>'+cells+'<td>'+d.via+'</td><td>'+d.obs+'</td></tr>';
+  }).join('');
+  return '<div class="table-wrap"><table style="min-width:860px"><thead>'+head+'</thead><tbody>'+rows+'</tbody></table></div>';
+}
+function calcWestley(){
+  var g=function(id){ var e=document.getElementById(id); return e?(parseInt(e.value,10)||0):0; };
+  var r=document.getElementById('westley-res'); if(!r)return;
+  var s=g('w-estridor')+g('w-tiraje')+g('w-aire')+g('w-cian')+g('w-conc');
+  var cat,cls,man;
+  if(s<3){ cat='Leve'; cls='green'; man='Dexametasona 0.15-0.6 mg/kg VO dosis única. Manejo ambulatorio, aire humidificado y control.'; }
+  else if(s<=7){ cat='Moderado'; cls='amber'; man='Dexametasona IM + adrenalina nebulizada (L-adrenalina 5 mL al 1:1000). Observar 2-4 h.'; }
+  else { cat='Grave'; cls='red'; man='Dexametasona + adrenalina nebulizada + hospitalización. Considerar intubación (tubo 0.5 mm menor).'; }
+  r.className='calc-res show';
+  r.innerHTML='<div class="score" style="color:var(--'+cls+')">Westley '+s+' · '+cat+'</div><div class="interp">'+man+'</div>';
+}
+function pediSx(icon,title,body,open){
+  return '<div class="block sx"><div class="sx-head" onclick="toggleSx(this)"><h3>'+icon+' '+title+'</h3><span class="sx-arrow">▾</span></div><div class="sx-body'+(open?' show':'')+'">'+body+'</div></div>';
+}
+function pediatriaHTML(){
+  var s1=''+
+    '<p>Enfoque de la fiebre según la edad. Umbral de fiebre: temperatura rectal ≥38 °C.</p>'+
+    '<h4>0-3 meses</h4><ul>'+
+    '<li><strong>Siempre hospitalizar</strong> y estudiar: hemocultivo, urocultivo, <strong>punción lumbar</strong> y ATB empírico.</li>'+
+    '<li>Riesgo alto de infección bacteriana grave (IBG); la clínica es poco fiable a esta edad.</li></ul>'+
+    '<h4>3-36 meses</h4><ul>'+
+    '<li>Temperatura &lt;39 °C sin foco y buen estado general → <strong>observación</strong> y control.</li>'+
+    '<li>≥39 °C → <strong>urocultivo</strong> (sobre todo niñas y varones no circuncidados); considerar hemocultivo.</li></ul>'+
+    '<h4>&gt;3 años</h4><ul><li>Buscar foco clínico y tratar según la etiología.</li></ul>'+
+    '<div class="callout crit"><strong>Signos de alarma → derivación urgente:</strong> petequias, rigidez de nuca, llanto inconsolable, fontanela abombada, mal estado general o relleno capilar lento.</div>';
+  var s2=''+
+    '<h4>Convulsión febril simple</h4><ul>'+
+    '<li>&lt;15 min, generalizada, única en 24 h, entre 6 meses y 5 años.</li>'+
+    '<li><strong>No requiere</strong> estudios de urgencia (ni EEG, ni neuroimagen, ni PL de rutina).</li></ul>'+
+    '<h4>Convulsión febril compleja</h4><ul>'+
+    '<li>&gt;15 min, focal o recurrente en 24 h.</li>'+
+    '<li>Valorar <strong>EEG, neuroimagen</strong> y considerar <strong>PL</strong> (sobre todo &lt;12 meses o sospecha de meningitis).</li></ul>'+
+    '<h4>Manejo agudo</h4><ul>'+
+    '<li><strong>Diazepam rectal 0.5 mg/kg</strong> o <strong>midazolam intranasal 0.2 mg/kg</strong> si la crisis persiste.</li></ul>'+
+    '<div class="callout warn">No hay indicación de ATB ni de antiepilépticos de mantenimiento de rutina. Tratar la causa de la fiebre.</div>';
+  var westley=''+
+    '<h4>Score de Westley</h4>'+
+    '<div class="fld"><label>Estridor inspiratorio</label><select id="w-estridor" onchange="calcWestley()"><option value="0">Ninguno (0)</option><option value="1">Con agitación (1)</option><option value="2">En reposo (2)</option></select></div>'+
+    '<div class="fld"><label>Tiraje / retracción</label><select id="w-tiraje" onchange="calcWestley()"><option value="0">Ninguno (0)</option><option value="1">Leve (1)</option><option value="2">Moderado (2)</option><option value="3">Grave (3)</option></select></div>'+
+    '<div class="fld"><label>Entrada de aire</label><select id="w-aire" onchange="calcWestley()"><option value="0">Normal (0)</option><option value="1">Disminuida (1)</option><option value="2">Muy disminuida (2)</option></select></div>'+
+    '<div class="fld"><label>Cianosis</label><select id="w-cian" onchange="calcWestley()"><option value="0">Ninguna (0)</option><option value="4">Con agitación (4)</option><option value="5">En reposo (5)</option></select></div>'+
+    '<div class="fld"><label>Nivel de conciencia</label><select id="w-conc" onchange="calcWestley()"><option value="0">Normal (0)</option><option value="5">Alterado / desorientado (5)</option></select></div>'+
+    '<div class="calc-res show" id="westley-res"></div>';
+  var s3=westley+
+    '<h4 style="margin-top:1rem">Interpretación y manejo</h4><ul>'+
+    '<li><strong>Leve (&lt;3):</strong> dexametasona 0.15-0.6 mg/kg VO dosis única.</li>'+
+    '<li><strong>Moderado (3-7):</strong> dexametasona IM + adrenalina nebulizada (L-adrenalina 5 mL al 1:1000).</li>'+
+    '<li><strong>Grave (≥8):</strong> lo anterior + hospitalización + considerar intubación.</li></ul>';
+  var s4=''+
+    '<h4>Criterios de internación</h4><ul>'+
+    '<li>FR &gt;60, SatO₂ &lt;92%, apneas, rechazo del alimento, edad &lt;2 meses o comorbilidades.</li></ul>'+
+    '<h4>Manejo</h4><ul>'+
+    '<li>O₂ para SatO₂ ≥94%, suero fisiológico intranasal, posición semisentada.</li>'+
+    '<li>Adrenalina nebulizada: puede usarse en la forma moderada; observar 2-4 h antes del alta.</li></ul>'+
+    '<div class="callout warn"><strong>No indicado de rutina:</strong> ATB, corticoides ni broncodilatadores.</div>';
+  var s5=''+
+    '<h4>Clasificación del grado</h4><ul>'+
+    '<li><strong>Leve (&lt;5%):</strong> mucosas algo secas, sed, irritable.</li>'+
+    '<li><strong>Moderada (5-10%):</strong> ojos hundidos, llanto sin lágrimas, pliegue cutáneo lento.</li>'+
+    '<li><strong>Grave (&gt;10%):</strong> hipotensión, letargo, relleno capilar &gt;3 s.</li></ul>'+
+    '<h4>Plan de hidratación</h4><ul>'+
+    '<li><strong>Leve/moderada:</strong> SRO 50-100 mL/kg en 4 h VO + reposición de pérdidas.</li>'+
+    '<li><strong>Grave:</strong> SF 20 mL/kg en bolo IV, repetir si es necesario; luego mantenimiento.</li></ul>';
+  var s6='<p>Dosis calculadas automáticamente por peso. <span style="color:var(--amber)">máx</span> = tope de dosis alcanzado.</p>'+pediDoseTable();
+  var s7=''+
+    '<h4>Diferencias con el adulto</h4><ul>'+
+    '<li><strong>Relación compresión:ventilación:</strong> 15:2 (2 reanimadores), 30:2 (1 reanimador).</li>'+
+    '<li><strong>Profundidad:</strong> 1/3 del diámetro AP del tórax (~4 cm lactante, ~5 cm niño).</li>'+
+    '<li><strong>DEA:</strong> usar atenuador pediátrico en &lt;8 años / &lt;25 kg.</li>'+
+    '<li><strong>Acceso:</strong> vía intraósea (IO) si no hay acceso IV en &lt;60 s.</li>'+
+    '<li><strong>Desfibrilación:</strong> 2-4 J/kg (bifásico).</li>'+
+    '<li><strong>Secuencia:</strong> A-B-C en el neonato; C-A-B en el niño.</li></ul>';
+  return pediSx('🌡️','1 · Fiebre en el niño',s1,true)+
+    pediSx('⚡','2 · Convulsión febril',s2)+
+    pediSx('😮‍💨','3 · Crup — Score de Westley',s3)+
+    pediSx('🫁','4 · Bronquiolitis',s4)+
+    pediSx('💧','5 · Deshidratación',s5)+
+    pediSx('💉','6 · Dosis pediátricas de emergencia',s6)+
+    pediSx('❤️','7 · RCP pediátrico',s7);
 }
 
 /* ---- Cardio real ---- */
