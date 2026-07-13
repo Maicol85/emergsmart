@@ -21,7 +21,53 @@
     --r:12px; --rs:8px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+  /* ═══ v1.5 · Tema claro (override de variables) ═══ */
+  body.light{
+    --bg:#eef2f7; --surface:#ffffff; --surface2:#f1f5f9; --surface3:#e2e8f0;
+    --border:#e2e8f0; --border2:#cbd5e1;
+    --text:#0f172a; --muted:#475569; --muted2:#64748b;
+    --teal-dim:rgba(20,184,166,.14); --teal-dim2:rgba(20,184,166,.07);
+    --red-dim:rgba(244,63,94,.10); --amber-dim:rgba(245,158,11,.13); --green-dim:rgba(34,197,94,.13);
+    --blue-dim:rgba(59,130,246,.10); --orange-dim:rgba(249,115,22,.13); --purple-dim:rgba(168,85,247,.12);
+    --shadow:0 2px 10px rgba(15,23,42,.08);
+  }
+  /* ═══ v1.5 · Fármacos: badges y leyendas ═══ */
+  .cell-sub{color:var(--muted2);font-size:.72rem;margin-top:.15rem}
+  .fda{display:inline-block;font-weight:800;font-size:.8rem;padding:.1rem .55rem;border-radius:999px}
+  .fda-ok{background:var(--green-dim);color:var(--green)}
+  .fda-warn{background:var(--amber-dim);color:var(--amber)}
+  .fda-bad{background:var(--red-dim);color:var(--red)}
+  .tcell{font-size:.82rem;font-weight:600}
+  .t-ok{color:var(--green)} .t-warn{color:var(--amber)} .t-bad{color:var(--red);font-weight:800}
+  .sev{display:inline-block;font-size:.78rem;font-weight:700;padding:.12rem .55rem;border-radius:999px;white-space:nowrap}
+  .sev-grave{background:var(--red-dim);color:var(--red)}
+  .sev-mod{background:var(--orange-dim);color:var(--orange)}
+  .sev-leve{background:var(--amber-dim);color:var(--amber)}
+  .leyenda-sev{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.9rem}
+  /* ═══ v1.5 · Favoritos ═══ */
+  .fav-star{background:none;border:none;cursor:pointer;font-size:1.15rem;filter:grayscale(1);opacity:.5;transition:.15s;padding:.1rem .3rem;line-height:1}
+  .fav-star.on{filter:none;opacity:1}
+  .fav-star:hover{opacity:1;transform:scale(1.15)}
+  .tool-card .fav-star{position:absolute;top:.35rem;right:.4rem;font-size:1.05rem}
+  .tool-card{position:relative}
+  .sec-head{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.2rem}
+  .fav-empty{text-align:center;color:var(--muted);padding:2.2rem 1rem}
+  .fav-item{display:flex;align-items:center;justify-content:space-between;gap:.6rem;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:.65rem .85rem;margin-bottom:.5rem}
+  .fav-item .fav-t{font-weight:600;font-size:.9rem}
+  .fav-item .fav-c{color:var(--muted);font-size:.76rem}
+  .fav-item .go{background:var(--teal);color:#04211d;border:none;border-radius:var(--rs);padding:.4rem .75rem;font-weight:700;cursor:pointer}
+  .fav-item .rm{background:none;border:none;color:var(--red);font-size:1.15rem;cursor:pointer}
+  /* ═══ v1.5 · Búsqueda global ═══ */
+  #gsResults{display:none;position:absolute;left:1.1rem;right:1.1rem;top:100%;background:var(--surface);border:1px solid var(--border);border-radius:0 0 var(--r) var(--r);max-height:65vh;overflow:auto;z-index:130;box-shadow:var(--shadow)}
+  #gsResults.show{display:block}
+  .gs-group{padding:.4rem .9rem;font-size:.7rem;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;background:var(--surface2);position:sticky;top:0}
+  .gs-item{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text);padding:.55rem .9rem;font-size:.88rem;cursor:pointer}
+  .gs-item:hover{background:var(--surface2)}
+  .gs-item .gs-sub{color:var(--muted);font-size:.78rem;margin-top:.1rem}
+  .gs-item mark{background:var(--teal-dim);color:var(--teal);border-radius:3px;padding:0 .12em}
+  .gs-none{padding:1.1rem;color:var(--muted);text-align:center;font-size:.9rem}
+  .fav-flash{outline:2px solid var(--teal);outline-offset:2px;border-radius:var(--r);transition:outline .3s}
   button{font-family:inherit;cursor:pointer}
   input,select,textarea{font-family:inherit}
   ::-webkit-scrollbar{width:9px;height:9px}
@@ -223,6 +269,7 @@
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -255,6 +302,9 @@
     <div class="header-actions">
       <span id="medBadge" class="med-badge" title="Médico configurado"></span>
       <button class="icon-btn" onclick="toggleSearch()" title="Buscar (Ctrl+F)">🔍</button>
+      <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Tema claro/oscuro">🌙</button>
+      <button class="icon-btn" onclick="openFavoritos()" title="Favoritos">⭐</button>
+      <button class="icon-btn" onclick="exportTabPDF()" title="Exportar PDF de esta pestaña">📄</button>
       <button class="icon-btn" onclick="openConfig()" title="Configuración">⚙️</button>
       <button class="icon-btn" onclick="exportData()" title="Exportar datos (JSON)">⬇️</button>
       <button class="icon-btn" onclick="document.getElementById('importFile').click()" title="Importar datos (JSON)">⬆️</button>
@@ -265,10 +315,11 @@
 
   <div id="searchBar">
     <div class="wrap">
-      <input id="searchInput" placeholder="Buscar en la pestaña activa…" oninput="applySearch(this.value)">
-      <span class="hint">filtra el tab activo</span>
+      <input id="searchInput" placeholder="Buscar en toda la app…" oninput="globalSearch(this.value)" onkeydown="if(event.key==='Escape')toggleSearch()">
+      <span class="hint">busca en toda la app</span>
       <button class="icon-btn" onclick="toggleSearch()" title="Cerrar">✕</button>
     </div>
+    <div id="gsResults"></div>
   </div>
 
   <nav class="main-nav" id="mainNav">
@@ -313,21 +364,10 @@
 
     <!-- ═════ FÁRMACOS ═════ -->
     <section class="panel" id="panel-farmacos">
-      <h2 class="sec">Fármacos de emergencia</h2>
-      <p class="sec-desc">Búsqueda por nombre o indicación. Verificá siempre dosis y contraindicaciones.</p>
-      <div class="searchbox">
-        <span class="ico">🔍</span>
-        <input id="drugSearch" placeholder="Buscar fármaco o indicación…" oninput="filterDrugs(this.value)">
-      </div>
-      <div class="table-wrap">
-        <table id="drugTable">
-          <thead><tr>
-            <th>Fármaco</th><th>Indicación</th><th>Dosis adulto</th><th>Dosis pediátrica</th><th>Observaciones</th>
-          </tr></thead>
-          <tbody id="drugBody"></tbody>
-        </table>
-      </div>
-      <div class="no-results" id="drug-nores">Sin coincidencias.</div>
+      <h2 class="sec">Fármacos</h2>
+      <p class="sec-desc">Emergencia, antibióticos, embarazo e interacciones. Verificá siempre dosis y contraindicaciones.</p>
+      <div class="subnav" id="farmSubnav"></div>
+      <div id="farmContent"></div>
     </section>
 
     <!-- ═════ MANIOBRAS ═════ -->
@@ -381,7 +421,7 @@ var LOGIN_KEY='emergsmart_login_expira', LOGIN_TTL=8*60*60*1000;
 var STATE_KEY='emergsmart_v1';
 var CONFIG_KEY='emergsmart_config';
 var GUARDIA_KEY='emergsmart_guardia';
-var state={tab:'sistemas',sysSub:'cardio',cardioSub:'sca',pocusSub:'fast',toxSub:'general',search:''};
+var state={tab:'sistemas',sysSub:'cardio',cardioSub:'sca',pocusSub:'fast',toxSub:'general',farmSub:'emergencia',search:''};
 /* Config del médico */
 var medConfig={nombre:'',especialidad:'',registro:'',institucion:'',ciudad:''};
 /* Guardia: turno activo + historial de turnos archivados */
@@ -502,6 +542,135 @@ var DRUGS=[
   {n:'Manitol 20%',ind:'Hipertensión intracraneal, edema cerebral',ad:'0.25-1 g/kg IV en 15-20 min; repetir según PIC/osmolaridad',pe:'0.25-1 g/kg IV',obs:'Usar filtro (cristaliza). Vigilar osmolaridad (<320) y natremia; efecto diurético y rebote. Evitar en hipovolemia/anuria.'},
   {n:'Fentanilo',ind:'Analgesia, sedoanalgesia en VM, inducción IOT',ad:'Bolo 1-2 µg/kg IV. Infusión 0.5-3 µg/kg/h (dilución 2500 µg/50 mL = 50 µg/mL)',pe:'1-2 µg/kg IV bolo',obs:'Opioide potente de acción rápida. Depresión respiratoria y rigidez torácica en bolo rápido. Antídoto: naloxona. Ver calculadora de infusión.'},
   {n:'Dexmedetomidina',ind:'Sedación consciente en VM, delirium, destete',ad:'Infusión 0.2-1.4 µg/kg/h IV (dilución 200 µg/50 mL = 4 µg/mL). Evitar bolo de carga',pe:'0.2-1 µg/kg/h IV',obs:'Sedación cooperativa sin depresión respiratoria significativa. Bradicardia e hipotensión. Ver calculadora de infusión.'}
+];
+
+/* ═══════════════ v1.5 · Antibióticos, antifúngicos y antivirales ═══════════════
+   Dosis de referencia adulto; ajustar por peso, función renal y foco. Verificar siempre. */
+var ATB=[
+  {gr:'Penicilinas',n:'Amoxicilina',fam:'Aminopenicilina',esp:'Gram+, algunos Gram-, respiratorio/ORL',ad:'500 mg c/8h VO o 1 g c/8h VO',pe:'40-90 mg/kg/día c/8-12h',ren:'ClCr<30: espaciar dosis',obs:'1ª línea faringitis/otitis; H. pylori.'},
+  {gr:'Penicilinas',n:'Amoxicilina-clavulánico',fam:'Aminopenicilina + inh. β-lactamasa',esp:'Gram+/-, anaerobios, H. influenzae',ad:'875/125 mg c/8h VO o 1 g/200 mg c/8h IV',pe:'40-90 mg/kg/día (amoxi)',ren:'ClCr<30: ajustar',obs:'Diarrea frecuente. Mordeduras, sinusitis.'},
+  {gr:'Penicilinas',n:'Ampicilina-sulbactam',fam:'Aminopenicilina + inh.',esp:'Gram+/-, anaerobios',ad:'1.5-3 g c/6h IV',pe:'100-200 mg/kg/día',ren:'ClCr<30: espaciar',obs:'Aspiración, intraabdominal, Acinetobacter.'},
+  {gr:'Penicilinas',n:'Piperacilina-tazobactam',fam:'Ureidopenicilina + inh.',esp:'Amplio: Pseudomona, anaerobios, Gram+/-',ad:'4.5 g c/6-8h IV',pe:'300 mg/kg/día (pipe)',ren:'Ajustar por ClCr',obs:'Antipseudomónico. Sepsis, neutropenia febril.'},
+  {gr:'Penicilinas',n:'Cloxacilina',fam:'Penicilina antiestafilocócica',esp:'S. aureus meticilino-sensible (SAMS)',ad:'1-2 g c/4-6h IV',pe:'100-200 mg/kg/día',ren:'Sin ajuste habitual',obs:'De elección en SAMS (endocarditis, piel).'},
+  {gr:'Cefalosporinas',n:'Cefalexina',fam:'Cefalosporina 1ª G',esp:'Gram+, piel y partes blandas',ad:'500 mg c/6h VO',pe:'25-50 mg/kg/día',ren:'Ajustar ClCr<50',obs:'Celulitis, profilaxis.'},
+  {gr:'Cefalosporinas',n:'Cefazolina',fam:'Cefalosporina 1ª G',esp:'SAMS, profilaxis quirúrgica',ad:'1-2 g c/8h IV',pe:'50-100 mg/kg/día',ren:'Ajustar ClCr<55',obs:'Profilaxis qx de elección.'},
+  {gr:'Cefalosporinas',n:'Cefuroxima',fam:'Cefalosporina 2ª G',esp:'Gram+/-, H. influenzae',ad:'500 mg c/12h VO o 750 mg-1.5 g c/8h IV',pe:'20-30 mg/kg/día VO',ren:'Ajustar ClCr<30',obs:'Respiratorio, ORL.'},
+  {gr:'Cefalosporinas',n:'Ceftriaxona',fam:'Cefalosporina 3ª G',esp:'Amplio Gram-, neumococo, meningitis, gonococo',ad:'1-2 g c/24h IV (meningitis 2 g c/12h)',pe:'50-100 mg/kg/día',ren:'Sin ajuste renal (excreción biliar)',obs:'No con calcio IV en neonatos. Muy versátil.'},
+  {gr:'Cefalosporinas',n:'Cefotaxima',fam:'Cefalosporina 3ª G',esp:'Similar a ceftriaxona',ad:'1-2 g c/6-8h IV',pe:'100-200 mg/kg/día',ren:'Ajustar ClCr<20',obs:'Preferida en neonatos (vs ceftriaxona).'},
+  {gr:'Cefalosporinas',n:'Ceftazidima',fam:'Cefalosporina 3ª G',esp:'Pseudomona, Gram-',ad:'1-2 g c/8h IV',pe:'100-150 mg/kg/día',ren:'Ajustar por ClCr',obs:'Antipseudomónico. Menor cobertura Gram+.'},
+  {gr:'Cefalosporinas',n:'Cefepime',fam:'Cefalosporina 4ª G',esp:'Pseudomona, Gram+/-',ad:'1-2 g c/8-12h IV',pe:'100-150 mg/kg/día',ren:'Ajustar por ClCr',obs:'Neurotoxicidad si no se ajusta en IR.'},
+  {gr:'Cefalosporinas',n:'Ceftarolina',fam:'Cefalosporina 5ª G',esp:'MRSA, Gram+/-',ad:'600 mg c/12h IV',pe:'Datos limitados',ren:'Ajustar ClCr<50',obs:'Activa frente a MRSA.'},
+  {gr:'Carbapenems',n:'Meropenem',fam:'Carbapenem',esp:'Muy amplio, BLEE, Pseudomona, anaerobios',ad:'1-2 g c/8h IV',pe:'60-120 mg/kg/día',ren:'Ajustar por ClCr',obs:'Menor riesgo convulsivo que imipenem.'},
+  {gr:'Carbapenems',n:'Imipenem-cilastatina',fam:'Carbapenem',esp:'Muy amplio',ad:'500 mg c/6h IV',pe:'60-100 mg/kg/día',ren:'Ajustar por ClCr',obs:'Reduce umbral convulsivo.'},
+  {gr:'Carbapenems',n:'Ertapenem',fam:'Carbapenem',esp:'Amplio (NO Pseudomona/Acinetobacter)',ad:'1 g c/24h IV',pe:'15 mg/kg c/12h',ren:'Ajustar ClCr<30',obs:'Cómodo 1 vez/día. No antipseudomónico.'},
+  {gr:'Monobactams',n:'Aztreonam',fam:'Monobactam',esp:'Gram- aerobios, Pseudomona',ad:'1-2 g c/8h IV',pe:'90-120 mg/kg/día',ren:'Ajustar por ClCr',obs:'Seguro en alérgicos a β-lactámicos.'},
+  {gr:'Macrólidos',n:'Azitromicina',fam:'Macrólido',esp:'Atípicos, respiratorio, ETS',ad:'500 mg c/24h VO/IV x3-5 días',pe:'10 mg/kg/día',ren:'Sin ajuste',obs:'Prolonga QT. Neumonía atípica.'},
+  {gr:'Macrólidos',n:'Claritromicina',fam:'Macrólido',esp:'Atípicos, H. pylori',ad:'500 mg c/12h VO',pe:'15 mg/kg/día',ren:'Ajustar ClCr<30',obs:'Interacciones CYP3A4. QT.'},
+  {gr:'Macrólidos',n:'Eritromicina',fam:'Macrólido',esp:'Gram+, atípicos',ad:'500 mg c/6h VO',pe:'30-50 mg/kg/día',ren:'Sin ajuste',obs:'Procinético. Prolonga QT.'},
+  {gr:'Fluoroquinolonas',n:'Ciprofloxacina',fam:'Fluoroquinolona',esp:'Gram-, Pseudomona, ITU',ad:'400 mg c/12h IV o 500-750 mg c/12h VO',pe:'20-30 mg/kg/día',ren:'Ajustar ClCr<30',obs:'Tendinopatía, QT, aneurisma aórtico.'},
+  {gr:'Fluoroquinolonas',n:'Levofloxacina',fam:'Fluoroquinolona',esp:'Respiratorio, Gram-/+',ad:'500-750 mg c/24h IV/VO',pe:'No habitual',ren:'Ajustar ClCr<50',obs:'Quinolona respiratoria.'},
+  {gr:'Fluoroquinolonas',n:'Moxifloxacina',fam:'Fluoroquinolona',esp:'Respiratorio, anaerobios',ad:'400 mg c/24h VO/IV',pe:'No habitual',ren:'Sin ajuste renal',obs:'NO en ITU (no concentra en orina). QT.'},
+  {gr:'Aminoglucósidos',n:'Gentamicina',fam:'Aminoglucósido',esp:'Gram-, sinergia con Gram+',ad:'5-7 mg/kg c/24h IV',pe:'5-7.5 mg/kg/día',ren:'Ajustar por ClCr + niveles',obs:'Nefro/ototóxico. Monitoreo de niveles.'},
+  {gr:'Aminoglucósidos',n:'Amikacina',fam:'Aminoglucósido',esp:'Gram- resistentes',ad:'15-20 mg/kg c/24h IV',pe:'15-22.5 mg/kg/día',ren:'Ajustar por ClCr + niveles',obs:'Nefro/ototóxico. Monitoreo de niveles.'},
+  {gr:'Glicopéptidos',n:'Vancomicina',fam:'Glicopéptido',esp:'MRSA, Gram+',ad:'25-30 mg/kg/día en 2-3 dosis IV',pe:'40-60 mg/kg/día',ren:'Ajustar por ClCr + niveles',obs:'Objetivo valle 15-20 mg/L o AUC/MIC 400-600.'},
+  {gr:'Glicopéptidos',n:'Teicoplanina',fam:'Glicopéptido',esp:'Gram+, MRSA',ad:'6 mg/kg c/12h x3 dosis, luego c/24h',pe:'10 mg/kg',ren:'Ajustar por ClCr',obs:'Alternativa a vancomicina.'},
+  {gr:'Otros',n:'Metronidazol',fam:'Nitroimidazol',esp:'Anaerobios, protozoos',ad:'500 mg c/8h IV/VO',pe:'30 mg/kg/día',ren:'Sin ajuste',obs:'Efecto disulfiram con alcohol.'},
+  {gr:'Otros',n:'Clindamicina',fam:'Lincosamida',esp:'Gram+, anaerobios',ad:'600-900 mg c/8h IV o 300-450 mg c/6-8h VO',pe:'20-40 mg/kg/día',ren:'Sin ajuste',obs:'Colitis por C. difficile. Antitoxina.'},
+  {gr:'Otros',n:'Linezolid',fam:'Oxazolidinona',esp:'MRSA, VRE, Gram+',ad:'600 mg c/12h IV/VO',pe:'10 mg/kg c/8h',ren:'Sin ajuste',obs:'Mielosupresión. Sínd. serotoninérgico con ISRS.'},
+  {gr:'Otros',n:'Daptomicina',fam:'Lipopéptido',esp:'MRSA, Gram+ (NO pulmón)',ad:'4-6 mg/kg c/24h IV',pe:'Datos limitados',ren:'Ajustar ClCr<30',obs:'Inactivada por surfactante. Vigilar CPK.'},
+  {gr:'Otros',n:'Cotrimoxazol (TMP-SMX)',fam:'Sulfonamida + trimetoprim',esp:'ITU, PJP, SARM comunitario',ad:'160/800 mg c/12h VO',pe:'8-12 mg/kg/día (TMP)',ren:'Ajustar ClCr<30',obs:'Hiperpotasemia, rash, ↑creatinina.'},
+  {gr:'Otros',n:'Fosfomicina',fam:'Ácido fosfónico',esp:'Cistitis no complicada',ad:'3 g dosis única VO',pe:'Datos limitados',ren:'—',obs:'Cistitis en mujer.'},
+  {gr:'Otros',n:'Nitrofurantoína',fam:'Nitrofurano',esp:'Cistitis',ad:'100 mg c/12h VO x5 días',pe:'5-7 mg/kg/día',ren:'Contraindicada ClCr<30',obs:'No en pielonefritis. Anemia hemolítica (G6PD).'},
+  {gr:'Otros',n:'Tigeciclina',fam:'Glicilciclina',esp:'Amplio (NO Pseudomona)',ad:'100 mg carga, luego 50 mg c/12h IV',pe:'No aprobada',ren:'Sin ajuste renal',obs:'Náuseas. Señal de ↑mortalidad; reservar.'},
+  {gr:'Otros',n:'Colistina',fam:'Polimixina',esp:'Gram- multirresistentes',ad:'Dosis por peso y función renal',pe:'Por peso',ren:'Ajustar por ClCr',obs:'Nefrotóxica. Último recurso.'},
+  {gr:'Antifúngicos',n:'Fluconazol',fam:'Azol',esp:'Candida (no krusei)',ad:'400 mg carga, luego 200-400 mg c/24h',pe:'6-12 mg/kg/día',ren:'Ajustar por ClCr',obs:'Interacciones CYP. Prolonga QT.'},
+  {gr:'Antifúngicos',n:'Voriconazol',fam:'Azol',esp:'Aspergillus, Candida',ad:'6 mg/kg c/12h x2, luego 4 mg/kg c/12h IV',pe:'9 mg/kg c/12h',ren:'IV: evitar ClCr<50',obs:'Alteraciones visuales, hepatotoxicidad.'},
+  {gr:'Antifúngicos',n:'Anfotericina B liposomal',fam:'Polieno',esp:'Hongos invasivos',ad:'3-5 mg/kg c/24h IV',pe:'3-5 mg/kg/día',ren:'Nefrotoxicidad',obs:'Mejor tolerada que la convencional.'},
+  {gr:'Antifúngicos',n:'Micafungina',fam:'Equinocandina',esp:'Candida, Aspergillus',ad:'100 mg c/24h IV',pe:'2-4 mg/kg/día',ren:'Sin ajuste renal',obs:'Buen perfil de seguridad.'},
+  {gr:'Antifúngicos',n:'Caspofungina',fam:'Equinocandina',esp:'Candida, Aspergillus',ad:'70 mg carga, luego 50 mg c/24h IV',pe:'70 mg/m² carga',ren:'Sin ajuste renal',obs:'Ajuste en insuficiencia hepática.'},
+  {gr:'Antivirales',n:'Aciclovir',fam:'Antiviral (análogo nucleósido)',esp:'VHS, VVZ',ad:'Encefalitis 10 mg/kg c/8h IV; zóster 800 mg 5x/día VO',pe:'20 mg/kg c/8h',ren:'Ajustar por ClCr',obs:'Hidratar. Nefrotoxicidad por cristaluria.'},
+  {gr:'Antivirales',n:'Oseltamivir',fam:'Antiviral (inh. neuraminidasa)',esp:'Influenza A/B',ad:'75 mg c/12h VO x5 días',pe:'Por peso',ren:'Ajustar ClCr<60',obs:'Iniciar <48h del inicio de síntomas.'},
+  {gr:'Antivirales',n:'Ganciclovir',fam:'Antiviral',esp:'CMV',ad:'5 mg/kg c/12h IV',pe:'5 mg/kg c/12h',ren:'Ajustar por ClCr',obs:'Mielosupresión.'},
+  {gr:'Antivirales',n:'Remdesivir',fam:'Antiviral',esp:'SARS-CoV-2',ad:'200 mg carga, luego 100 mg c/24h IV',pe:'Por peso',ren:'Evitar ClCr<30',obs:'Vigilar transaminasas.'}
+];
+
+/* ═══════════════ v1.5 · Vademécum en embarazo y lactancia ═══════════════
+   Categoría FDA (histórica). Ante la duda, consultar y priorizar el fármaco de menor riesgo. */
+var EMB=[
+  {gr:'Analgésicos',n:'Paracetamol',fda:'B',t1:'Seguro',t2:'Seguro',t3:'Seguro',lac:'Seguro',obs:'Analgésico/antipirético de 1ª línea.'},
+  {gr:'Analgésicos',n:'Ibuprofeno',fda:'B/D',t1:'Evitar',t2:'Permitido',t3:'CONTRAINDICADO',lac:'Evitar',obs:'Cierre prematuro del ductus en 3ºT.'},
+  {gr:'Analgésicos',n:'AAS (baja dosis)',fda:'C',t1:'Evitar',t2:'Permitido',t3:'Evitar',lac:'Con precaución',obs:'Profilaxis de preeclampsia a dosis baja.'},
+  {gr:'Analgésicos',n:'Tramadol',fda:'C',t1:'Evitar',t2:'Evitar',t3:'Evitar',lac:'Contraindicado',obs:'Síndrome de abstinencia neonatal.'},
+  {gr:'Analgésicos',n:'Morfina',fda:'C',t1:'Evitar',t2:'Con precaución',t3:'Evitar',lac:'Contraindicado',obs:'Depresión respiratoria neonatal.'},
+  {gr:'Analgésicos',n:'Ketorolac',fda:'C/D',t1:'Evitar',t2:'Evitar',t3:'CONTRAINDICADO',lac:'Evitar',obs:'AINE: mismo riesgo ductal en 3ºT.'},
+  {gr:'Antibióticos',n:'Amoxicilina',fda:'B',t1:'Seguro',t2:'Seguro',t3:'Seguro',lac:'Seguro',obs:'β-lactámico seguro.'},
+  {gr:'Antibióticos',n:'Amoxicilina-clavulánico',fda:'B',t1:'Seguro',t2:'Seguro',t3:'Seguro',lac:'Seguro',obs:'Seguro.'},
+  {gr:'Antibióticos',n:'Cefalosporinas',fda:'B',t1:'Seguras',t2:'Seguras',t3:'Seguras',lac:'Seguras',obs:'Grupo seguro en general.'},
+  {gr:'Antibióticos',n:'Azitromicina',fda:'B',t1:'Seguro',t2:'Seguro',t3:'Seguro',lac:'Seguro',obs:'Macrólido de elección en embarazo.'},
+  {gr:'Antibióticos',n:'Metronidazol',fda:'B',t1:'Evitar 1ºT',t2:'Seguro',t3:'Seguro',lac:'Con precaución',obs:'Preferir evitar en 1ºT.'},
+  {gr:'Antibióticos',n:'Clindamicina',fda:'B',t1:'Seguro',t2:'Seguro',t3:'Seguro',lac:'Seguro',obs:'Seguro.'},
+  {gr:'Antibióticos',n:'Nitrofurantoína',fda:'B',t1:'Seguro',t2:'Seguro',t3:'Evitar a término',lac:'Con precaución',obs:'Anemia hemolítica neonatal cerca del término.'},
+  {gr:'Antibióticos',n:'Ciprofloxacina',fda:'C',t1:'EVITAR',t2:'EVITAR',t3:'EVITAR',lac:'Evitar',obs:'Artropatía en cartílago en desarrollo.'},
+  {gr:'Antibióticos',n:'Gentamicina',fda:'D',t1:'Evitar',t2:'Solo si necesario',t3:'Solo si necesario',lac:'Con precaución',obs:'Ototoxicidad fetal.'},
+  {gr:'Antibióticos',n:'Vancomicina',fda:'C',t1:'Solo si necesario',t2:'Solo si necesario',t3:'Solo si necesario',lac:'Con precaución',obs:'Usar si beneficio supera riesgo.'},
+  {gr:'Antihipertensivos',n:'Labetalol',fda:'C',t1:'Seguro',t2:'Seguro',t3:'Seguro',lac:'Con precaución',obs:'1ª línea en urgencia hipertensiva del embarazo.'},
+  {gr:'Antihipertensivos',n:'Hidralazina',fda:'C',t1:'Seguro',t2:'Seguro',t3:'Seguro',lac:'Seguro',obs:'Opción en crisis hipertensiva.'},
+  {gr:'Antihipertensivos',n:'Nifedipina',fda:'C',t1:'Con precaución',t2:'Seguro',t3:'Seguro',lac:'Con precaución',obs:'También tocolítico.'},
+  {gr:'Antihipertensivos',n:'Metildopa',fda:'B',t1:'Seguro',t2:'Seguro',t3:'Seguro',lac:'Seguro',obs:'1ª línea en HTA crónica del embarazo.'},
+  {gr:'Antihipertensivos',n:'Enalapril / IECAs',fda:'D',t1:'CONTRAINDICADO',t2:'CONTRAINDICADO',t3:'CONTRAINDICADO',lac:'Contraindicado',obs:'Fetotoxicidad (oligoamnios, IRA fetal).'},
+  {gr:'Antihipertensivos',n:'ARA II',fda:'D',t1:'CONTRAINDICADO',t2:'CONTRAINDICADO',t3:'CONTRAINDICADO',lac:'Contraindicado',obs:'Mismo perfil fetotóxico que IECAs.'},
+  {gr:'Anticoagulantes',n:'Heparina no fraccionada',fda:'C',t1:'Segura',t2:'Segura',t3:'Segura',lac:'Segura',obs:'No cruza la placenta.'},
+  {gr:'Anticoagulantes',n:'Enoxaparina',fda:'B',t1:'Segura',t2:'Segura',t3:'Segura',lac:'Segura',obs:'Anticoagulante de 1ª línea en embarazo.'},
+  {gr:'Anticoagulantes',n:'Warfarina',fda:'X',t1:'CONTRAINDICADA 1ºT',t2:'Con precaución',t3:'CONTRAINDICADA',lac:'Segura',obs:'Embriopatía warfarínica; hemorragia fetal.'},
+  {gr:'Anticoagulantes',n:'NACO (rivaroxabán, apixabán)',fda:'X',t1:'CONTRAINDICADOS',t2:'CONTRAINDICADOS',t3:'CONTRAINDICADOS',lac:'Contraindicados',obs:'Datos insuficientes; evitar.'},
+  {gr:'Antiepilépticos',n:'Ácido valproico',fda:'D/X',t1:'EVITAR',t2:'EVITAR',t3:'EVITAR',lac:'Con precaución',obs:'Espina bífida; teratógeno mayor.'},
+  {gr:'Antiepilépticos',n:'Fenitoína',fda:'D',t1:'EVITAR',t2:'EVITAR',t3:'EVITAR',lac:'Con precaución',obs:'Síndrome hidantoína fetal.'},
+  {gr:'Antiepilépticos',n:'Levetiracetam',fda:'C',t1:'Con precaución',t2:'Con precaución',t3:'Con precaución',lac:'Con precaución',obs:'Mejor perfil de los antiepilépticos.'},
+  {gr:'Antiepilépticos',n:'Sulfato de magnesio',fda:'A',t1:'Seguro',t2:'Seguro',t3:'Seguro',lac:'Con precaución',obs:'Eclampsia y neuroprotección fetal.'},
+  {gr:'Urgencia frecuente',n:'Ondansetrón',fda:'B',t1:'Con precaución 1ºT',t2:'Seguro',t3:'Seguro',lac:'Con precaución',obs:'Antiemético.'},
+  {gr:'Urgencia frecuente',n:'Metoclopramida',fda:'B',t1:'Seguro',t2:'Seguro',t3:'Seguro',lac:'Seguro',obs:'Antiemético seguro.'},
+  {gr:'Urgencia frecuente',n:'Omeprazol',fda:'C',t1:'Con precaución',t2:'Seguro',t3:'Seguro',lac:'Con precaución',obs:'IBP.'},
+  {gr:'Urgencia frecuente',n:'Dexametasona',fda:'C',t1:'Evitar',t2:'Seguro',t3:'Seguro',lac:'Con precaución',obs:'Maduración pulmonar fetal.'},
+  {gr:'Urgencia frecuente',n:'Adrenalina',fda:'C',t1:'Solo emergencia',t2:'Solo emergencia',t3:'Solo emergencia',lac:'Con precaución',obs:'Anafilaxia/PCR: no se difiere.'},
+  {gr:'Urgencia frecuente',n:'Diazepam',fda:'D',t1:'EVITAR',t2:'Evitar',t3:'EVITAR',lac:'Contraindicado',obs:'Síndrome floppy infant.'}
+];
+
+/* ═══════════════ v1.5 · Interacciones farmacológicas relevantes en urgencia ═══════════════ */
+var INTER=[
+  {a:'Warfarina',b:'AINEs',sev:'grave',mec:'Antiagregación + lesión mucosa GI + desplazamiento proteico',ef:'Hemorragia mayor (digestiva)',man:'Evitar; usar paracetamol. Si imprescindible: IBP + control estrecho.'},
+  {a:'Warfarina',b:'Fluconazol',sev:'grave',mec:'Inhibición de CYP2C9',ef:'↑INR, hemorragia',man:'Evitar o reducir warfarina; monitorizar INR.'},
+  {a:'Amiodarona',b:'Warfarina',sev:'grave',mec:'Inhibición CYP2C9/3A4',ef:'↑INR, hemorragia',man:'Reducir warfarina ~30-50%; controlar INR.'},
+  {a:'Amiodarona',b:'Digoxina',sev:'grave',mec:'↓aclaramiento de digoxina (P-gp)',ef:'Toxicidad digitálica',man:'Reducir digoxina 50%; niveles.'},
+  {a:'Amiodarona',b:'Fármacos que prolongan QT',sev:'grave',mec:'Efecto aditivo sobre el QT',ef:'Torsade de pointes',man:'Evitar; monitorizar ECG/QT, K+ y Mg.'},
+  {a:'Metronidazol',b:'Alcohol',sev:'grave',mec:'Inhibición de aldehído deshidrogenasa',ef:'Efecto disulfiram (flushing, náuseas, hipotensión)',man:'Evitar alcohol durante y 72h post-tratamiento.'},
+  {a:'Metronidazol',b:'Warfarina',sev:'grave',mec:'Inhibición del metabolismo de warfarina',ef:'↑INR, hemorragia',man:'Monitorizar INR; ajustar dosis.'},
+  {a:'IECAs',b:'Espironolactona',sev:'grave',mec:'Retención de potasio aditiva',ef:'Hiperpotasemia grave',man:'Monitorizar K+ y función renal.'},
+  {a:'Ciprofloxacina',b:'Tizanidina',sev:'grave',mec:'Inhibición de CYP1A2',ef:'Hipotensión y sedación grave',man:'Contraindicado; usar otro AB o relajante.'},
+  {a:'Linezolid',b:'ISRS / IMAO',sev:'grave',mec:'Inhibición de MAO + exceso de serotonina',ef:'Síndrome serotoninérgico',man:'Evitar; lavado; vigilar.'},
+  {a:'Macrólidos',b:'Fármacos que prolongan QT',sev:'grave',mec:'QT aditivo',ef:'Torsade de pointes',man:'Evitar; ECG.'},
+  {a:'Haloperidol',b:'Fármacos que prolongan QT',sev:'grave',mec:'QT aditivo',ef:'Torsade de pointes',man:'Evitar; monitorizar QT, K+ y Mg.'},
+  {a:'Succinilcolina',b:'Aminoglucósidos',sev:'grave',mec:'Potenciación del bloqueo neuromuscular',ef:'Bloqueo neuromuscular prolongado, apnea',man:'Vigilar; soporte ventilatorio.'},
+  {a:'IECA',b:'ARA II',sev:'grave',mec:'Doble bloqueo del SRAA',ef:'Hiperpotasemia, IRA',man:'No combinar de rutina.'},
+  {a:'Metotrexato',b:'AINEs',sev:'grave',mec:'↓excreción renal de MTX',ef:'Toxicidad por MTX (mielosupresión)',man:'Evitar a dosis altas de MTX.'},
+  {a:'Amiodarona',b:'Betabloqueantes',sev:'mod',mec:'Depresión nodal aditiva',ef:'Bradicardia, BAV',man:'Monitorizar FC/ECG.'},
+  {a:'Digoxina',b:'Verapamilo',sev:'mod',mec:'↓aclaramiento de digoxina',ef:'Toxicidad digitálica',man:'Reducir digoxina; niveles.'},
+  {a:'Digoxina',b:'Amiodarona',sev:'mod',mec:'↓aclaramiento de digoxina',ef:'Toxicidad digitálica',man:'Reducir digoxina 50%.'},
+  {a:'Estatinas',b:'Macrólidos',sev:'mod',mec:'Inhibición de CYP3A4',ef:'Miopatía, rabdomiólisis',man:'Suspender estatina o usar azitromicina.'},
+  {a:'Estatinas',b:'Fluconazol',sev:'mod',mec:'Inhibición CYP3A4/2C9',ef:'Miopatía',man:'Vigilar CPK; ajustar.'},
+  {a:'Ciprofloxacina',b:'Warfarina',sev:'mod',mec:'Inhibición del metabolismo',ef:'↑INR',man:'Monitorizar INR.'},
+  {a:'Heparina',b:'AINEs',sev:'mod',mec:'Efecto antihemostático aditivo',ef:'Riesgo hemorrágico',man:'Vigilar sangrado.'},
+  {a:'Morfina',b:'Benzodiacepinas',sev:'mod',mec:'Depresión del SNC aditiva',ef:'Depresión respiratoria',man:'Reducir dosis; vigilar.'},
+  {a:'Tramadol',b:'ISRS',sev:'mod',mec:'Exceso de serotonina',ef:'Síndrome serotoninérgico',man:'Vigilar; evitar si es posible.'},
+  {a:'Metformina',b:'Contraste yodado',sev:'mod',mec:'Riesgo de IRA por contraste',ef:'Acidosis láctica',man:'Suspender metformina peri-procedimiento.'},
+  {a:'Furosemida',b:'Aminoglucósidos',sev:'mod',mec:'Ototoxicidad aditiva',ef:'Ototoxicidad',man:'Vigilar audición y niveles.'},
+  {a:'Vancomicina',b:'Aminoglucósidos',sev:'mod',mec:'Nefrotoxicidad aditiva',ef:'Nefrotoxicidad',man:'Monitorizar función renal y niveles.'},
+  {a:'Betabloqueantes',b:'Verapamilo / Diltiazem',sev:'mod',mec:'Depresión nodal e inotrópica',ef:'Bradicardia, BAV, depresión miocárdica',man:'Evitar combinación IV; monitorizar.'},
+  {a:'AINEs',b:'Antihipertensivos',sev:'mod',mec:'Retención de Na/agua, ↓prostaglandinas',ef:'↓efecto antihipertensivo',man:'Vigilar TA; evitar uso crónico.'},
+  {a:'Corticoides',b:'AINEs',sev:'mod',mec:'Lesión de mucosa GI aditiva',ef:'Úlcera GI, hemorragia',man:'Gastroprotección con IBP.'},
+  {a:'Paracetamol',b:'Warfarina',sev:'leve',mec:'Efecto sobre síntesis de factores',ef:'Leve ↑INR (dosis altas mantenidas)',man:'Vigilar INR si uso prolongado.'},
+  {a:'Antiácidos',b:'Fluoroquinolonas',sev:'leve',mec:'Quelación con cationes',ef:'↓absorción del antibiótico',man:'Separar las tomas ≥2h.'},
+  {a:'Antiácidos',b:'Tetraciclinas',sev:'leve',mec:'Quelación con cationes',ef:'↓absorción del antibiótico',man:'Separar las tomas ≥2h.'},
+  {a:'IBP',b:'Clopidogrel',sev:'leve',mec:'Inhibición de CYP2C19 (activación)',ef:'↓efecto antiagregante',man:'Preferir pantoprazol sobre omeprazol.'}
 ];
 
 /* Maniobras (10) */
@@ -1771,9 +1940,9 @@ function wirePolitrauma(){
 function buildTools(){
   var g=document.getElementById('toolsGrid'); g.innerHTML='';
   TOOLS_ORDER.forEach(function(id){ var c=CALCS[id];
-    var card=document.createElement('button'); card.className='tool-card'; card.dataset.text=(c.title+' '+c.sub).toLowerCase();
+    var card=document.createElement('div'); card.className='tool-card'; card.style.position='relative'; card.dataset.text=(c.title+' '+c.sub).toLowerCase();
     card.onclick=function(){openCalc(id);};
-    card.innerHTML='<span class="tc-icon">'+c.icon+'</span><span class="tc-title">'+c.title+'</span><span class="tc-sub">'+c.sub+'</span>';
+    card.innerHTML='<span class="tc-icon">'+c.icon+'</span><span class="tc-title">'+c.title+'</span><span class="tc-sub">'+c.sub+'</span>'+favStarHTML('calc',id,c.title,'Calculadora');
     g.appendChild(card);
   });
 }
@@ -1825,29 +1994,81 @@ function showPocusSub(id,init){
 }
 
 /* ---- Fármacos ---- */
+/* ---- Fármacos (v1.5: Emergencia · Antibióticos · Embarazo · Interacciones) ---- */
+var FARM_SUBS=[['emergencia','💉 Emergencia'],['atb','🦠 Antibióticos'],['embarazo','🤰 Embarazo'],['interacciones','⚠️ Interacciones']];
 function buildDrugs(){
-  var b=document.getElementById('drugBody'); b.innerHTML='';
-  DRUGS.forEach(function(d){
-    var tr=document.createElement('tr'); tr.dataset.text=(d.n+' '+d.ind).toLowerCase();
-    tr.innerHTML='<td><span class="drug-name">'+d.n+'</span></td><td>'+d.ind+'</td><td>'+d.ad+'</td><td>'+d.pe+'</td><td>'+d.obs+'</td>';
-    b.appendChild(tr);
+  var nav=document.getElementById('farmSubnav'); if(!nav)return; nav.innerHTML='';
+  if(!state.farmSub)state.farmSub='emergencia';
+  FARM_SUBS.forEach(function(s){
+    var b=document.createElement('button'); b.className='subtab'+(s[0]===state.farmSub?' active':'');
+    b.textContent=s[1]; b.onclick=function(){showFarmSub(s[0]);};
+    nav.appendChild(b);
   });
+  showFarmSub(state.farmSub,true);
 }
-function filterDrugs(q){
+function showFarmSub(id,init){
+  state.farmSub=id; saveState();
+  Array.prototype.forEach.call(document.querySelectorAll('#farmSubnav .subtab'),function(b,i){ b.classList.toggle('active',FARM_SUBS[i][0]===id); });
+  var c=document.getElementById('farmContent'); if(!c)return;
+  if(id==='emergencia')c.innerHTML=farmEmergHTML();
+  else if(id==='atb')c.innerHTML=farmAtbHTML();
+  else if(id==='embarazo')c.innerHTML=farmEmbHTML();
+  else c.innerHTML=farmInterHTML();
+  if(!init)resetSearch();
+}
+function farmFilter(q,bodyId,noresId){
   q=(q||'').trim().toLowerCase(); var any=false;
-  Array.prototype.forEach.call(document.querySelectorAll('#drugBody tr'),function(tr){
+  Array.prototype.forEach.call(document.querySelectorAll('#'+bodyId+' tr'),function(tr){
+    if(!tr.dataset.text)return;
     var show=tr.dataset.text.indexOf(q)>-1; tr.style.display=show?'':'none'; if(show)any=true;
   });
-  document.getElementById('drug-nores').style.display=any?'none':'block';
+  var nr=document.getElementById(noresId); if(nr)nr.style.display=any?'none':'block';
+}
+function farmEmergHTML(){
+  var rows=DRUGS.map(function(d){
+    return '<tr data-text="'+esc((d.n+' '+d.ind).toLowerCase())+'"><td><span class="drug-name">'+d.n+'</span></td><td>'+d.ind+'</td><td>'+d.ad+'</td><td>'+d.pe+'</td><td>'+d.obs+'</td></tr>';
+  }).join('');
+  return '<div class="searchbox"><span class="ico">🔍</span><input id="drugSearch" placeholder="Buscar fármaco o indicación…" oninput="farmFilter(this.value,\'drugBody\',\'drug-nores\')"></div>'+
+    '<div class="table-wrap"><table><thead><tr><th>Fármaco</th><th>Indicación</th><th>Dosis adulto</th><th>Dosis pediátrica</th><th>Observaciones</th></tr></thead><tbody id="drugBody">'+rows+'</tbody></table></div>'+
+    '<div class="no-results" id="drug-nores" style="display:none">Sin coincidencias.</div>';
+}
+function farmAtbHTML(){
+  var rows=ATB.map(function(d){
+    return '<tr data-text="'+esc((d.n+' '+d.fam+' '+d.esp+' '+d.gr).toLowerCase())+'"><td><span class="drug-name">'+d.n+'</span></td><td>'+d.fam+'</td><td>'+d.esp+'</td><td>'+d.ad+'</td><td>'+d.pe+'</td><td>'+d.ren+'</td><td>'+d.obs+'</td></tr>';
+  }).join('');
+  return '<div class="searchbox"><span class="ico">🔍</span><input id="atbSearch" placeholder="Buscar por nombre, familia o indicación…" oninput="farmFilter(this.value,\'atbBody\',\'atb-nores\')"></div>'+
+    '<div class="table-wrap"><table><thead><tr><th>Fármaco</th><th>Familia</th><th>Espectro principal</th><th>Dosis adulto</th><th>Dosis pediátrica</th><th>Ajuste renal</th><th>Observaciones</th></tr></thead><tbody id="atbBody">'+rows+'</tbody></table></div>'+
+    '<div class="no-results" id="atb-nores" style="display:none">Sin coincidencias.</div>';
+}
+function fdaBadge(c){ var cls=(c.indexOf('X')>-1||c.indexOf('D')>-1)?'fda-bad':(c==='A'||c==='B')?'fda-ok':'fda-warn'; return '<span class="fda '+cls+'">'+c+'</span>'; }
+function trimCell(v){ var u=(v||'').toUpperCase(); var cls=(u.indexOf('CONTRAIND')>-1||u==='EVITAR')?'t-bad':(v.indexOf('precaución')>-1||v.indexOf('Solo')>-1||v.indexOf('Evitar')>-1)?'t-warn':'t-ok'; return '<span class="tcell '+cls+'">'+v+'</span>'; }
+function farmEmbHTML(){
+  var rows=EMB.map(function(d){
+    return '<tr data-text="'+esc((d.n+' '+d.gr+' '+d.obs).toLowerCase())+'"><td><span class="drug-name">'+d.n+'</span><div class="cell-sub">'+d.gr+'</div></td><td>'+fdaBadge(d.fda)+'</td><td>'+trimCell(d.t1)+'</td><td>'+trimCell(d.t2)+'</td><td>'+trimCell(d.t3)+'</td><td>'+d.lac+'</td><td>'+d.obs+'</td></tr>';
+  }).join('');
+  return '<div class="callout warn" style="margin-bottom:1rem"><strong>Categoría FDA histórica</strong> — referencia orientativa. Priorizar el fármaco de menor riesgo y consultar ante la duda.</div>'+
+    '<div class="searchbox"><span class="ico">🔍</span><input id="embSearch" placeholder="Buscar fármaco o grupo…" oninput="farmFilter(this.value,\'embBody\',\'emb-nores\')"></div>'+
+    '<div class="table-wrap"><table><thead><tr><th>Fármaco</th><th>FDA</th><th>1ºT</th><th>2ºT</th><th>3ºT</th><th>Lactancia</th><th>Observaciones</th></tr></thead><tbody id="embBody">'+rows+'</tbody></table></div>'+
+    '<div class="no-results" id="emb-nores" style="display:none">Sin coincidencias.</div>';
+}
+function sevBadge(s){ var m={grave:['🔴','Grave','sev-grave'],mod:['🟠','Moderada','sev-mod'],leve:['🟡','Leve','sev-leve']}[s]; return '<span class="sev '+m[2]+'">'+m[0]+' '+m[1]+'</span>'; }
+function farmInterHTML(){
+  var rows=INTER.map(function(d){
+    return '<tr data-text="'+esc((d.a+' '+d.b+' '+d.ef+' '+d.mec).toLowerCase())+'"><td><span class="drug-name">'+d.a+'</span> + <span class="drug-name">'+d.b+'</span></td><td>'+sevBadge(d.sev)+'</td><td>'+d.mec+'</td><td>'+d.ef+'</td><td>'+d.man+'</td></tr>';
+  }).join('');
+  return '<div class="searchbox"><span class="ico">🔍</span><input id="interSearch" placeholder="Ingresá un fármaco (p.ej. warfarina, amiodarona)…" oninput="farmFilter(this.value,\'interBody\',\'inter-nores\')"></div>'+
+    '<div class="leyenda-sev"><span class="sev sev-grave">🔴 Grave (contraindicada)</span><span class="sev sev-mod">🟠 Moderada (monitorear)</span><span class="sev sev-leve">🟡 Leve (precaución)</span></div>'+
+    '<div class="table-wrap"><table><thead><tr><th>Fármaco A + B</th><th>Severidad</th><th>Mecanismo</th><th>Efecto clínico</th><th>Manejo</th></tr></thead><tbody id="interBody">'+rows+'</tbody></table></div>'+
+    '<div class="no-results" id="inter-nores" style="display:none">Sin coincidencias.</div>';
 }
 
 /* ---- Maniobras ---- */
 function buildManiobras(){
   var g=document.getElementById('maniobrasGrid'); g.innerHTML='';
   MANIOBRAS.forEach(function(m){
-    var card=document.createElement('button'); card.className='tool-card'; card.dataset.text=(m.name+' '+m.sub).toLowerCase();
+    var card=document.createElement('div'); card.className='tool-card'; card.style.position='relative'; card.dataset.text=(m.name+' '+m.sub).toLowerCase();
     card.onclick=function(){openManiobra(m.id);};
-    card.innerHTML='<span class="tc-icon">'+m.icon+'</span><span class="tc-title">'+m.name+'</span><span class="tc-sub">'+m.sub+'</span>';
+    card.innerHTML='<span class="tc-icon">'+m.icon+'</span><span class="tc-title">'+m.name+'</span><span class="tc-sub">'+m.sub+'</span>'+favStarHTML('man',m.id,m.name,'Maniobra');
     g.appendChild(card);
   });
 }
@@ -1885,11 +2106,12 @@ function toggleSearch(){
   var bar=document.getElementById('searchBar'), nav=document.getElementById('mainNav');
   var show=!bar.classList.contains('show');
   bar.classList.toggle('show',show); nav.classList.toggle('pushed',show);
-  if(show){ var i=document.getElementById('searchInput'); i.value=state.search||''; i.focus(); if(state.search)applySearch(state.search); }
+  if(show){ var i=document.getElementById('searchInput'); i.value=state.search||''; i.focus(); if(state.search)globalSearch(state.search); }
   else resetSearch();
 }
 function resetSearch(){
   var i=document.getElementById('searchInput'); if(i)i.value='';
+  var gb=document.getElementById('gsResults'); if(gb){ gb.classList.remove('show'); gb.innerHTML=''; }
   state.search=''; saveState(); applySearch('');
 }
 function applySearch(q){
@@ -1897,7 +2119,7 @@ function applySearch(q){
   q=(q||'').trim().toLowerCase();
   var panel=document.querySelector('.panel.active'); if(!panel)return;
   var id=panel.id.replace('panel-','');
-  if(id==='farmacos'){ var ds=document.getElementById('drugSearch'); ds.value=q; filterDrugs(q); return; }
+  if(id==='farmacos'){ var fi=document.querySelector('#farmContent .searchbox input'); if(fi){ fi.value=q; if(fi.oninput)fi.oninput(); } return; }
   var cards=panel.querySelectorAll('.tool-card'); var any=false, hasCards=cards.length>0;
   Array.prototype.forEach.call(cards,function(c){ var show=c.dataset.text.indexOf(q)>-1; c.style.display=show?'':'none'; if(show)any=true; });
   var nores=panel.querySelector('.no-results');
@@ -2761,8 +2983,151 @@ document.addEventListener('keydown',function(e){
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='f'){ if(document.getElementById('app').style.display!=='none'){ e.preventDefault(); toggleSearch(); } }
   if(e.key==='Escape'){ if(document.getElementById('modal').classList.contains('show'))closeModal(); }
 });
+/* ═══════════════ v1.5 · Tema claro/oscuro ═══════════════ */
+var THEME_KEY='emergsmart_theme';
+function applyTheme(t){
+  var light=(t==='light');
+  document.body.classList.toggle('light',light);
+  var btn=document.getElementById('themeBtn'); if(btn){ btn.textContent=light?'☀️':'🌙'; btn.title=light?'Cambiar a modo oscuro':'Cambiar a modo claro'; }
+}
+function toggleTheme(){
+  var cur=(localStorage.getItem(THEME_KEY)==='light')?'dark':'light';
+  localStorage.setItem(THEME_KEY,cur); applyTheme(cur);
+}
+function initTheme(){ applyTheme(localStorage.getItem(THEME_KEY)||'dark'); }
+
+/* ═══════════════ v1.5 · Favoritos ═══════════════ */
+var FAV_KEY='emergsmart_favoritos';
+var favs=[];
+function loadFavs(){ try{ favs=JSON.parse(localStorage.getItem(FAV_KEY)||'[]')||[]; }catch(e){ favs=[]; } }
+function saveFavs(){ localStorage.setItem(FAV_KEY,JSON.stringify(favs)); }
+function favAttr(s){ return String(s==null?'':s).replace(/['"\\]/g,''); }
+function favKey(t,id){ return t+':'+id; }
+function isFav(t,id){ return favs.some(function(f){ return f.t===t&&f.id===id; }); }
+function toggleFav(t,id,label,cat,ev){
+  if(ev){ ev.stopPropagation(); }
+  var i=favs.map(function(f){return favKey(f.t,f.id);}).indexOf(favKey(t,id));
+  if(i>-1) favs.splice(i,1); else favs.push({t:t,id:id,label:label,cat:cat});
+  saveFavs();
+  var btn=ev&&ev.currentTarget; if(btn){ btn.classList.toggle('on',isFav(t,id)); }
+}
+function favStarHTML(t,id,label,cat){
+  return '<button class="fav-star'+(isFav(t,id)?' on':'')+'" title="Marcar favorito" '+
+    'onclick="toggleFav(\''+t+'\',\''+favAttr(id)+'\',\''+favAttr(label)+'\',\''+favAttr(cat)+'\',event)">★</button>';
+}
+function qtab(t){ return document.querySelector('.main-tab[data-tab="'+t+'"]'); }
+function navFav(t,id){
+  closeModal();
+  if(t==='calc'){ showMainTab('herramientas',qtab('herramientas')); openCalc(id); }
+  else if(t==='man'){ showMainTab('maniobras',qtab('maniobras')); openManiobra(id); }
+  else if(t==='sys'){ showMainTab('sistemas',qtab('sistemas')); showSysSub(id); }
+  else if(t==='farm'){ showMainTab('farmacos',qtab('farmacos')); showFarmSub(id); }
+  else if(t==='pocus'){ showMainTab('pocus',qtab('pocus')); if(typeof showPocusSub==='function')showPocusSub(id); }
+}
+function rmFav(t,id){
+  var i=favs.map(function(f){return favKey(f.t,f.id);}).indexOf(favKey(t,id));
+  if(i>-1){ favs.splice(i,1); saveFavs(); openFavoritos(); buildTools(); buildManiobras(); }
+}
+function openFavoritos(){
+  var html;
+  if(!favs.length){
+    html='<div class="fav-empty">Todavía no marcaste favoritos.<br>Tocá la ★ en una calculadora, maniobra o sistema para guardarla acá.</div>';
+  } else {
+    html=favs.map(function(f){
+      return '<div class="fav-item"><div><div class="fav-t">'+esc(f.label)+'</div><div class="fav-c">'+esc(f.cat||'')+'</div></div>'+
+        '<div style="display:flex;gap:.4rem;align-items:center">'+
+        '<button class="go" onclick="navFav(\''+favAttr(f.t)+'\',\''+favAttr(f.id)+'\')">Ir</button>'+
+        '<button class="rm" title="Quitar" onclick="rmFav(\''+favAttr(f.t)+'\',\''+favAttr(f.id)+'\')">✕</button></div></div>';
+    }).join('');
+  }
+  showModal('⭐ Favoritos', html);
+}
+
+/* ═══════════════ v1.5 · Búsqueda global ═══════════════ */
+var SEARCH_IDX=null;
+function buildSearchIndex(){
+  var idx=[];
+  try{ SISTEMAS.forEach(function(s){ idx.push({cat:'Sistemas',label:s.name,t:'sys',id:s.id}); }); }catch(e){}
+  try{ TOOLS_ORDER.forEach(function(id){ var c=CALCS[id]; if(c)idx.push({cat:'Calculadoras',label:c.title,sub:c.sub,t:'calc',id:id}); }); }catch(e){}
+  try{ MANIOBRAS.forEach(function(m){ idx.push({cat:'Maniobras',label:m.name,sub:m.sub,t:'man',id:m.id}); }); }catch(e){}
+  try{ POCUS.forEach(function(p){ idx.push({cat:'POCUS',label:p.name,sub:p.desc,t:'pocus',id:p.id}); }); }catch(e){}
+  try{ DRUGS.forEach(function(d){ idx.push({cat:'Fármacos · Emergencia',label:d.n,sub:d.ind,t:'farm',id:'emergencia'}); }); }catch(e){}
+  try{ ATB.forEach(function(d){ idx.push({cat:'Antibióticos',label:d.n,sub:d.esp,t:'farm',id:'atb'}); }); }catch(e){}
+  try{ EMB.forEach(function(d){ idx.push({cat:'Embarazo',label:d.n,sub:d.gr,t:'farm',id:'embarazo'}); }); }catch(e){}
+  try{ INTER.forEach(function(d){ idx.push({cat:'Interacciones',label:d.a+' + '+d.b,sub:d.ef,t:'farm',id:'interacciones'}); }); }catch(e){}
+  return idx;
+}
+function ensureIdx(){ if(!SEARCH_IDX)SEARCH_IDX=buildSearchIndex(); return SEARCH_IDX; }
+function gsHL(text,q){ text=String(text==null?'':text); var i=text.toLowerCase().indexOf(q); if(q&&i>-1){ return esc(text.slice(0,i))+'<mark>'+esc(text.slice(i,i+q.length))+'</mark>'+esc(text.slice(i+q.length)); } return esc(text); }
+function globalSearch(q){
+  state.search=q; saveState();
+  var box=document.getElementById('gsResults'); if(!box)return;
+  q=(q||'').trim().toLowerCase();
+  if(q.length<2){ box.classList.remove('show'); box.innerHTML=''; return; }
+  var hits=ensureIdx().filter(function(it){ return (it.label+' '+(it.sub||'')+' '+it.cat).toLowerCase().indexOf(q)>-1; });
+  if(!hits.length){ box.innerHTML='<div class="gs-none">Sin resultados para "'+esc(q)+'"</div>'; box.classList.add('show'); return; }
+  hits=hits.slice(0,80);
+  var groups={}, order=[];
+  hits.forEach(function(h){ if(!groups[h.cat]){ groups[h.cat]=[]; order.push(h.cat); } groups[h.cat].push(h); });
+  var html='';
+  order.forEach(function(cat){
+    html+='<div class="gs-group">'+esc(cat)+' ('+groups[cat].length+')</div>';
+    groups[cat].forEach(function(h){
+      html+='<button class="gs-item" onclick="gsGo(\''+favAttr(h.t)+'\',\''+favAttr(h.id)+'\')"><div>'+gsHL(h.label,q)+'</div>'+(h.sub?'<div class="gs-sub">'+gsHL(h.sub,q)+'</div>':'')+'</button>';
+    });
+  });
+  box.innerHTML=html; box.classList.add('show');
+}
+function gsGo(t,id){ var box=document.getElementById('gsResults'); if(box){ box.classList.remove('show'); } navFav(t,id); }
+
+/* ═══════════════ v1.5 · Exportar PDF de la pestaña activa ═══════════════ */
+function exportTabPDF(){
+  if(!(window.jspdf&&window.jspdf.jsPDF)||typeof html2canvas!=='function'){ alert('No se pudo cargar el generador de PDF (sin conexión).'); return; }
+  var panel=document.querySelector('.panel.active'); if(!panel){ alert('No hay contenido para exportar.'); return; }
+  var tabEl=document.querySelector('.main-tab.active');
+  var tabName=(tabEl?tabEl.textContent:'EmergSmart').replace(/[^\wáéíóúñÁÉÍÓÚÑ .·-]/g,'').trim()||'EmergSmart';
+  var ev=window.event, btn=ev&&ev.currentTarget, old=btn?btn.textContent:'';
+  if(btn){ btn.textContent='⏳'; }
+  var isLight=document.body.classList.contains('light');
+  html2canvas(panel,{backgroundColor:isLight?'#ffffff':'#0f172a',scale:2,useCORS:true}).then(function(canvas){
+    var jsPDF=window.jspdf.jsPDF, pdf=new jsPDF('p','mm','a4');
+    var pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+    var margin=10, headerH=23, footerH=9, imgW=pw-margin*2;
+    function drawHeader(y){
+      pdf.setFillColor(20,184,166); pdf.rect(0,0,pw,3,'F');
+      pdf.setTextColor(15,23,42); pdf.setFont('helvetica','bold'); pdf.setFontSize(14);
+      pdf.text('EmergSmart · '+tabName,margin,13);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(90,90,90);
+      var line=[]; if(medConfig.nombre)line.push(medConfig.nombre); if(medConfig.registro)line.push(medConfig.registro); if(medConfig.institucion)line.push(medConfig.institucion);
+      var d=new Date(), p2=function(n){return String(n).padStart(2,'0');};
+      var fecha=p2(d.getDate())+'/'+p2(d.getMonth()+1)+'/'+d.getFullYear()+' '+p2(d.getHours())+':'+p2(d.getMinutes());
+      pdf.text((line.join(' · ')||'Profesional no configurado')+'  |  '+fecha,margin,19);
+      pdf.setDrawColor(210); pdf.line(margin,headerH-2,pw-margin,headerH-2);
+    }
+    var availH=ph-headerH-footerH;
+    var sliceHpx=Math.floor(canvas.width*availH/imgW);
+    var rendered=0, first=true;
+    while(rendered<canvas.height){
+      var sh=Math.min(sliceHpx,canvas.height-rendered);
+      var pc=document.createElement('canvas'); pc.width=canvas.width; pc.height=sh;
+      pc.getContext('2d').drawImage(canvas,0,rendered,canvas.width,sh,0,0,canvas.width,sh);
+      if(!first){ pdf.addPage(); }
+      drawHeader();
+      pdf.addImage(pc.toDataURL('image/jpeg',0.92),'JPEG',margin,headerH,imgW,sh*imgW/canvas.width);
+      rendered+=sh; first=false;
+    }
+    var pages=pdf.internal.getNumberOfPages();
+    for(var p=1;p<=pages;p++){ pdf.setPage(p); pdf.setFontSize(7.5); pdf.setTextColor(140,140,140);
+      pdf.text('EmergSmart © Dr. M. Dos Santos · EasyMed Suite — apoyo a la decisión clínica, no sustituye el juicio médico.',margin,ph-4);
+      pdf.text(p+'/'+pages,pw-margin-9,ph-4);
+    }
+    pdf.save('EmergSmart_'+tabName.replace(/[^a-zA-Z0-9]+/g,'_')+'.pdf');
+    if(btn){ btn.textContent=old; }
+  }).catch(function(e){ alert('Error al generar el PDF: '+e); if(btn){ btn.textContent=old; } });
+}
+
 (function init(){
-  loadState(); loadConfig(); loadGuardia();
+  loadState(); loadConfig(); loadGuardia(); loadFavs(); initTheme();
   var savedHash=localStorage.getItem('emergsmart_passhash'); if(savedHash)PASS_HASH=savedHash;
   if(sessionValid()) enterApp();
   else document.getElementById('pwd').focus();
