@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EmergSmart — Referencia Clínica en Emergencias</title>
+<link rel="manifest" href="/emergsmart/manifest.json">
+<meta name="theme-color" content="#14b8a6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EmergSmart">
+<link rel="apple-touch-icon" href="/emergsmart/icon-192.png">
 <style>
   :root{
     --bg:#0f172a; --surface:#1e293b; --surface2:#273449; --surface3:#334155;
@@ -328,6 +334,7 @@
     <div class="brand"><span class="logo">🚨</span> Emerg<span class="em">Smart</span></div>
     <div class="header-actions">
       <span id="medBadge" class="med-badge" title="Médico configurado"></span>
+      <button id="installBtn" class="icon-btn" style="display:none;width:auto;padding:0 .7rem;gap:.35rem;background:var(--teal);color:#04211d;border-color:var(--teal);font-weight:700;font-size:.82rem" onclick="pwaInstall()" title="Instalar EmergSmart">📲 Instalar</button>
       <button class="icon-btn" onclick="toggleSearch()" title="Buscar (Ctrl+F)">🔍</button>
       <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Tema claro/oscuro">🌙</button>
       <button class="icon-btn" onclick="openFavoritos()" title="Favoritos">⭐</button>
@@ -356,8 +363,8 @@
     <button class="main-tab"        data-tab="pocus"       onclick="showMainTab('pocus',this)">📡 POCUS</button>
     <button class="main-tab"        data-tab="farmacos"    onclick="showMainTab('farmacos',this)">💊 Fármacos</button>
     <button class="main-tab"        data-tab="maniobras"   onclick="showMainTab('maniobras',this)">🩺 Maniobras</button>
-    <button class="main-tab"        data-tab="guardia"     onclick="showMainTab('guardia',this)">📋 Guardia</button>
     <button class="main-tab"        data-tab="toxicologia" onclick="showMainTab('toxicologia',this)">☠️ Toxicología</button>
+    <button class="main-tab"        data-tab="guardia"     onclick="showMainTab('guardia',this)">📋 Guardia</button>
   </nav>
 
   <main class="app-content">
@@ -403,6 +410,8 @@
       <p class="sec-desc">Tocá un procedimiento para ver materiales, pasos y complicaciones.</p>
       <div class="grid" id="maniobrasGrid"></div>
       <div class="no-results" id="man-nores">Sin coincidencias.</div>
+      <h3 class="sec" style="font-size:1.1rem;margin-top:1.6rem">Protocolos detallados</h3>
+      <div id="maniobrasDetalle"></div>
     </section>
 
     <!-- ═════ GUARDIA ═════ -->
@@ -1198,9 +1207,52 @@ var CALCS={
       else if(s<=2){t='Riesgo bajo (~5–17%): test rápido/cultivo; ATB solo si es positivo.';c='amber';}
       else if(s===3){t='Riesgo moderado (~28–35%): test rápido; ATB si es positivo.';c='amber';}
       else {t='Riesgo alto (~50%): test rápido; valorar ATB empírico (penicilina/amoxicilina).';c='red';}
-      return{score:s+' pts',interp:t+' Faringitis viral no requiere ATB.',cls:c}; }}
+      return{score:s+' pts',interp:t+' Faringitis viral no requiere ATB.',cls:c}; }},
+  rankin:{title:'Rankin modificado (mRS)', icon:'🧠', sub:'Discapacidad neurológica — ACV',
+    fields:[
+      {id:'mrs',label:'Grado funcional',opts:[
+        ['0','0 — Sin síntomas'],
+        ['1','1 — Sin discapacidad significativa'],
+        ['2','2 — Discapacidad leve (independiente)'],
+        ['3','3 — Discapacidad moderada (requiere ayuda)'],
+        ['4','4 — Moderada-severa (dependiente)'],
+        ['5','5 — Severa (encamado, incontinente)'],
+        ['6','6 — Muerte']]}
+    ],
+    calc:function(v){ var s=v.mrs;
+      var txt=['Sin síntomas.','Sin discapacidad significativa: realiza sus actividades habituales.','Discapacidad leve: no realiza todas las actividades previas pero es independiente.','Discapacidad moderada: requiere algo de ayuda, camina sin asistencia.','Discapacidad moderada-severa: no camina ni se atiende sin ayuda.','Discapacidad severa: encamado, incontinente, cuidados constantes.','Muerte.'][s];
+      var c=s<=1?'green':(s<=3?'amber':'red');
+      return{score:'mRS '+s, interp:txt+' En ACV: se prefiere Rankin previo <2 para trombólisis.', cls:c}; }},
+  abcd2:{title:'ABCD²', icon:'🧠', sub:'Riesgo de ACV tras AIT',
+    fields:[
+      {id:'ab_age',label:'Edad ≥60 años',opts:[['0','No'],['1','Sí']]},
+      {id:'ab_bp',label:'PA ≥140/90 mmHg',opts:[['0','No'],['1','Sí']]},
+      {id:'ab_clin',label:'Características clínicas',opts:[['2','Debilidad unilateral'],['1','Alteración del habla sin debilidad'],['0','Otro']]},
+      {id:'ab_dur',label:'Duración de los síntomas',opts:[['2','≥60 min'],['1','10–59 min'],['0','<10 min']]},
+      {id:'ab_dm',label:'Diabetes',opts:[['0','No'],['1','Sí']]}
+    ],
+    calc:function(v){ var s=v.ab_age+v.ab_bp+v.ab_clin+v.ab_dur+v.ab_dm, t,c;
+      if(s<=3){t='Riesgo bajo (~1% de ACV a 2 días).';c='green';}
+      else if(s<=5){t='Riesgo moderado (~4% a 2 días).';c='amber';}
+      else{t='Riesgo alto (~8% a 2 días): valorar ingreso y estudio vascular urgente.';c='red';}
+      return{score:s+' / 7 pts', interp:t, cls:c}; }},
+  blatchford:{title:'Glasgow-Blatchford (GBS)', icon:'🩸', sub:'Hemorragia digestiva alta — riesgo',
+    fields:[
+      {id:'gb_urea',label:'Urea (mmol/L)',opts:[['0','<6.5'],['2','6.5–7.9'],['3','8–9.9'],['4','10–24.9'],['6','≥25']]},
+      {id:'gb_hb',label:'Hemoglobina (g/dL)',opts:[['0','≥12'],['1','Mujer 10–11.9'],['3','Hombre 10–11.9'],['6','<10 (cualquier sexo)']]},
+      {id:'gb_pas',label:'PA sistólica (mmHg)',opts:[['0','≥110'],['1','100–109'],['2','90–99'],['3','<90']]},
+      {id:'gb_fc',label:'FC ≥100 lpm',opts:[['0','No'],['1','Sí']]},
+      {id:'gb_mel',label:'Melena',opts:[['0','No'],['1','Sí']]},
+      {id:'gb_sinc',label:'Síncope',opts:[['0','No'],['2','Sí']]},
+      {id:'gb_hep',label:'Hepatopatía',opts:[['0','No'],['2','Sí']]},
+      {id:'gb_ic',label:'Insuficiencia cardíaca',opts:[['0','No'],['2','Sí']]}
+    ],
+    calc:function(v){ var s=v.gb_urea+v.gb_hb+v.gb_pas+v.gb_fc+v.gb_mel+v.gb_sinc+v.gb_hep+v.gb_ic, t,c;
+      if(s===0){t='Riesgo muy bajo: alta ambulatoria segura con seguimiento precoz.';c='green';}
+      else{t='Riesgo elevado: endoscopía urgente e ingreso.';c=(s>=7?'red':'amber');}
+      return{score:s+' pts', interp:t, cls:c}; }}
 };
-var TOOLS_ORDER=['heart','wellstep','wellstvp','geneva','curb65','glasgow','nihss','sofa','qsofa','killip','alvarado','ranson','bisap','parkland','iss','rts','lrinec','apache2','stewart','sedoinf','vtpbw','adrenalina','o2traslado','cthead','centor'];
+var TOOLS_ORDER=['heart','wellstep','wellstvp','geneva','curb65','glasgow','nihss','sofa','qsofa','killip','alvarado','ranson','bisap','parkland','iss','rts','lrinec','apache2','stewart','sedoinf','vtpbw','adrenalina','o2traslado','cthead','centor','rankin','abcd2','blatchford'];
 
 /* ═══════════════ RENDER ═══════════════ */
 function buildAll(){ renderMedBadge(); buildSistemas(); buildSintomas(); buildTools(); buildPocus(); buildDrugs(); buildManiobras(); buildGuardia(); buildToxicologia(); }
@@ -2539,6 +2591,115 @@ function buildManiobras(){
     card.innerHTML='<span class="tc-icon">'+m.icon+'</span><span class="tc-title">'+m.name+'</span><span class="tc-sub">'+m.sub+'</span>'+favStarHTML('man',m.id,m.name,'Maniobra');
     g.appendChild(card);
   });
+  var det=document.getElementById('maniobrasDetalle'); if(det)det.innerHTML=maniobrasDetalleHTML();
+}
+/* ═══════════════ v2.0 · Maniobras — protocolos detallados + calculadora ISR ═══════════════ */
+var ISR_DRUGS=[
+  {n:'Atropina',cat:'Premedicación · 1 mg/mL',perkg:0.02,unit:'mg',conc:1},
+  {n:'Lidocaína',cat:'Premedicación · 20 mg/mL',perkg:1.5,unit:'mg',conc:20},
+  {n:'Fentanilo',cat:'Premedicación · 50 µg/mL',perkg:3,unit:'µg',conc:50},
+  {n:'Ketamina',cat:'Inductor · 50 mg/mL',perkg:2,unit:'mg',conc:50},
+  {n:'Propofol',cat:'Inductor · 10 mg/mL',perkg:2,unit:'mg',conc:10},
+  {n:'Etomidato',cat:'Inductor · 2 mg/mL',perkg:0.3,unit:'mg',conc:2},
+  {n:'Midazolam',cat:'Inductor · 5 mg/mL',perkg:0.2,unit:'mg',conc:5},
+  {n:'Succinilcolina',cat:'Relajante · 20 mg/mL',perkg:1.5,unit:'mg',conc:20},
+  {n:'Rocuronio',cat:'Relajante · 10 mg/mL',perkg:1.2,unit:'mg',conc:10}
+];
+function calcISR(){
+  var res=document.getElementById('isr-res'); if(!res)return;
+  var w=parseFloat((document.getElementById('isr-peso')||{}).value)||0;
+  if(!w||w<=0){ res.innerHTML='<div class="callout warn">Ingresá el peso (kg) para calcular las dosis.</div>'; return; }
+  var rows=ISR_DRUGS.map(function(d){
+    var dose=d.perkg*w, vol=dose/d.conc;
+    return '<tr><td><span class="drug-name">'+d.n+'</span><div class="cell-sub">'+d.cat+'</div></td><td>'+d.perkg+' '+d.unit+'/kg</td><td><strong>'+pdFmt(dose)+' '+d.unit+'</strong></td><td>'+pdFmt(vol)+' mL</td></tr>';
+  }).join('');
+  res.innerHTML='<div class="table-wrap"><table style="min-width:520px"><thead><tr><th>Fármaco</th><th>Dosis/kg</th><th>Dosis ('+w+' kg)</th><th>Volumen</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<p style="font-size:.8rem;color:var(--muted);margin-top:.5rem">Concentraciones estándar asumidas — verificar siempre la presentación disponible.</p>';
+}
+function maniobrasDetalleHTML(){
+  var S=function(icon,title,body,open){ return pediSx(icon,title,body,open); };
+  var isr=''+
+    '<div class="callout"><strong>Indicaciones:</strong> hipoxemia refractaria, Glasgow ≤8, obstrucción de vía aérea, apnea, trabajo respiratorio extremo.</div>'+
+    '<h4>Secuencia de los 7 pasos</h4><ol class="steps">'+
+    '<li><strong>Preparación:</strong> materiales, posición, monitoreo y plan de rescate.</li>'+
+    '<li><strong>Pre-oxigenación:</strong> O₂ 100% ×3-5 min, VNI si tolera, semifowler 20-30°.</li>'+
+    '<li><strong>Pre-medicación (opcional):</strong> atropina 0.02 mg/kg (bradicardia en &lt;1 año); lidocaína 1.5 mg/kg (HTE, broncoespasmo); fentanilo 3 µg/kg (respuesta simpática).</li>'+
+    '<li><strong>Parálisis + inducción</strong> (simultáneas — ver dosis abajo).</li>'+
+    '<li><strong>Protección (Sellick):</strong> presión cricoidea opcional, no recomendada de rutina.</li>'+
+    '<li><strong>Laringoscopía e intubación:</strong> hoja curva (Macintosh) o recta (Miller); tubo 8-8.5 (H) / 7-7.5 (M); profundidad 21-23 cm en comisura; confirmar con capnografía, condensación, expansión bilateral y ausencia epigástrica.</li>'+
+    '<li><strong>Post-intubación:</strong> fijar tubo, RX tórax, sedoanalgesia (propofol/midazolam + fentanilo); VM inicial VT 6-8 mL/kg PBW, FR 14-16, FiO₂ 100% y titular, PEEP 5.</li></ol>'+
+    '<h4>Inductores</h4><ul>'+
+    '<li><strong>Ketamina</strong> 1.5-2 mg/kg (elección en shock, broncoespasmo, trauma).</li>'+
+    '<li><strong>Propofol</strong> 1.5-2 mg/kg (elección en HTE/epilepsia — cuidado hipotensión).</li>'+
+    '<li><strong>Etomidato</strong> 0.3 mg/kg (estable hemodinámicamente; evitar en sepsis prolongada).</li>'+
+    '<li><strong>Midazolam</strong> 0.1-0.3 mg/kg (alternativa).</li></ul>'+
+    '<h4>Relajantes musculares</h4><ul>'+
+    '<li><strong>Succinilcolina</strong> 1.5 mg/kg (inicio 45-60 s, dura 10-12 min). Contraindicado: hiperpotasemia, quemados &gt;48 h, aplastamiento, miopatías.</li>'+
+    '<li><strong>Rocuronio</strong> 1.2 mg/kg (inicio 60-90 s, dura 30-60 min). Revertir con sugammadex 16 mg/kg.</li></ul>'+
+    '<h4>🧮 Calculadora de dosis ISR</h4>'+
+    '<div class="fld"><label>Peso (kg)</label><input id="isr-peso" type="number" min="1" placeholder="ej. 70" oninput="calcISR()"></div>'+
+    '<button class="btn-calc" style="max-width:260px" onclick="calcISR()">Calcular dosis</button>'+
+    '<div id="isr-res" style="margin-top:.8rem"></div>';
+  var crico=''+
+    '<div class="callout crit"><strong>Indicación:</strong> "can\'t intubate, can\'t oxygenate".</div>'+
+    '<h4>Técnica quirúrgica rápida</h4><ol class="steps">'+
+    '<li>Palpar la membrana cricotiroidea (entre cartílago tiroides y cricoides).</li>'+
+    '<li>Incisión vertical de piel 3-4 cm, luego horizontal de la membrana.</li>'+
+    '<li>Dilatar con pinza, introducir tubo 6.0 o cánula de traqueostomía 6.</li>'+
+    '<li>Inflar cuff, ventilar y confirmar con capnografía.</li></ol>'+
+    '<h4>Kit percutáneo (Seldinger)</h4><ol class="steps">'+
+    '<li>Punción con aguja 14G + jeringa con SF.</li>'+
+    '<li>Burbujeo → en vía aérea → introducir guía.</li>'+
+    '<li>Dilatar e introducir la cánula.</li></ol>'+
+    '<div class="callout warn"><strong>Complicaciones:</strong> hemorragia, falsa vía, obstrucción.</div>';
+  var cardiov=''+
+    '<div class="callout"><strong>Indicaciones urgentes:</strong> FA/flutter con inestabilidad, TV con pulso inestable, TSV refractaria.</div>'+
+    '<h4>Sedación previa (si hay tiempo)</h4><p>Midazolam 0.05-0.1 mg/kg + fentanilo 1-2 µg/kg IV.</p>'+
+    '<h4>Energía sincronizada</h4><ul>'+
+    '<li><strong>FA:</strong> 120-200 J bifásico.</li>'+
+    '<li><strong>Flutter/TSV:</strong> 50-100 J bifásico.</li>'+
+    '<li><strong>TV monomórfica con pulso:</strong> 100-200 J bifásico.</li></ul>'+
+    '<div class="callout crit">No sincronizar en FV / TV sin pulso → desfibrilación.</div>'+
+    '<p style="font-size:.85rem;color:var(--muted)">Posición de electrodos: esternal-apical o anteroposterior.</p>';
+  var mcp=''+
+    '<div class="callout"><strong>Indicaciones:</strong> bradicardia sintomática refractaria a atropina, BAV completo con inestabilidad, asistolia con onda P.</div>'+
+    '<h4>Técnica</h4><ul>'+
+    '<li>Electrodos: anterior (V3) y posterior (escápula izquierda), o esternal-apical.</li>'+
+    '<li>Frecuencia: 60-80 lpm.</li>'+
+    '<li>Corriente: iniciar 40 mA y subir hasta captura (habitualmente 60-90 mA).</li>'+
+    '<li><strong>Captura eléctrica:</strong> espiga seguida de QRS ancho.</li>'+
+    '<li><strong>Captura mecánica:</strong> pulso palpable con cada espiga.</li></ul>'+
+    '<div class="callout warn">Sedoanalgesia obligatoria (muy doloroso).</div>';
+  var toraco=''+
+    '<div class="callout"><strong>Indicaciones:</strong> derrame pleural sintomático o diagnóstico; neumotórax a tensión (aguja).</div>'+
+    '<h4>Toracocentesis</h4>'+
+    '<p><strong>Sitio:</strong> línea axilar posterior, 1-2 espacios por encima del nivel del líquido (guiar por eco).</p>'+
+    '<ol class="steps">'+
+    '<li>Paciente sentado inclinado hacia adelante.</li>'+
+    '<li>Anestesia local hasta la pleura.</li>'+
+    '<li>Aguja/catéter por el borde superior de la costilla (evitar el paquete vasculonervioso inferior).</li>'+
+    '<li>Aspirar máximo 1-1.5 L en la primera sesión (riesgo de edema por reexpansión).</li></ol>'+
+    '<h4>Neumotórax a tensión — descompresión con aguja</h4><ul>'+
+    '<li>2º espacio intercostal, línea medioclavicular.</li>'+
+    '<li>Aguja 14-16G, escuchar la salida de aire.</li>'+
+    '<li>Seguir con tubo de drenaje.</li></ul>';
+  var paracent=''+
+    '<div class="callout"><strong>Indicaciones:</strong> ascitis a tensión, diagnóstica, peritonitis bacteriana espontánea (PBE).</div>'+
+    '<p><strong>Sitio:</strong> fosa ilíaca izquierda (McBurney izquierdo) o línea media infraumbilical; guiar por eco si es posible.</p>'+
+    '<h4>Técnica</h4><ol class="steps">'+
+    '<li>Vejiga vacía.</li>'+
+    '<li>Anestesia local en Z-track.</li>'+
+    '<li>Aguja 18G o catéter.</li>'+
+    '<li>Evacuadora: hasta 5 L con albúmina IV (8 g por litro extraído si &gt;5 L).</li></ol>'+
+    '<h4>Análisis</h4><ul>'+
+    '<li>Diagnóstica: enviar PMN, proteínas, cultivo, LDH.</li>'+
+    '<li><strong>PBE:</strong> PMN &gt;250/mm³ → cefotaxima 2 g c/8h IV.</li></ul>';
+  return S('🫁','A · Intubación de secuencia rápida (ISR)',isr,true)+
+    S('🔪','B · Cricotiroidotomía de emergencia',crico)+
+    S('⚡','C · Cardioversión eléctrica',cardiov)+
+    S('🫀','D · Marcapaso transcutáneo',mcp)+
+    S('💧','E · Toracocentesis',toraco)+
+    S('🩸','F · Paracentesis',paracent);
 }
 function openManiobra(id){
   var m=MANIOBRAS.filter(function(x){return x.id===id;})[0];
@@ -3619,6 +3780,36 @@ function showSplash(cb){
     else { document.getElementById('login').style.display='none'; showSplash(enterApp); }
   } else {
     document.getElementById('pwd').focus();
+  }
+})();
+</script>
+<!-- ══════════ PWA · service worker + instalación ══════════ -->
+<script>
+(function(){
+  var deferred=null;
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault(); deferred=e;
+    if(localStorage.getItem('emergsmart_pwa_dismiss')==='1') return;
+    var b=document.getElementById('installBtn'); if(b) b.style.display='inline-flex';
+  });
+  window.pwaInstall=function(){
+    if(!deferred){ return; }
+    deferred.prompt();
+    deferred.userChoice.then(function(c){
+      if(!c || c.outcome!=='accepted'){ localStorage.setItem('emergsmart_pwa_dismiss','1'); }
+      var b=document.getElementById('installBtn'); if(b) b.style.display='none';
+      deferred=null;
+    });
+  };
+  window.addEventListener('appinstalled', function(){
+    var b=document.getElementById('installBtn'); if(b) b.style.display='none';
+  });
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('/emergsmart/sw.js')
+        .then(function(){ console.log('SW registrado'); })
+        .catch(function(e){ console.log('SW error:', e); });
+    });
   }
 })();
 </script>
