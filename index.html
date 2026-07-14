@@ -27,7 +27,7 @@
     --r:8px; --rs:8px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
   /* ═══ v1.5 · Tema claro (override de variables) ═══ */
   body.light{
     --bg:#eef2f7; --surface:#ffffff; --surface2:#f1f5f9; --surface3:#e2e8f0;
@@ -46,7 +46,7 @@
   .fda-bad{background:var(--red-dim);color:var(--red)}
   .tcell{font-size:.82rem;font-weight:600}
   .t-ok{color:var(--green)} .t-warn{color:var(--amber)} .t-bad{color:var(--red);font-weight:800}
-  .sev{display:inline-block;font-size:.78rem;font-weight:700;padding:.12rem .55rem;border-radius:999px;white-space:nowrap}
+  .sev{display:inline-block;font-size:.72rem;font-weight:500;padding:.12rem .55rem;border-radius:999px;white-space:nowrap}
   .sev-grave{background:var(--red-dim);color:var(--red)}
   .sev-mod{background:var(--orange-dim);color:var(--orange)}
   .sev-leve{background:var(--amber-dim);color:var(--amber)}
@@ -76,7 +76,7 @@
   .fav-flash{outline:2px solid var(--teal);outline-offset:2px;border-radius:var(--r);transition:outline .3s}
   button{font-family:inherit;cursor:pointer}
   input,select,textarea{font-family:inherit}
-  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar{width:4px;height:4px}
   ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:6px}
   ::-webkit-scrollbar-track{background:transparent}
 
@@ -110,9 +110,9 @@
 
   /* ══════════ APP SHELL ══════════ */
   #app{display:none;min-height:100vh;flex-direction:column}
-  .app-header{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:0 1.1rem;height:56px}
-  .brand{display:flex;align-items:center;gap:.55rem;font-weight:800;font-size:1.15rem;letter-spacing:-.3px}
-  .brand .logo{font-size:1.5rem}
+  .app-header{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:0 1.1rem;height:48px}
+  .brand{display:flex;align-items:center;gap:.55rem;font-weight:600;font-size:1.05rem;letter-spacing:-.2px}
+  .brand .logo{font-size:1.2rem}
   .brand .em{color:var(--teal)}
   .header-actions{display:flex;align-items:center;gap:.4rem}
   .med-badge{display:none;color:var(--teal);font-size:.78rem;font-weight:600;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:.3rem}
@@ -121,14 +121,14 @@
   .icon-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:var(--rs);width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;transition:border-color .15s,background .15s}
   .icon-btn:hover{border-color:var(--teal);background:var(--surface3)}
   /* Botones del header con etiqueta (icono + texto) */
-  .hdr-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:var(--rs);min-width:48px;padding:4px 7px;font-size:18px;line-height:1;transition:border-color .15s,background .15s}
+  .hdr-btn{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:2px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--rs);min-width:32px;height:32px;padding:0 8px;font-size:16px;line-height:1;transition:border-color .15s,background .15s}
   .hdr-btn:hover{border-color:var(--teal);background:var(--surface3)}
-  .hdr-btn .ib-label{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.01em}
+  .hdr-btn .ib-label{display:none}
   .hdr-btn:hover .ib-label{color:var(--text)}
   @media(max-width:480px){ .hdr-btn .ib-label{display:none} .hdr-btn{min-width:36px;padding:6px 5px} .app-header{padding:0 .6rem} .header-actions{gap:.25rem} }
 
   /* Global search bar */
-  #searchBar{display:none;background:var(--surface2);border-bottom:1px solid var(--border);padding:.6rem 1.1rem;position:sticky;top:56px;z-index:99}
+  #searchBar{display:none;background:var(--surface2);border-bottom:1px solid var(--border);padding:.6rem 1.1rem;position:sticky;top:48px;z-index:99}
   #searchBar.show{display:block}
   #searchBar .wrap{display:flex;align-items:center;gap:.5rem;max-width:1100px;margin:0 auto}
   #searchInput{flex:1;background:var(--surface);border:1px solid var(--border2);border-radius:var(--rs);padding:.6rem .85rem;color:var(--text);font-size:.92rem}
@@ -136,11 +136,20 @@
   #searchBar .hint{color:var(--muted2);font-size:.75rem;white-space:nowrap}
 
   /* Main tabs */
-  .main-nav{position:sticky;top:56px;z-index:98;display:flex;gap:0;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;padding:0 .4rem}
+  .app-body{display:flex;align-items:flex-start;flex:1;min-height:0}
+  .main-nav{position:sticky;top:48px;z-index:98;flex:0 0 160px;width:160px;height:calc(100vh - 48px);display:flex;flex-direction:column;gap:0;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;overflow-x:hidden;padding:.4rem 0}
   .main-nav.pushed{top:calc(56px + 53px)}
-  .main-tab{flex:0 0 auto;background:none;border:none;border-bottom:2.5px solid transparent;color:var(--muted);font-size:.88rem;font-weight:600;padding:.7rem 1rem;margin:.25rem .1rem 0;display:flex;align-items:center;gap:.4rem;white-space:nowrap;border-radius:var(--rs) var(--rs) 0 0;transition:color .15s,background .15s}
-  .main-tab:hover{color:var(--text);border-bottom-color:var(--teal)}
-  .main-tab.active{background:var(--teal);color:#fff;border-bottom-color:var(--teal)}
+  .main-tab{flex:0 0 auto;width:100%;background:none;border:none;border-left:2px solid transparent;color:var(--muted);font-size:13px;font-weight:400;padding:10px 16px;display:flex;align-items:center;gap:.5rem;white-space:nowrap;text-align:left;border-radius:0;transition:color .15s,background .15s}
+  .main-tab:hover{color:var(--text)}
+  .main-tab.active{color:var(--teal);background:var(--teal-dim);border-left:2px solid var(--teal)}
+  .app-content{min-width:0}
+  @media(max-width:768px){
+    .app-body{flex-direction:column;align-items:stretch}
+    .main-nav{position:sticky;top:48px;flex:0 0 auto;width:100%;height:44px;flex-direction:row;border-right:none;border-bottom:1px solid var(--border);overflow-x:auto;overflow-y:hidden;padding:0}
+    .main-tab{width:auto;height:44px;justify-content:center;padding:0 14px;font-size:18px;border-left:none;border-bottom:2px solid transparent}
+    .main-tab.active{border-left:none;border-bottom:2px solid var(--teal);background:var(--teal-dim)}
+    .mt-label{display:none}
+  }
 
   .app-content{flex:1;max-width:1100px;width:100%;margin:0 auto;padding:1.2rem 1.1rem 3rem}
   .panel{display:none}
@@ -149,24 +158,24 @@
 
   /* Sub tabs */
   .subnav{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.3rem}
-  .subtab{background:var(--surface2);border:1px solid var(--border2);color:var(--muted);border-radius:999px;padding:.4rem .9rem;font-size:.8rem;font-weight:600;transition:all .15s}
-  .subtab:hover{color:var(--text);border-color:var(--teal)}
-  .subtab.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+  .subtab{background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.4rem .9rem;font-size:.8rem;font-weight:500;transition:all .15s}
+  .subtab:hover{color:var(--text);border-color:var(--border2)}
+  .subtab.active{background:var(--surface3);color:var(--text);border-color:var(--border2);font-weight:600}
   .subpanel{display:none}
   .subpanel.active{display:block}
 
-  h2.sec{font-size:1rem;font-weight:600;margin-bottom:.2rem;letter-spacing:0}
+  h2.sec{font-size:14px;font-weight:500;margin-bottom:.2rem;letter-spacing:0}
   .sec-desc{color:var(--muted);font-size:.9rem;margin-bottom:1.2rem}
 
   /* Cards / grids */
-  .card{background:var(--surface);border:1px solid rgba(20,184,166,.14);border-radius:var(--r);padding:.85rem .9rem;box-shadow:var(--shadow)}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.85rem .9rem;box-shadow:var(--shadow)}
   .placeholder-card{text-align:center;padding:2.8rem 1.2rem;color:var(--muted)}
   .placeholder-card .ph-icon{font-size:1.25rem;line-height:1;margin-bottom:.6rem}
   .placeholder-card h3{font-size:1rem;font-weight:600;color:var(--text);margin-bottom:.35rem}
   .placeholder-card p{font-size:.9rem}
 
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.85rem}
-  .tool-card{background:var(--surface);border:1px solid rgba(20,184,166,.14);border-radius:var(--r);padding:.85rem;box-shadow:var(--shadow);text-align:left;transition:border-color .15s,transform .12s;display:flex;flex-direction:column;gap:.3rem}
+  .tool-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.85rem;box-shadow:var(--shadow);text-align:left;transition:border-color .15s,transform .12s;display:flex;flex-direction:column;gap:.3rem}
   .tool-card:hover{border-color:var(--teal);transform:translateY(-2px)}
   .tool-card .tc-icon{font-size:1.25rem;line-height:1}
   .tool-card .tc-title{font-weight:600;font-size:.9rem}
@@ -188,13 +197,13 @@
   .no-results{display:none;text-align:center;color:var(--muted);padding:1.5rem;font-size:.9rem}
 
   /* Clinical content blocks (Cardio) */
-  .block{background:var(--surface);border:1px solid rgba(20,184,166,.14);border-radius:var(--r);padding:.9rem 1rem;box-shadow:var(--shadow);margin-bottom:1rem}
-  .block h3{font-size:.95rem;font-weight:600;color:var(--teal);margin-bottom:.55rem;display:flex;align-items:center;gap:.4rem}
+  .block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.9rem 1rem;box-shadow:var(--shadow);margin-bottom:1rem}
+  .block h3{font-size:14px;font-weight:500;color:var(--text);margin-bottom:.55rem;display:flex;align-items:center;gap:.4rem}
   .block h4{font-size:.9rem;font-weight:600;margin:.8rem 0 .4rem}
   .block p{font-size:.9rem;margin-bottom:.5rem}
   .block ul{margin:.3rem 0 .6rem 1.1rem;font-size:.9rem}
   .block li{margin-bottom:.28rem}
-  .pill{display:inline-block;padding:.12rem .55rem;border-radius:999px;font-size:.75rem;font-weight:700}
+  .pill{display:inline-block;padding:.12rem .55rem;border-radius:999px;font-size:.72rem;font-weight:500}
   .pill.red{background:var(--red-dim);color:var(--red)} .pill.amber{background:var(--amber-dim);color:var(--amber)}
   .pill.green{background:var(--green-dim);color:var(--green)} .pill.blue{background:var(--blue-dim);color:var(--blue)}
   .callout{border-left:3px solid var(--teal);background:var(--teal-dim2);padding:.6rem .85rem;border-radius:0 var(--rs) var(--rs) 0;font-size:.87rem;margin:.6rem 0}
@@ -363,15 +372,16 @@
     <div id="gsResults"></div>
   </div>
 
+  <div class="app-body">
   <nav class="main-nav" id="mainNav">
-    <button class="main-tab active" data-tab="sistemas"    onclick="showMainTab('sistemas',this)">🫀 Sistemas</button>
-    <button class="main-tab"        data-tab="sintomas"    onclick="showMainTab('sintomas',this)">🔎 Síntomas</button>
-    <button class="main-tab"        data-tab="herramientas" onclick="showMainTab('herramientas',this)">🧮 Herramientas</button>
-    <button class="main-tab"        data-tab="pocus"       onclick="showMainTab('pocus',this)">📡 POCUS</button>
-    <button class="main-tab"        data-tab="farmacos"    onclick="showMainTab('farmacos',this)">💊 Fármacos</button>
-    <button class="main-tab"        data-tab="maniobras"   onclick="showMainTab('maniobras',this)">🩺 Maniobras</button>
-    <button class="main-tab"        data-tab="toxicologia" onclick="showMainTab('toxicologia',this)">☠️ Toxicología</button>
-    <button class="main-tab"        data-tab="guardia"     onclick="showMainTab('guardia',this)">📋 Guardia</button>
+    <button class="main-tab active" data-tab="sistemas"    onclick="showMainTab('sistemas',this)">🫀 <span class="mt-label">Sistemas</span></button>
+    <button class="main-tab"        data-tab="sintomas"    onclick="showMainTab('sintomas',this)">🔎 <span class="mt-label">Síntomas</span></button>
+    <button class="main-tab"        data-tab="herramientas" onclick="showMainTab('herramientas',this)">🧮 <span class="mt-label">Herramientas</span></button>
+    <button class="main-tab"        data-tab="pocus"       onclick="showMainTab('pocus',this)">📡 <span class="mt-label">POCUS</span></button>
+    <button class="main-tab"        data-tab="farmacos"    onclick="showMainTab('farmacos',this)">💊 <span class="mt-label">Fármacos</span></button>
+    <button class="main-tab"        data-tab="maniobras"   onclick="showMainTab('maniobras',this)">🩺 <span class="mt-label">Maniobras</span></button>
+    <button class="main-tab"        data-tab="toxicologia" onclick="showMainTab('toxicologia',this)">☠️ <span class="mt-label">Toxicología</span></button>
+    <button class="main-tab"        data-tab="guardia"     onclick="showMainTab('guardia',this)">📋 <span class="mt-label">Guardia</span></button>
   </nav>
 
   <main class="app-content">
@@ -444,6 +454,7 @@
     </section>
 
   </main>
+  </div><!-- /app-body -->
 
   <footer class="app-footer">EmergSmart © Dr. M. Dos Santos | EasyMed Suite</footer>
 </div>
