@@ -506,7 +506,7 @@ function renderMedBadge(){
   if(medConfig.nombre){ b.textContent=medConfig.nombre+(medConfig.especialidad?' · '+medConfig.especialidad:''); b.classList.add('show'); }
   else{ b.textContent=''; b.classList.remove('show'); }
 }
-function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 /* ---------- login SHA-256 ---------- */
 async function sha256(str){
