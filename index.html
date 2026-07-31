@@ -209,6 +209,15 @@
   .callout{border-left:3px solid var(--teal);background:var(--teal-dim2);padding:.6rem .85rem;border-radius:0 var(--rs) var(--rs) 0;font-size:.87rem;margin:.6rem 0}
   .callout.warn{border-left-color:var(--amber);background:var(--amber-dim)}
   .callout.crit{border-left-color:var(--red);background:var(--red-dim)}
+  .pearl{border-left:3px solid var(--blue);background:rgba(59,130,246,.10);padding:.6rem .85rem;border-radius:0 var(--rs) var(--rs) 0;font-size:.87rem;margin:.6rem 0}
+  .high-alert{border:1px solid rgba(239,68,68,.45);background:var(--red-dim);padding:.65rem .85rem;border-radius:var(--rs);font-size:.87rem;margin:.6rem 0}
+  .calc-guide{margin-top:.85rem;border-top:1px solid var(--border);padding-top:.65rem}
+  .calc-guide h4{margin:.35rem 0 .15rem;color:var(--teal);font-size:.82rem}
+  .calc-guide p{margin:.1rem 0 .45rem;font-size:.84rem}
+  .library-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.55rem;margin-top:.65rem}
+  .library-item{border:1px solid var(--border);border-radius:var(--rs);padding:.65rem;background:var(--surface2)}
+  .library-item a{color:var(--teal);font-weight:800;text-decoration:none}
+  .library-item p{margin:.25rem 0 0;font-size:.79rem;color:var(--muted)}
   .authority{display:inline-block;margin-left:.35rem;padding:.1rem .42rem;border:1px solid var(--border2);border-radius:999px;color:var(--muted);font-size:.62rem;font-weight:700;letter-spacing:.04em;vertical-align:middle}
   .guide-ref{color:var(--muted);font-size:.76rem;margin-top:.55rem;padding-top:.45rem;border-top:1px solid var(--border)}
   /* Expandable symptom / toxicology cards */
@@ -406,15 +415,7 @@
       <p class="sec-desc">Tocá una calculadora para abrirla. Resultados con interpretación clínica.</p>
       <div class="grid" id="toolsGrid"></div>
       <div class="no-results" id="tools-nores">Sin coincidencias.</div>
-      <div class="block sx" style="margin-top:1rem"><h3 class="sx-head" onclick="toggleSx(this)"><span>📚 Referencias académicas principales</span><span class="sx-arrow">▾</span></h3><div class="sx-body"><ul>
-        <li>ACC/AHA/ACEP/NAEMSP/SCAI — Acute Coronary Syndromes 2025.</li>
-        <li>American Heart Association — CPR &amp; ECC 2025.</li>
-        <li>AHA/ASA — Acute Ischemic Stroke 2026.</li>
-        <li>AHA/ACC y sociedades colaboradoras — Acute Pulmonary Embolism 2026.</li>
-        <li>Surviving Sepsis Campaign — Sepsis and Septic Shock 2026.</li>
-        <li>AHA/ASA — Spontaneous Intracerebral Hemorrhage 2022.</li>
-        <li>World Allergy Organization — Anaphylaxis Guidance 2020.</li>
-      </ul><p>Consultar siempre el documento original y los protocolos institucionales.</p></div></div>
+      <div id="clinicalLibrary"></div>
     </section>
 
     <!-- ═════ POCUS ═════ -->
@@ -609,13 +610,25 @@ var DRUGS=[
   {n:'Flumazenil',ind:'Reversión de sedación/intoxicación por benzodiacepinas',ad:'0.2 mg IV en 15 s; repetir 0.1-0.2 mg c/min (máx ~1 mg)',pe:'0.01 mg/kg IV (máx 0.2 mg/dosis)',obs:'Riesgo de convulsiones en dependientes o coingesta de proconvulsivantes. Vida media corta.'},
   {n:'Aminofilina',ind:'Broncoespasmo refractario, bradicardia por β-bloqueo',ad:'Carga 5-6 mg/kg IV en 20-30 min + perfusión 0.5 mg/kg/h',pe:'5-6 mg/kg IV carga',obs:'Margen terapéutico estrecho. Arritmias, náuseas, convulsiones. Monitorizar niveles.'},
   {n:'Sulfato de magnesio',ind:'Torsade de pointes, asma grave, eclampsia',ad:'TdP: 2 g IV en 1-2 min. Asma: 2 g IV en 20 min. Eclampsia: 4-6 g + 1-2 g/h',pe:'25-50 mg/kg IV (máx 2 g)',obs:'Vigilar reflejos, FR y TA (toxicidad: hiporreflexia, depresión resp.). Antídoto: gluconato de calcio.'},
-  {n:'Ácido tranexámico',ind:'Hemorragia traumática (<3 h), HDA, hemorragia posparto',ad:'Trauma: 1 g IV en 10 min + 1 g en 8 h',pe:'15 mg/kg IV (máx 1 g)',obs:'Administrar precoz (CRASH-2: <3 h). Precaución con antecedentes trombóticos/convulsiones.'},
+  {n:'Ácido tranexámico',ind:'Hemorragia traumática (<3 h), hemorragia posparto',ad:'Trauma: 1 g IV en 10 min + 1 g en 8 h',pe:'15 mg/kg IV (máx 1 g)',obs:'Trauma: administrar precoz (CRASH-2: <3 h). En hemorragia gastrointestinal aguda no se recomienda de rutina: los estudios modernos no demostraron beneficio clínico neto; ESGE 2021 recomienda no usarlo en HDA no variceal. Precaución con antecedentes trombóticos/convulsiones.'},
   {n:'Vitamina K (fitomenadiona)',ind:'Reversión de antagonistas de vit. K (warfarina), sangrado',ad:'Sangrado grave: 5-10 mg IV lento (+ CCP/PFC). Sin sangrado: 1-2.5 mg VO',pe:'0.03-0.06 mg/kg',obs:'Efecto en 6-24 h: no sirve para reversión inmediata (usar CCP). Riesgo de anafilaxia con IV rápido.'},
   {n:'Plasma fresco congelado (PFC)',ind:'Coagulopatía con sangrado, transfusión masiva',ad:'10-15 mL/kg IV; en transfusión masiva ratio 1:1:1 con hematíes y plaquetas',pe:'10-15 mL/kg IV',obs:'Requiere compatibilidad ABO y descongelación. Riesgo de TACO/TRALI. No para reversión aislada de warfarina si hay CCP.'},
   {n:'Manitol 20%',ind:'Hipertensión intracraneal, edema cerebral',ad:'0.25-1 g/kg IV en 15-20 min; repetir según PIC/osmolaridad',pe:'0.25-1 g/kg IV',obs:'Usar filtro (cristaliza). Vigilar osmolaridad (<320) y natremia; efecto diurético y rebote. Evitar en hipovolemia/anuria.'},
   {n:'Fentanilo',ind:'Analgesia, sedoanalgesia en VM, inducción IOT',ad:'Bolo 1-2 µg/kg IV. Infusión 0.5-3 µg/kg/h (dilución 2500 µg/50 mL = 50 µg/mL)',pe:'1-2 µg/kg IV bolo',obs:'Opioide potente de acción rápida. Depresión respiratoria y rigidez torácica en bolo rápido. Antídoto: naloxona. Ver calculadora de infusión.'},
   {n:'Dexmedetomidina',ind:'Sedación consciente en VM, delirium, destete',ad:'Infusión 0.2-1.4 µg/kg/h IV (dilución 200 µg/50 mL = 4 µg/mL). Evitar bolo de carga',pe:'0.2-1 µg/kg/h IV',obs:'Sedación cooperativa sin depresión respiratoria significativa. Bradicardia e hipotensión. Ver calculadora de infusión.'}
 ];
+var DRUG_PRACTICE={
+  'Adrenalina (epinefrina)':['Confirmar indicación, vía y concentración antes de administrar.','Monitor ECG, presión y perfusión; en infusión usar bomba.','La administración IV para anafilaxia exige entorno monitorizado y experiencia; no sustituye la vía IM inicial.'],
+  'Amiodarona':['En perfusión, respetar diluyente y acceso compatible con el protocolo local.','Monitor ECG, QT, frecuencia y presión.','Corregir potasio/magnesio y revisar otros fármacos que prolongan QT.'],
+  'Atropina':['IV/IO en bradicardia adulta; titular al algoritmo y preparar marcapaseo si falla.','Monitor ECG y presión.','Puede ser ineficaz en bloqueo infranodal avanzado: no retrasar marcapaseo/infusiones.'],
+  'Noradrenalina (norepinefrina)':['Infusión titulada con bomba; acceso central preferido, sin demorar el inicio urgente por vía periférica proximal bien vigilada.','Presión arterial frecuente/continua, perfusión, diuresis y sitio de acceso.','Tratar la extravasación según protocolo y reevaluar causa/respuesta del shock.'],
+  'Nitroglicerina':['SL o infusión titulada según escenario y presión arterial.','Presión, síntomas y ECG cuando corresponda.','Evitar con hipotensión, sospecha de infarto de VD o exposición reciente a inhibidores PDE-5.'],
+  'Alteplase (rt-PA)':['Vía y esquema dependen estrictamente de la indicación.','Evaluación neurológica/hemodinámica y vigilancia de sangrado según protocolo.','Verificar hora, imagen, anticoagulantes, presión y contraindicaciones; no extrapolar esquemas entre ACV, TEP e IAM.'],
+  'Heparina sódica (no fraccionada)':['Bolo/infusión según indicación y protocolo institucional.','Hemograma, plaquetas, función renal, TTPa o anti-Xa según protocolo.','Revisar sangrado activo, cirugía reciente y antecedente de trombocitopenia inducida por heparina.'],
+  'Insulina regular IV':['Usar bomba y protocolo específico para hiperpotasemia o CAD.','Glucemia seriada y potasio; en CAD también anión gap/cetonemia según disponibilidad.','El descenso del potasio sérico puede ser rápido; anticipar hipoglucemia e hipokalemia.'],
+  'Naloxona':['Titular a ventilación adecuada, no necesariamente a despertar completo.','Ventilación, nivel de conciencia y recurrencia tras la respuesta.','Su duración puede ser menor que la del opioide; observar y considerar infusión según exposición.'],
+  'Sulfato de magnesio':['La velocidad y el esquema dependen de torsades, asma o eclampsia.','ECG cuando corresponde; presión, respiración y reflejos en infusión obstétrica.','Ajustar precaución en insuficiencia renal y tener calcio disponible ante toxicidad.']
+};
 
 /* ═══════════════ v1.5 · Antibióticos, antifúngicos y antivirales ═══════════════
    Dosis de referencia adulto; ajustar por peso, función renal y foco. Verificar siempre. */
@@ -1287,6 +1300,51 @@ var CALCS={
 };
 var TOOLS_ORDER=['heart','wellstep','wellstvp','geneva','curb65','glasgow','nihss','sofa','qsofa','killip','alvarado','ranson','bisap','parkland','iss','rts','lrinec','apache2','stewart','sedoinf','vtpbw','adrenalina','o2traslado','cthead','centor','rankin','abcd2','blatchford'];
 
+/* Capa docente: no interviene en ninguna fórmula ni modifica el resultado calculado. */
+var CALC_GUIDANCE={
+  heart:['Riesgo de eventos cardíacos en dolor torácico evaluado por posible SCA.','0–10 puntos.','Apoya la estratificación junto con ECG y troponinas seriadas.','No diagnostica ni excluye SCA y no define por sí solo una estrategia invasiva.'],
+  wellstep:['Probabilidad clínica pretest de TEP.','La interpretación depende del modelo de 2 o 3 niveles.','Orienta el uso de PERC, dímero D o imagen dentro de un algoritmo validado.','No debe usarse para excluir TEP sin completar el algoritmo; con probabilidad alta no usar dímero D para intentar descartarlo.'],
+  wellstvp:['Probabilidad clínica pretest de TVP.','Puntaje continuo; puede interpretarse en 2 o 3 niveles.','Orienta dímero D y ecografía según el algoritmo elegido.','No confirma ni descarta TVP en forma aislada.'],
+  geneva:['Probabilidad clínica pretest de TEP con variables objetivas.','Puntaje por categorías de probabilidad.','Alternativa a Wells dentro de un algoritmo diagnóstico.','No reemplaza la imagen cuando está indicada ni debe mezclarse con otro modelo.'],
+  curb65:['Gravedad y mortalidad de neumonía adquirida en la comunidad.','0–5 puntos.','Ayuda a decidir ámbito de atención junto con estabilidad, oxigenación y soporte disponible.','No sustituye el juicio clínico ni detecta por sí solo necesidad de UCI.'],
+  glasgow:['Nivel de conciencia mediante apertura ocular, respuesta verbal y motora.','3–15 puntos.','Permite describir y seguir cambios neurológicos.','Sedación, intubación, afasia y trauma facial pueden impedir componentes; documentarlos, no asumir puntuaciones.'],
+  nihss:['Severidad del déficit neurológico focal por 15 ítems.','0–42 puntos.','Estandariza el examen y la evolución del ACV.','Un puntaje bajo no excluye un déficit discapacitante ni decide por sí solo reperfusión o destino.'],
+  sofa:['Disfunción de seis sistemas orgánicos.','0–24 puntos.','El cambio seriado aporta información pronóstica en el paciente crítico.','No diagnostica infección ni debe usarse aisladamente para iniciar o negar tratamiento.'],
+  qsofa:['Riesgo pronóstico junto a la cama en infección sospechada.','0–3 puntos.','Un valor ≥2 identifica mayor riesgo y obliga a evaluar disfunción orgánica.','qSOFA <2 no excluye sepsis; no es herramienta única de screening o descarte.'],
+  killip:['Gravedad clínica de insuficiencia cardíaca en IAM.','Clases I–IV.','Comunica congestión y compromiso hemodinámico.','No reemplaza ecocardiografía, perfusión ni evaluación contemporánea de riesgo.'],
+  alvarado:['Probabilidad clínica de apendicitis.','0–10 puntos.','Ayuda a ordenar observación, imagen y consulta según contexto.','No excluye apendicitis en grupos con rendimiento diferente ni reemplaza reevaluación.'],
+  ranson:['Gravedad pronóstica de pancreatitis con variables al ingreso y a 48 h.','0–11 puntos.','Aporta estratificación histórica.','No es útil para una decisión definitiva al ingreso y no sustituye evaluación dinámica.'],
+  bisap:['Riesgo temprano en pancreatitis aguda.','0–5 puntos.','Puede calcularse durante las primeras 24 horas.','No diagnostica pancreatitis ni reemplaza falla orgánica persistente y evolución clínica.'],
+  parkland:['Estimación inicial de cristaloides en quemaduras.','mL calculados por peso y superficie quemada.','Es un punto de partida para titular por perfusión y diuresis.','No es una orden fija; evitar infra/sobrerresucitación y revisar inhalación, edad y comorbilidad.'],
+  iss:['Gravedad anatómica global del trauma.','1–75 puntos.','Útil para descripción, pronóstico e investigación.','Requiere codificación AIS y no guía por sí solo la reanimación inmediata.'],
+  rts:['Gravedad fisiológica del trauma.','0–7,8408.','Resume GCS, presión sistólica y frecuencia respiratoria.','No reemplaza ABCDE ni detecta lesiones ocultas en un paciente compensado.'],
+  lrinec:['Variables de laboratorio asociadas a fascitis necrotizante.','0–13 puntos.','Puede aumentar la sospecha en un cuadro compatible.','Un puntaje bajo no excluye la enfermedad y nunca debe retrasar cirugía/consulta.'],
+  apache2:['Gravedad fisiológica en adultos críticos.','0–71 puntos más ajuste diagnóstico para mortalidad estimada.','Sirve para comparación poblacional y pronóstico, no para triage aislado.','No fue diseñado para decidir limitar cuidados ni sustituir valoración clínica.'],
+  stewart:['Análisis fisicoquímico simplificado del trastorno ácido–base.','Entrega SID aparente y variables relacionadas.','Complementa gases, anión gap y contexto clínico.','No sustituye medición completa ni establece por sí solo la causa.'],
+  sedoinf:['Estimación práctica de infusiones de sedoanalgesia por peso.','Resultado en dosis/velocidad según entradas.','Facilita el cálculo y debe cotejarse con concentración y bomba reales.','No sustituye titulación clínica, monitorización ni protocolo institucional.'],
+  vtpbw:['Predice peso corporal para ventilación protectora.','Kilogramos predichos según sexo y talla.','Se usa para calcular volumen corriente, no el peso real.','El volumen final debe ajustarse por mecánica, presión plateau y contexto.'],
+  adrenalina:['Estimación de dosis pediátrica por peso.','Resultado dependiente de peso y presentación.','Reduce errores aritméticos si se verifica concentración y vía.','No sustituye doble control de ampolla, indicación y protocolo.'],
+  o2traslado:['Estimación de autonomía de oxígeno.','Minutos aproximados.','Ayuda a planificar reserva para traslado.','Agregar margen de seguridad: fugas, ventilación y manómetro alteran la duración real.'],
+  cthead:['Regla de decisión para TC en traumatismo craneal menor dentro de su población validada.','Criterios presentes/ausentes.','Apoya la decisión de imagen cuando se cumplen inclusión y exclusión.','No aplicar fuera de la población validada ni ante deterioro que ya exige evaluación urgente.'],
+  centor:['Probabilidad de faringitis por estreptococo del grupo A.','McIsaac/Centor por puntos.','Orienta testeo y conducta según prevalencia y guía local.','No diagnostica etiología ni debe promover antibióticos sin el algoritmo correspondiente.'],
+  rankin:['Discapacidad funcional global después de ACV.','0–6 puntos.','Describe independencia y desenlace funcional.','No mide déficit agudo ni sustituye NIHSS o valoración basal detallada.'],
+  abcd2:['Riesgo temprano tras un AIT clínicamente diagnosticado.','0–7 puntos.','Puede complementar la evaluación urgente y el circuito local.','Un puntaje bajo no descarta etiología de alto riesgo ni justifica demorar imagen vascular/especialista.'],
+  blatchford:['Necesidad probable de intervención en hemorragia digestiva alta.','0–23 puntos.','GBS 0–1 identifica muy bajo riesgo y posible manejo ambulatorio en seleccionados.','No sustituye reanimación, endoscopia indicada ni juicio clínico.']
+};
+
+var CLINICAL_LIBRARY=[
+  ['Síndrome coronario agudo','ACC/AHA/ACEP/NAEMSP/SCAI','2025','https://www.acc.org/guidelines/hubs/acute-coronary-syndromes'],
+  ['RCP y cuidados cardiovasculares de emergencia','AHA','2025','https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines'],
+  ['ACV isquémico agudo','AHA/ASA','2026','https://professional.heart.org/en/science-news/2026-guideline-for-the-early-management-of-patients-with-acute-ischemic-stroke'],
+  ['Tromboembolismo pulmonar agudo','AHA/ACC y sociedades colaboradoras','2026','https://www.acc.org/latest-in-cardiology/journal-scans/2026/02/17/14/32/acc-aha-release-first-ever-guideline-for-treatment-and-management-of-acute-pe'],
+  ['Hemorragia intracerebral espontánea','AHA/ASA','2022','https://professional.heart.org/en/science-news/2022-guideline-for-the-management-of-patients-with-spontaneous-intracerebral-hemorrhage'],
+  ['Sepsis y shock séptico','Surviving Sepsis Campaign','2026','https://www.sccm.org/survivingsepsiscampaign/guidelines-and-resources/surviving-sepsis-campaign-adult-guidelines'],
+  ['Asma','GINA','2025','https://ginasthma.org/2025-gina-strategy-report/'],
+  ['EPOC','GOLD','2026','https://goldcopd.org/2026-gold-report-and-pocket-guide/'],
+  ['Enfermedad renal crónica','KDIGO','2024','https://kdigo.org/guidelines/ckd-evaluation-and-management/'],
+  ['Anafilaxia','World Allergy Organization','2020','https://www.worldallergyorganizationjournal.org/article/S1939-4551(20)30375-6/fulltext']
+];
+
 /* ═══════════════ RENDER ═══════════════ */
 function buildAll(){ renderMedBadge(); buildSistemas(); buildSintomas(); buildTools(); buildPocus(); buildDrugs(); buildManiobras(); buildGuardia(); buildToxicologia(); }
 
@@ -1735,6 +1793,7 @@ function neuroHTML(){ return ''+
   '<li>Pacientes seleccionados mediante imagen avanzada pueden recibir trombólisis entre <strong>4.5–9 h</strong> o en <em>wake-up stroke</em>.</li></ul>'+
   '<h4>Trombectomía mecánica</h4><ul>'+
   '<li>Hasta 6 h y, en pacientes seleccionados por imagen, entre 6–24 h.</li><li>Incluir pacientes seleccionados con <em>large core</em>; un ASPECTS bajo no es una exclusión automática.</li></ul>'+
+  '<div class="pearl"><strong>💡 PERLA CLÍNICA:</strong> un NIHSS bajo no excluye un déficit discapacitante; integrar la función comprometida, la oclusión vascular y el contexto de reperfusión.</div>'+
   '<h4>Criterios rt-PA (inclusión)</h4><ul>'+
   '<li>Dx de ACV isquémico con déficit medible, edad ≥18, inicio &lt;4.5 h.</li></ul>'+
   '<h4>Contraindicaciones principales</h4><ul>'+
@@ -2004,7 +2063,7 @@ function renalHTML(){ return ''+
   '<li><strong>Estabilizar el miocardio</strong>: gluconato de calcio 10% 10–30 mL IV (o cloruro), repetir según ECG. No baja el K⁺.</li>'+
   '<li><strong>Introducir K⁺ a la célula</strong>: insulina regular 10 U + dextrosa 25 g IV; salbutamol nebulizado 10–20 mg; bicarbonato si acidosis.</li>'+
   '<li><strong>Eliminar K⁺</strong>: diuréticos de asa, resinas/quelantes (patiromer/zirconio), <strong>diálisis</strong> si refractaria/IRA.</li></ol>'+
-  '<div class="callout crit">Suspender IECA/ARA-II, AINE, ahorradores de K⁺ y aportes de potasio.</div></div>'+
+  '<div class="pearl"><strong>💡 PERLA CLÍNICA:</strong> el calcio estabiliza la membrana, pero no reduce la concentración de potasio; siempre completar desplazamiento y eliminación según el contexto.</div><div class="callout crit">Suspender IECA/ARA-II, AINE, ahorradores de K⁺ y aportes de potasio.</div></div>'+
   '<div class="block"><h3>💧 Hiponatremia severa</h3>'+
   '<p>Na⁺ &lt;120 mEq/L o sintomática (convulsiones, coma, edema cerebral).</p>'+
   '<h4>Algoritmo diagnóstico</h4><ul>'+
@@ -2029,6 +2088,7 @@ function infecHTML(){ return ''+
   '<li>Sospechar infección + disfunción orgánica; medir lactato cuando esté indicado.</li>'+
   '<li>Obtener hemocultivos/cultivos cuanto antes, idealmente antes de antibióticos, si no genera un retraso clínicamente importante.</li>'+
   '<li>Usar NEWS2/NEWS, MEWS o SIRS como herramientas posibles de screening; qSOFA es pronóstico y <strong>no debe usarse como screening único ni para descartar</strong>.</li></ol>'+
+  '<div class="pearl"><strong>💡 PERLA CLÍNICA:</strong> un qSOFA &lt;2 no excluye sepsis.</div>'+
   '<h4>Tratamiento inmediato</h4><ul><li><strong>Antibióticos:</strong> timing según probabilidad de sepsis y presencia de shock; elegir por foco, exposiciones y epidemiología local. Desescalar con microbiología y controlar el foco.</li><li><strong>Fluidos:</strong> cristaloides, preferentemente balanceados cuando corresponda. En hipoperfusión/shock, 30 mL/kg iniciales son contextuales, con reevaluación frecuente y dinámica; no un dogma universal.</li><li><strong>Vasopresores:</strong> noradrenalina primera línea; objetivo inicial habitual PAM 65 mmHg, individualizable. Vasopresina como adyuvante cuando corresponda.</li></ul>'+
   '<div class="callout crit"><strong>Red flags:</strong> shock refractario, hipoperfusión persistente, lactato en ascenso, oliguria o deterioro del sensorio.</div><div class="callout warn"><strong>Qué no hacer:</strong> no usar qSOFA para excluir sepsis ni continuar fluidos sin reevaluar respuesta y tolerancia.</div>'+guideRef('Surviving Sepsis Campaign 2026')+'</div>'+
   '<div class="block"><h3>🌡️ Neutropenia febril</h3><ul>'+
@@ -2336,6 +2396,14 @@ function buildTools(){
     card.innerHTML='<span class="tc-icon">'+c.icon+'</span><span class="tc-title">'+c.title+authority(auth)+'</span><span class="tc-sub">'+c.sub+'</span>'+favStarHTML('calc',id,c.title,'Calculadora');
     g.appendChild(card);
   });
+  buildClinicalLibrary();
+}
+function buildClinicalLibrary(){
+  var c=document.getElementById('clinicalLibrary'); if(!c)return;
+  var cards=CLINICAL_LIBRARY.map(function(r){
+    return '<div class="library-item"><div>'+authority('GUÍA')+' <strong>'+esc(r[0])+'</strong></div><p>'+esc(r[1])+' · '+esc(r[2])+'</p><p><a href="'+esc(r[3])+'" target="_blank" rel="noopener noreferrer">Documento oficial ↗</a></p></div>';
+  }).join('');
+  c.innerHTML='<div class="block sx" style="margin-top:1rem"><h3 class="sx-head" onclick="toggleSx(this)"><span>📚 Biblioteca clínica / Evidencia</span><span class="sx-arrow">▾</span></h3><div class="sx-body"><p>Guías principales utilizadas para trazabilidad. La fecha junto a cada recomendación identifica el documento de referencia; consultar la versión original y el protocolo institucional.</p><div class="library-list">'+cards+'</div></div></div>';
 }
 function openCalc(id){
   var c=CALCS[id];
@@ -2347,8 +2415,14 @@ function openCalc(id){
       f.opts.map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>';}).join('')+'</select></div>';
   }).join('');
   html+='<button class="btn-calc" onclick="runCalc(\''+id+'\')">Calcular</button>'+
-        '<div class="calc-res" id="res-'+id+'"><div class="score" id="res-score-'+id+'"></div><div class="interp" id="res-interp-'+id+'"></div></div>';
+        '<div class="calc-res" id="res-'+id+'"><div class="score" id="res-score-'+id+'"></div><div class="interp" id="res-interp-'+id+'"></div></div>'+
+        calcGuidanceHTML(id);
   showModal(c.icon+' '+c.title, html);
+}
+function calcGuidanceHTML(id){
+  var g=CALC_GUIDANCE[id]; if(!g)return '';
+  return '<div class="block sx calc-guide"><h3 class="sx-head" onclick="toggleSx(this)"><span>🎓 Cómo interpretar este resultado</span><span class="sx-arrow">▾</span></h3><div class="sx-body">'+
+    '<h4>Qué mide / calcula</h4><p>'+esc(g[0])+'</p><h4>Rango o salida</h4><p>'+esc(g[1])+'</p><h4>Uso clínico</h4><p>'+esc(g[2])+'</p><div class="callout warn"><strong>Limitación — qué NO concluir:</strong> '+esc(g[3])+'</div></div></div>';
 }
 function runCalc(id){
   var c=CALCS[id], v={};
@@ -2359,8 +2433,12 @@ function runCalc(id){
   box.style.background='var(--surface2)'; box.style.borderColor=colMap[r.cls]||'var(--border2)';
   document.getElementById('res-score-'+id).textContent=r.score;
   document.getElementById('res-score-'+id).style.color=colMap[r.cls]||'var(--text)';
-  document.getElementById('res-interp-'+id).textContent=r.interp;
+  document.getElementById('res-interp-'+id).textContent=historicalEstimateLabel(id,r.interp);
   box.classList.add('show');
+}
+function historicalEstimateLabel(id,text){
+  if(['heart','killip','ranson','apache2'].indexOf(id)===-1)return text;
+  return 'Estimación histórica / poblacional — '+text+' No representa un riesgo individual exacto y puede variar según cohorte, tratamiento contemporáneo y contexto clínico.';
 }
 
 /* ---- POCUS ---- */
@@ -2594,17 +2672,23 @@ function farmFilter(q,bodyId,noresId){
   var nr=document.getElementById(noresId); if(nr)nr.style.display=any?'none':'block';
 }
 function farmEmergHTML(){
-  var rows=DRUGS.map(function(d){
+  var rows=DRUGS.map(function(d,idx){
     var hay=(d.n+' '+d.ind+' '+d.obs).toLowerCase(),badges='';
     if(/adrenalina|noradrenalina|insulina|trombol|succinil|nitroprusiato/.test(hay))badges+=' <span title="Alto riesgo">⚠️</span>';
     if(/arrit|qt|bradic|amiodarona|adenosina|digox/.test(hay))badges+=' <span title="Monitorización ECG">🫀</span>';
     if(/anticoag|heparina|enoxaparina|alteplase|sangrado/.test(hay))badges+=' <span title="Riesgo hemorrágico">🩸</span>';
     if(/renal|clcr|anuria/.test(hay))badges+=' <span title="Revisar función renal">🧪</span>';
-    return '<tr data-text="'+esc((d.n+' '+d.ind).toLowerCase())+'"><td><span class="drug-name">'+d.n+'</span>'+badges+'</td><td>'+d.ind+'</td><td>'+d.ad+'</td><td>'+d.pe+'</td><td>'+d.obs+'</td></tr>';
+    var ficha=DRUG_PRACTICE[d.n]?'<div><button class="pt-mini" style="margin-top:.35rem" onclick="openDrugPractice('+idx+')">Ficha segura</button></div>':'';
+    return '<tr data-text="'+esc((d.n+' '+d.ind).toLowerCase())+'"><td><span class="drug-name">'+d.n+'</span>'+badges+ficha+'</td><td>'+d.ind+'</td><td>'+d.ad+'</td><td>'+d.pe+'</td><td>'+d.obs+'</td></tr>';
   }).join('');
   return '<div class="searchbox"><span class="ico">🔍</span><input id="drugSearch" placeholder="Buscar fármaco o indicación…" oninput="farmFilter(this.value,\'drugBody\',\'drug-nores\')"></div>'+
     '<div class="table-wrap"><table><thead><tr><th>Fármaco</th><th>Indicación</th><th>Dosis adulto</th><th>Dosis pediátrica</th><th>Observaciones</th></tr></thead><tbody id="drugBody">'+rows+'</tbody></table></div>'+
     '<div class="no-results" id="drug-nores" style="display:none">Sin coincidencias.</div>';
+}
+function openDrugPractice(idx){
+  var d=DRUGS[idx],p=d&&DRUG_PRACTICE[d.n]; if(!d||!p)return;
+  var html='<div class="callout"><strong>Indicación:</strong> '+d.ind+'</div><h4>Administración práctica</h4><p>'+p[0]+'</p><h4>Monitorización</h4><p>'+p[1]+'</p><div class="callout warn"><strong>Precaución crítica:</strong> '+p[2]+'</div><div class="pearl"><strong>💡 PERLA CLÍNICA:</strong> verificar prescripción, concentración, vía, bomba y compatibilidad con el protocolo local antes de un fármaco de alto riesgo.</div>';
+  showModal('💊 '+d.n+' — ficha ampliada',html);
 }
 function farmAtbHTML(){
   var rows=ATB.map(function(d){
@@ -3466,7 +3550,7 @@ function urologiaHTML(){ return ''+
 /* ---- Alergias ---- */
 function alergiasHTML(){ return ''+
   '<div class="block"><h3>🚨 Anafilaxia</h3>'+
-  '<div class="callout crit"><strong>ADRENALINA IM ES EL TRATAMIENTO DE PRIMERA LÍNEA.</strong></div>'+
+  '<div class="high-alert"><strong>⚠️ ALERTA: ADRENALINA IM ES EL TRATAMIENTO DE PRIMERA LÍNEA.</strong> Antihistamínicos y corticoides no la sustituyen.</div>'+
   '<button class="btn-calc" style="max-width:340px" onclick="openCalc(\'adrenalina\')">🧮 Calcular adrenalina IM por peso</button>'+
   '<h4>Criterios diagnósticos (WAO 2020)</h4><ul>'+
   '<li>Inicio agudo con afectación de piel/mucosas + compromiso respiratorio o hipotensión; <strong>o</strong></li>'+
@@ -3659,7 +3743,7 @@ function toxEspecificas(){
     ['💨','Monóxido de carbono','<ul><li>Cefalea, náuseas, confusión; la SatO₂ del pulsioxímetro es FALSAMENTE normal → medir <strong>COHb</strong>.</li><li><strong>O₂ 100%</strong> con máscara con reservorio (acelera la eliminación).</li><li><strong>Cámara hiperbárica</strong>: COHb &gt;25% (&gt;20% en embarazo), pérdida de conciencia, isquemia/ECG alterado, focalidad neurológica, acidosis grave.</li></ul>'],
     ['💊','Betabloqueantes','<ul><li>Bradicardia, hipotensión, hipoglucemia, broncoespasmo.</li><li><strong>Glucagón</strong> 3–10 mg IV (bolo + infusión), <strong>insulina-glucosa hiperinsulinémica euglucémica</strong>, calcio; vasopresores, marcapasos; <strong>emulsión lipídica IV</strong> en refractario (liposolubles).</li></ul>'],
     ['💊','Calcioantagonistas','<ul><li>Bradicardia/bloqueo (verapamilo, diltiazem), vasoplejía (dihidropiridinas), hiperglucemia.</li><li><strong>Calcio IV</strong>, <strong>insulina-glucosa a dosis altas</strong>, vasopresores (noradrenalina); glucagón; emulsión lipídica en refractario.</li></ul>'],
-    ['❤️','Digoxina','<ul><li>Náuseas, visión amarilla, arritmias (bradiarritmias, ESV, TV bidireccional), hiperK⁺ (agudo, marcador de gravedad).</li><li><strong>Anticuerpos antidigoxina (DigiFab)</strong>: arritmia grave/inestable, K⁺ &gt;5 (agudo), ingesta masiva o nivel muy alto. Evitar el calcio IV en la hiperK⁺ por digoxina.</li></ul>'],
+    ['❤️','Digoxina','<ul><li>Náuseas, visión amarilla, arritmias (bradiarritmias, ESV, TV bidireccional), hiperK⁺ (agudo, marcador de gravedad).</li><li><strong>Anticuerpos antidigoxina (DigiFab)</strong>: arritmia grave/inestable, K⁺ &gt;5 (agudo), ingesta masiva o nivel muy alto.</li><li>En hiperpotasemia grave con sospecha de toxicidad digitálica, priorizar evaluación toxicológica y Fab cuando esté indicado. La evidencia contemporánea no demuestra de forma convincente mayor mortalidad por calcio IV: no presentarlo como contraindicación absoluta. Ante cambios ECG potencialmente letales, individualizar el calcio y priorizar toxicología/Fab si la toxicidad es significativa.</li></ul>'],
     ['⚗️','Metanol / etilenglicol','<ul><li>Acidosis metabólica con anión gap alto + <strong>osmol gap elevado</strong>; metanol → ceguera; etilenglicol → cristales de oxalato, IRA.</li><li><strong>Fomepizol</strong> (inhibidor de la alcohol-deshidrogenasa); etanol como alternativa. <strong>Hemodiálisis</strong> urgente si acidosis grave, nivel alto o daño de órgano.</li><li>Coadyuvantes: folato (metanol), tiamina/piridoxina (etilenglicol).</li></ul><button class="btn-calc" style="max-width:250px" onclick="openCalc(\'aniongap\')">🧮 Anión gap</button> <button class="btn-calc" style="max-width:250px" onclick="openCalc(\'osmolgap\')">🧮 Osmol gap</button>']
   ];
   var toxSafety={
@@ -3688,7 +3772,7 @@ var ANTIDOTOS=[
   ['Antidepresivos tricíclicos','Bicarbonato de sodio','1–2 mEq/kg si QRS &gt;100 ms','Objetivo pH 7.45–7.55'],
   ['Betabloqueantes','Glucagón + insulina-glucosa','Glucagón 3–10 mg IV','Emulsión lipídica si refractario'],
   ['Calcioantagonistas','Calcio + insulina-glucosa','Calcio IV; insulina a dosis altas','Vasopresores; lípidos'],
-  ['Digoxina','Anticuerpos antidigoxina (DigiFab)','Según nivel / arritmia / K⁺','No dar calcio IV en la hiperK⁺'],
+  ['Digoxina','Anticuerpos antidigoxina (DigiFab)','Según nivel / arritmia / K⁺','Priorizar Fab/toxicología; calcio IV no absolutamente contraindicado, individualizar si cambios ECG letales'],
   ['Metanol / etilenglicol','Fomepizol (o etanol)','Fomepizol 15 mg/kg carga','Hemodiálisis si grave'],
   ['Heparina','Protamina','1 mg por cada 100 U de heparina','Riesgo de reacción anafiláctica'],
   ['Warfarina','Vitamina K (+ CCP)','5–10 mg IV lento','CCP para reversión inmediata'],
