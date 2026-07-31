@@ -209,6 +209,8 @@
   .callout{border-left:3px solid var(--teal);background:var(--teal-dim2);padding:.6rem .85rem;border-radius:0 var(--rs) var(--rs) 0;font-size:.87rem;margin:.6rem 0}
   .callout.warn{border-left-color:var(--amber);background:var(--amber-dim)}
   .callout.crit{border-left-color:var(--red);background:var(--red-dim)}
+  .authority{display:inline-block;margin-left:.35rem;padding:.1rem .42rem;border:1px solid var(--border2);border-radius:999px;color:var(--muted);font-size:.62rem;font-weight:700;letter-spacing:.04em;vertical-align:middle}
+  .guide-ref{color:var(--muted);font-size:.76rem;margin-top:.55rem;padding-top:.45rem;border-top:1px solid var(--border)}
   /* Expandable symptom / toxicology cards */
   .block.sx .sx-head{cursor:pointer;justify-content:space-between;margin-bottom:0;user-select:none}
   .block.sx .sx-arrow{color:var(--muted);font-size:.85rem;font-weight:400;transition:transform .15s}
@@ -336,10 +338,9 @@
     <button class="btn-login" onclick="doLogin()">Ingresar</button>
     <div class="login-err" id="loginErr"></div>
     <div class="login-disc">
-      <strong>Aviso:</strong> EmergSmart es una herramienta de <strong>apoyo a la decisión clínica</strong>
-      y referencia rápida. No sustituye el juicio médico, los protocolos institucionales ni la valoración
-      individual del paciente. Verificá siempre dosis y contraindicaciones antes de aplicar. El uso es
-      responsabilidad exclusiva del profesional.
+      <strong>Aviso:</strong> EmergSmart es una herramienta de apoyo clínico para profesionales de la salud.
+      No sustituye la evaluación médica, el juicio clínico, los protocolos institucionales ni la consulta
+      de la guía original.
     </div>
   </div>
 </div>
@@ -405,6 +406,15 @@
       <p class="sec-desc">Tocá una calculadora para abrirla. Resultados con interpretación clínica.</p>
       <div class="grid" id="toolsGrid"></div>
       <div class="no-results" id="tools-nores">Sin coincidencias.</div>
+      <div class="block sx" style="margin-top:1rem"><h3 class="sx-head" onclick="toggleSx(this)"><span>📚 Referencias académicas principales</span><span class="sx-arrow">▾</span></h3><div class="sx-body"><ul>
+        <li>ACC/AHA/ACEP/NAEMSP/SCAI — Acute Coronary Syndromes 2025.</li>
+        <li>American Heart Association — CPR &amp; ECC 2025.</li>
+        <li>AHA/ASA — Acute Ischemic Stroke 2026.</li>
+        <li>AHA/ACC y sociedades colaboradoras — Acute Pulmonary Embolism 2026.</li>
+        <li>Surviving Sepsis Campaign — Sepsis and Septic Shock 2026.</li>
+        <li>AHA/ASA — Spontaneous Intracerebral Hemorrhage 2022.</li>
+        <li>World Allergy Organization — Anaphylaxis Guidance 2020.</li>
+      </ul><p>Consultar siempre el documento original y los protocolos institucionales.</p></div></div>
     </section>
 
     <!-- ═════ POCUS ═════ -->
@@ -470,7 +480,7 @@
 <script>
 /* ═══════════════ EmergSmart · vanilla JS ═══════════════ */
 'use strict';
-var PASS_HASH='f94629b99c9e764d4239e7b47d55f9401e38498a8d6c66169e316ddefed383fe'; // SHA-256("emergsmart1")
+var PASS_HASH='f94629b99c9e764d4239e7b47d55f9401e38498a8d6c66169e316ddefed383fe'; // SHA-256
 var LOGIN_KEY='emergsmart_login_expira', LOGIN_TTL=8*60*60*1000;
 var STATE_KEY='emergsmart_v1';
 var CONFIG_KEY='emergsmart_config';
@@ -565,7 +575,7 @@ var POCUS=[
 var DRUGS=[
   {n:'Adrenalina (epinefrina)',ind:'PCR, anafilaxia, shock',ad:'PCR: 1 mg IV c/3-5 min. Anafilaxia: 0.5 mg IM (1:1000)',pe:'0.01 mg/kg IV (PCR); 0.01 mg/kg IM (anafilaxia, máx 0.5 mg)',obs:'Vasopresor de 1ª línea en PCR. IM cara anterolateral del muslo en anafilaxia.'},
   {n:'Amiodarona',ind:'FV/TV sin pulso, taquiarritmias',ad:'PCR: 300 mg IV bolo (2ª: 150 mg). Perfusión: 900 mg/24h',pe:'5 mg/kg IV en PCR',obs:'Vigilar hipotensión y bradicardia. Diluir en SG5%.'},
-  {n:'Atropina',ind:'Bradicardia sintomática, intox. organofosforados',ad:'0.5-1 mg IV c/3-5 min (máx 3 mg)',pe:'0.02 mg/kg IV (mín 0.1 mg)',obs:'Dosis <0.5 mg pueden causar bradicardia paradójica.'},
+  {n:'Atropina',ind:'Bradicardia sintomática, intox. organofosforados',ad:'Bradicardia sintomática: 1 mg IV/IO c/3–5 min (máx total 3 mg)',pe:'0.02 mg/kg IV (mín 0.1 mg)',obs:'En bradicardia sintomática adulta: 1 mg IV/IO por dosis.'},
   {n:'Midazolam',ind:'Sedación, estatus epiléptico, IOT',ad:'Convulsión: 10 mg IM / 5-10 mg IV. Sedación: 1-2.5 mg IV titulado',pe:'0.15-0.2 mg/kg IV; 0.2 mg/kg IM/intranasal',obs:'Depresión respiratoria dosis-dependiente. Antídoto: flumazenil.'},
   {n:'Morfina',ind:'Dolor severo, SCA, EAP',ad:'2-4 mg IV c/5-15 min titulado',pe:'0.1 mg/kg IV/SC',obs:'Vigilar hipotensión y depresión respiratoria. Antídoto: naloxona.'},
   {n:'Furosemida',ind:'EAP, IC aguda, sobrecarga de volumen',ad:'20-40 mg IV lento (hasta 80-120 mg si insuf. renal)',pe:'0.5-1 mg/kg IV',obs:'Vigilar hipopotasemia e hipovolemia. Ototoxicidad en bolo rápido.'},
@@ -585,7 +595,7 @@ var DRUGS=[
   {n:'Diazepam',ind:'Estatus epiléptico, ansiedad, abstinencia OH',ad:'Convulsión: 5-10 mg IV (máx 20 mg). Rectal: 10-20 mg',pe:'0.15-0.3 mg/kg IV; rectal 0.5 mg/kg',obs:'Depresión respiratoria. Vida media larga. Antídoto: flumazenil.'},
   {n:'Noradrenalina (norepinefrina)',ind:'Shock séptico y distributivo (1ª línea), hipotensión',ad:'Perfusión 0.05-0.5 µg/kg/min IV titulado (inicio 5-15 µg/min)',pe:'0.05-0.1 µg/kg/min, titular a respuesta',obs:'Vasopresor de elección en shock séptico. Preferible por vía central; vigilar extravasación (necrosis).'},
   {n:'Dopamina',ind:'Bradicardia sintomática, shock (2ª línea)',ad:'2-20 µg/kg/min IV. Cronotrópico >5; vasopresor >10 µg/kg/min',pe:'2-20 µg/kg/min IV',obs:'Más arritmogénica que la noradrenalina. Sin efecto "renal" protector demostrado.'},
-  {n:'Vasopresina',ind:'Shock séptico refractario (asociada a NA), PCR',ad:'Perfusión fija 0.03 U/min IV (no titular)',pe:'0.0003-0.002 U/kg/min',obs:'Ahorrador de catecolaminas. Vigilar isquemia digital/mesentérica.'},
+  {n:'Vasopresina',ind:'Shock séptico refractario (adyuvante de noradrenalina)',ad:'Perfusión fija 0.03 U/min IV (no titular)',pe:'0.0003-0.002 U/kg/min',obs:'No sustituye rutinariamente a la adrenalina en paro. Vigilar isquemia digital/mesentérica.'},
   {n:'Nitroprusiato de sodio',ind:'Emergencia hipertensiva, disección aórtica (con β-bloq)',ad:'0.3-0.5 µg/kg/min IV, titular hasta máx 10 µg/kg/min',pe:'0.5-8 µg/kg/min',obs:'Proteger de la luz. Toxicidad por cianuro/tiocianato en uso prolongado o insuf. renal.'},
   {n:'Esmolol',ind:'Taquiarritmias, disección aórtica, control rápido de FC/TA',ad:'Bolo 0.5 mg/kg en 1 min + perfusión 50-200 µg/kg/min',pe:'100-500 µg/kg bolo + 25-100 µg/kg/min',obs:'β-bloqueante cardioselectivo de vida media ultracorta. Evitar en asma/IC descompensada.'},
   {n:'Adenosina',ind:'TSV paroxística (diagnóstica y terapéutica)',ad:'6 mg IV rápido (bolo en 1-2 s) + flush; 2ª dosis 12 mg',pe:'0.1 mg/kg (máx 6 mg); 2ª 0.2 mg/kg (máx 12 mg)',obs:'Asistolia transitoria y disconfort torácico. Vía proximal + lavado rápido. Contraindicada en asma grave.'},
@@ -738,7 +748,7 @@ var INTER=[
 
 /* Maniobras (10) */
 var MANIOBRAS=[
-  {id:'rcp',name:'RCP básico adulto',icon:'🫀',sub:'AHA 2020',
+  {id:'rcp',name:'RCP / ACLS adulto',icon:'🫀',sub:'AHA 2025',
    mat:['Superficie firme','Tabla de RCP','DEA/monitor','BVM + O₂','Cronómetro'],
    pasos:['Confirmar inconsciencia y ausencia de respiración/pulso (≤10 s).','Activar sistema de emergencia y pedir DEA.','Compresiones: centro del tórax, 100-120/min, profundidad 5-6 cm.','Permitir reexpansión completa; minimizar interrupciones (<10 s).','Relación 30:2 con vía aérea no avanzada; ventilar con BVM.','Colocar DEA en cuanto llegue y seguir sus indicaciones.','Rotar compresor cada 2 min para evitar fatiga.','Con vía aérea avanzada: compresiones continuas + 1 ventilación c/6 s.'],
    obs:'Prioridad: compresiones de calidad e ininterrumpidas. Considerar causas reversibles (5H/5T).'},
@@ -863,20 +873,25 @@ var CALCS={
       if(s>=13){t='TCE leve';c='green';} else if(s>=9){t='TCE moderado';c='amber';} else {t='TCE grave — valorar vía aérea (GCS ≤8: IOT)';c='red';}
       return{score:s+' / 15',interp:t,cls:c}; }},
 
-  nihss:{title:'NIHSS simplificado', icon:'🧠', sub:'Gravedad del ACV',
+  nihss:{title:'NIHSS completo', icon:'🧠', sub:'Escala oficial de 0–42 puntos',
     fields:[
-      {id:'n_loc',label:'Nivel de conciencia',opts:[['0','Alerta'],['1','Somnoliento'],['2','Estuporoso'],['3','Coma']]},
-      {id:'n_gaze',label:'Mirada conjugada',opts:[['0','Normal'],['1','Paresia parcial'],['2','Desviación forzada']]},
-      {id:'n_vis',label:'Campos visuales',opts:[['0','Normal'],['1','Hemianopsia parcial'],['2','Hemianopsia completa'],['3','Ceguera bilateral']]},
-      {id:'n_face',label:'Parálisis facial',opts:[['0','Normal'],['1','Menor'],['2','Parcial'],['3','Completa']]},
-      {id:'n_arm',label:'Motor mejor brazo',opts:[['0','Sin caída'],['1','Caída <10 s'],['2','Vence gravedad parcial'],['3','No vence gravedad'],['4','Sin movimiento']]},
-      {id:'n_leg',label:'Motor mejor pierna',opts:[['0','Sin caída'],['1','Caída <5 s'],['2','Vence gravedad parcial'],['3','No vence gravedad'],['4','Sin movimiento']]},
-      {id:'n_sens',label:'Sensibilidad',opts:[['0','Normal'],['1','Leve-moderada'],['2','Grave/anestesia']]},
-      {id:'n_lang',label:'Lenguaje (afasia)',opts:[['0','Normal'],['1','Leve-moderada'],['2','Grave'],['3','Mutismo/afasia global']]},
-      {id:'n_dys',label:'Disartria',opts:[['0','Normal'],['1','Leve-moderada'],['2','Grave/anartria']]},
-      {id:'n_ext',label:'Extinción/inatención',opts:[['0','Normal'],['1','Una modalidad'],['2','Grave/hemi-inatención']]}
+      {id:'n_1a',label:'1a. Nivel de conciencia',opts:[['0','Alerta, responde correctamente'],['1','No alerta; despierta con estímulo menor'],['2','No alerta; requiere estímulo repetido o doloroso'],['3','Solo respuestas reflejas o ninguna respuesta']]},
+      {id:'n_1b',label:'1b. Preguntas (mes y edad)',opts:[['0','Responde ambas correctamente'],['1','Responde una correctamente'],['2','Ninguna correctamente']]},
+      {id:'n_1c',label:'1c. Órdenes (abrir/cerrar ojos y mano)',opts:[['0','Realiza ambas correctamente'],['1','Realiza una correctamente'],['2','No realiza ninguna']]},
+      {id:'n_2',label:'2. Mirada',opts:[['0','Normal'],['1','Parálisis parcial de la mirada'],['2','Desviación forzada o paresia total']]},
+      {id:'n_3',label:'3. Campos visuales',opts:[['0','Sin pérdida visual'],['1','Hemianopsia parcial'],['2','Hemianopsia completa'],['3','Hemianopsia bilateral / ceguera cortical']]},
+      {id:'n_4',label:'4. Paresia facial',opts:[['0','Movimientos normales y simétricos'],['1','Paresia menor'],['2','Parálisis parcial'],['3','Parálisis completa unilateral o bilateral']]},
+      {id:'n_5a',label:'5a. Brazo izquierdo (10 s)',opts:[['0','Sin caída'],['1','Cae antes de 10 s, sin tocar apoyo'],['2','Algún esfuerzo contra gravedad; toca apoyo'],['3','Sin esfuerzo contra gravedad'],['4','Sin movimiento']]},
+      {id:'n_5b',label:'5b. Brazo derecho (10 s)',opts:[['0','Sin caída'],['1','Cae antes de 10 s, sin tocar apoyo'],['2','Algún esfuerzo contra gravedad; toca apoyo'],['3','Sin esfuerzo contra gravedad'],['4','Sin movimiento']]},
+      {id:'n_6a',label:'6a. Pierna izquierda (5 s)',opts:[['0','Sin caída'],['1','Cae antes de 5 s, sin tocar apoyo'],['2','Algún esfuerzo contra gravedad; toca apoyo'],['3','Sin esfuerzo contra gravedad'],['4','Sin movimiento']]},
+      {id:'n_6b',label:'6b. Pierna derecha (5 s)',opts:[['0','Sin caída'],['1','Cae antes de 5 s, sin tocar apoyo'],['2','Algún esfuerzo contra gravedad; toca apoyo'],['3','Sin esfuerzo contra gravedad'],['4','Sin movimiento']]},
+      {id:'n_7',label:'7. Ataxia de miembros',opts:[['0','Ausente'],['1','Presente en un miembro'],['2','Presente en dos miembros']]},
+      {id:'n_8',label:'8. Sensibilidad',opts:[['0','Normal'],['1','Pérdida leve a moderada'],['2','Pérdida grave o total']]},
+      {id:'n_9',label:'9. Lenguaje',opts:[['0','Sin afasia'],['1','Afasia leve a moderada'],['2','Afasia grave'],['3','Mudo / afasia global']]},
+      {id:'n_10',label:'10. Disartria',opts:[['0','Articulación normal'],['1','Disartria leve a moderada'],['2','Disartria grave / anartria']]},
+      {id:'n_11',label:'11. Extinción/inatención',opts:[['0','Sin alteración'],['1','Inatención en una modalidad'],['2','Hemi-inatención profunda o en más de una modalidad']]}
     ],
-    calc:function(v){ var s=v.n_loc+v.n_gaze+v.n_vis+v.n_face+v.n_arm+v.n_leg+v.n_sens+v.n_lang+v.n_dys+v.n_ext; var t,c;
+    calc:function(v){ var s=v.n_1a+v.n_1b+v.n_1c+v.n_2+v.n_3+v.n_4+v.n_5a+v.n_5b+v.n_6a+v.n_6b+v.n_7+v.n_8+v.n_9+v.n_10+v.n_11; var t,c;
       if(s===0){t='Sin déficit';c='green';} else if(s<=4){t='ACV leve';c='green';} else if(s<=15){t='ACV moderado';c='amber';} else if(s<=20){t='ACV moderado-grave';c='red';} else {t='ACV grave';c='red';}
       return{score:s+' pts',interp:t,cls:c}; }},
 
@@ -887,20 +902,20 @@ var CALCS={
       {id:'s_liver',label:'Hígado (bilirrubina mg/dL)',opts:[['0','< 1.2'],['1','1.2–1.9'],['2','2.0–5.9'],['3','6.0–11.9'],['4','≥ 12']]},
       {id:'s_cv',label:'Cardiovascular',opts:[['0','PAM ≥ 70'],['1','PAM < 70'],['2','Dopa ≤5 o dobuta'],['3','Dopa >5 / NA ≤0.1'],['4','Dopa >15 / NA >0.1']]},
       {id:'s_cns',label:'SNC (Glasgow)',opts:[['0','15'],['1','13–14'],['2','10–12'],['3','6–9'],['4','< 6']]},
-      {id:'s_ren',label:'Renal (creatinina mg/dL)',opts:[['0','< 1.2'],['1','1.2–1.9'],['2','2.0–3.4'],['3','3.5–4.9'],['4','≥ 5.0 o oliguria']]}
+      {id:'s_ren',label:'Renal (creatinina o diuresis)',opts:[['0','Creatinina <1.2 mg/dL'],['1','Creatinina 1.2–1.9 mg/dL'],['2','Creatinina 2.0–3.4 mg/dL'],['3','Creatinina 3.5–4.9 mg/dL o diuresis <500 mL/día'],['4','Creatinina ≥5.0 mg/dL o diuresis <200 mL/día']]}
     ],
     calc:function(v){ var s=v.s_resp+v.s_coag+v.s_liver+v.s_cv+v.s_cns+v.s_ren; var t,c;
       if(s<=6){t='Disfunción baja (mortalidad <10%)';c='green';} else if(s<=9){t='Mortalidad ~15–20%';c='amber';} else if(s<=12){t='Mortalidad ~40–50%';c='red';} else {t='Disfunción grave (mortalidad >50%)';c='red';}
       return{score:s+' pts',interp:t,cls:c}; }},
 
-  qsofa:{title:'qSOFA', icon:'⚠️', sub:'Cribado rápido de sepsis',
+  qsofa:{title:'qSOFA', icon:'⚠️', sub:'Marcador pronóstico en infección/sepsis — NO herramienta de descarte',
     fields:[
       {id:'q_rr',label:'Frecuencia respiratoria ≥ 22',opts:[['0','No'],['1','Sí']]},
       {id:'q_ment',label:'Alteración del estado mental (GCS <15)',opts:[['0','No'],['1','Sí']]},
       {id:'q_bp',label:'PAS ≤ 100 mmHg',opts:[['0','No'],['1','Sí']]}
     ],
     calc:function(v){ var s=v.q_rr+v.q_ment+v.q_bp; var t,c;
-      if(s>=2){t='Alto riesgo — mayor mortalidad; valorar sepsis y SOFA completo';c='red';} else {t='Bajo riesgo — reevaluar si cambia la clínica';c='green';}
+      if(s>=2){t='Alto riesgo — mayor mortalidad; valorar sepsis y SOFA completo';c='red';} else {t='qSOFA <2 no excluye sepsis. Integrar clínica, NEWS2/SIRS, lactato, disfunción orgánica y SOFA.';c='green';}
       return{score:s+' / 3',interp:t,cls:c}; }},
 
   killip:{title:'Killip-Kimball', icon:'❤️', sub:'IC en el IAM',
@@ -1257,7 +1272,7 @@ var CALCS={
   blatchford:{title:'Glasgow-Blatchford (GBS)', icon:'🩸', sub:'Hemorragia digestiva alta — riesgo',
     fields:[
       {id:'gb_urea',label:'Urea (mmol/L)',opts:[['0','<6.5'],['2','6.5–7.9'],['3','8–9.9'],['4','10–24.9'],['6','≥25']]},
-      {id:'gb_hb',label:'Hemoglobina (g/dL)',opts:[['0','≥12'],['1','Mujer 10–11.9'],['3','Hombre 10–11.9'],['6','<10 (cualquier sexo)']]},
+      {id:'gb_hb',label:'Hemoglobina (g/dL, según sexo)',opts:[['0','Varón ≥13 / mujer ≥12'],['1','Varón 12–12.9 / mujer 10–11.9'],['3','Varón 10–11.9'],['6','<10 (cualquier sexo)']]},
       {id:'gb_pas',label:'PA sistólica (mmHg)',opts:[['0','≥110'],['1','100–109'],['2','90–99'],['3','<90']]},
       {id:'gb_fc',label:'FC ≥100 lpm',opts:[['0','No'],['1','Sí']]},
       {id:'gb_mel',label:'Melena',opts:[['0','No'],['1','Sí']]},
@@ -1266,7 +1281,7 @@ var CALCS={
       {id:'gb_ic',label:'Insuficiencia cardíaca',opts:[['0','No'],['2','Sí']]}
     ],
     calc:function(v){ var s=v.gb_urea+v.gb_hb+v.gb_pas+v.gb_fc+v.gb_mel+v.gb_sinc+v.gb_hep+v.gb_ic, t,c;
-      if(s===0){t='Riesgo muy bajo: alta ambulatoria segura con seguimiento precoz.';c='green';}
+      if(s<=1){t='Muy bajo riesgo / posible manejo ambulatorio en pacientes seleccionados.';c='green';}
       else{t='Riesgo elevado: endoscopía urgente e ingreso.';c=(s>=7?'red':'amber');}
       return{score:s+' pts', interp:t, cls:c}; }}
 };
@@ -1589,17 +1604,20 @@ function wireCardio(){
 }
 function cardioSCA(){ return ''+
   '<div class="block"><h3>❤️ Síndrome coronario agudo (SCA)</h3>'+
-  '<p>Estratificación de riesgo con <strong>HEART score</strong> integrado (Historia, ECG, Edad, Factores de riesgo, Troponina).</p>'+
+  '<p>'+authority('GUÍA')+' Integrar clínica, ECG y biomarcadores; activar reperfusión sin demoras evitables.</p>'+
   '<button class="btn-calc" style="max-width:280px" onclick="openCalc(\'heart\')">🧮 Abrir HEART score</button></div>'+
+  acad('Evaluación inicial','<ul><li>ECG de 12 derivaciones precoz; repetir ECG si persiste sospecha con trazado inicial no diagnóstico.</li><li>Troponina cardíaca de alta sensibilidad cuando esté disponible.</li><li>Considerar V7–V9 ante sospecha de infarto posterior y V3R–V4R en IAM inferior con posible compromiso de VD.</li></ul>')+
   '<div class="block"><h3>🩺 SCASEST — algoritmo 0h/1h (ESC 2023)</h3>'+
   '<p>Troponina ultrasensible (Tn-us) seriada + estratificación <strong>GRACE/TIMI</strong>.</p><ul>'+
   '<li><strong>Rule-out</strong>: Tn-us 0 h por debajo del límite de detección (con dolor &gt;3 h), o algoritmo 0/1 h con valor muy bajo y Δ pequeño.</li>'+
   '<li><strong>Rule-in</strong>: Tn-us claramente elevada o Δ significativo a la 1 h.</li>'+
   '<li><strong>Zona de observación</strong>: 3ª muestra a las 3 h + ecocardiograma.</li>'+
   '<li><strong>Estrategia invasiva</strong>: &lt;2 h si muy alto riesgo (inestabilidad, angina refractaria, arritmia maligna, IC/shock); &lt;24 h si alto riesgo (Tn+, cambios dinámicos ST-T, GRACE &gt;140).</li></ul>'+
+  '<p><strong>Riesgo:</strong> distinguir bajo, intermedio y alto integrando evolución, ECG, troponina y GRACE cuando corresponda. HEART estratifica dolor torácico, pero <strong>no determina por sí solo</strong> una estrategia invasiva.</p>'+
   '<div class="callout warn">La troponina confirma necrosis, no su causa: integrar clínica + ECG + función renal (falsos positivos: IRA, TEP, miocarditis, sepsis).</div></div>'+
   '<div class="block"><h3>⚡ IAMCEST — reperfusión y fibrinólisis</h3>'+
-  '<h4>Criterios ECG</h4><ul><li>Elevación del ST ≥1 mm en ≥2 derivaciones contiguas (≥2 mm en V2–V3 ♂ / ≥1.5 mm ♀), BRIHH nuevo con clínica, o equivalentes (posterior, De Winter, Sgarbossa).</li></ul>'+
+  '<h4>Criterios ECG</h4><ul><li>Elevación del ST ≥1 mm en ≥2 derivaciones contiguas (≥2 mm en V2–V3 ♂ / ≥1.5 mm ♀), o equivalentes (posterior, De Winter).</li></ul>'+
+  '<h4>BRIHH y sospecha de oclusión coronaria</h4><ul><li>El BRIHH nuevo por sí solo no diagnostica IAMCEST.</li><li>Evaluar clínica, criterios de Sgarbossa/modificados, cambios seriados, troponina y ecocardiografía cuando corresponda.</li><li>Si alta sospecha de oclusión coronaria/inestabilidad, activar estrategia invasiva urgente.</li></ul>'+
   '<h4>Fibrinolíticos (si ICP no disponible &lt;120 min)</h4><ul>'+
   '<li><strong>Tenecteplasa (TNK) IV bolo por peso</strong>: &lt;60 kg 30 mg · 60–69 35 mg · 70–79 40 mg · 80–89 45 mg · ≥90 kg 50 mg. En ≥75 años usar <strong>media dosis</strong>.</li>'+
   '<li><strong>Alteplasa</strong>: 15 mg bolo + 0.75 mg/kg (máx 50 mg) en 30 min + 0.5 mg/kg (máx 35 mg) en 60 min.</li>'+
@@ -1614,14 +1632,16 @@ function cardioSCA(){ return ''+
   '<li><strong>Anticoagulación</strong>: HNF o enoxaparina según estrategia de reperfusión.</li>'+
   '<li><strong>Nitratos</strong> SL/IV si dolor y sin hipotensión ni IAM de VD ni inhibidor PDE5.</li>'+
   '<li><strong>Morfina</strong> 2–4 mg IV si dolor refractario (con precaución: retrasa antiagregantes VO).</li>'+
-  '<li><strong>Oxígeno</strong> solo si SatO₂ < 90%.</li></ul>'+
-  '<div class="callout warn">Obtener ECG de 12 derivaciones en &lt;10 min del primer contacto médico.</div></div>'+
+  '<li><strong>Estatina de alta intensidad</strong> precoz, salvo contraindicación.</li>'+
+  '<li><strong>Oxígeno</strong> solo si hipoxemia u otra indicación clínica; no de rutina.</li></ul>'+
+  '<div class="callout warn"><strong>Red flags/precauciones:</strong> no dar nitratos con hipotensión, sospecha de IAM de VD o uso reciente de inhibidores PDE-5. Shock, hemorragia activa o posible disección aórtica cambian la estrategia.</div></div>'+
+  acad('Equivalentes y patrones de oclusión','<ul><li><strong>IAM posterior:</strong> cambios recíprocos anteriores; confirmar con V7–V9.</li><li><strong>Compromiso de VD:</strong> evaluar V3R–V4R en IAM inferior.</li><li><strong>BRIHH o ritmo estimulado:</strong> aplicar Sgarbossa y Sgarbossa modificado en el contexto clínico.</li><li>Los patrones de alto riesgo requieren valoración urgente, pero no deben denominarse automáticamente IAMCEST si no cumplen criterios formales.</li></ul>')+
   '<div class="block"><h3>Criterios de reperfusión (IAMCEST)</h3>'+
-  '<p><span class="pill red">SCACEST</span> Elevación del ST persistente / BRIHH nuevo con clínica.</p><ul>'+
+  '<p><span class="pill red">SCACEST</span> Elevación persistente del ST o equivalente de oclusión coronaria.</p><ul>'+
   '<li><strong>ICP primaria</strong>: preferida si &lt;120 min desde el dx hasta el paso de la guía.</li>'+
   '<li><strong>Fibrinólisis</strong>: si ICP no disponible en tiempo — administrar en &lt;10 min del dx; ventana útil &lt;12 h.</li>'+
   '<li>Traslado a centro con hemodinamia; ICP de rescate si fibrinólisis fallida.</li></ul>'+
-  '<div class="callout crit">Tiempo es músculo: minimizar el retraso a la reperfusión.</div></div>'+
+  '<div class="callout crit"><strong>Errores frecuentes / Qué no hacer:</strong> no retrasar reperfusión por pruebas innecesarias.</div>'+guideRef('ACC/AHA/ACEP/NAEMSP/SCAI ACS Guideline 2025')+'</div>'+
   '<div class="block"><h3>💧 Taponamiento cardíaco</h3>'+
   '<p>Acumulación de líquido pericárdico que compromete el llenado ventricular → shock obstructivo.</p>'+
   '<h4>Tríada de Beck</h4><ul>'+
@@ -1669,6 +1689,7 @@ function cardioICA(){ return ''+
   '<div class="callout warn">Evitar diuréticos agresivos en el perfil "frío y seco" (hipovolemia).</div></div>';
 }
 function cardioArr(){ return ''+
+  '<div class="block"><h3>🚨 Inestabilidad con pulso '+authority('AHA 2025')+'</h3><p>Hipotensión, alteración aguda del sensorio, signos de shock, dolor torácico isquémico o insuficiencia cardíaca aguda.</p></div>'+
   '<div class="block"><h3>⚡ Arritmias — manejo por ritmo</h3>'+
   '<div class="table-wrap"><table style="min-width:560px"><thead><tr><th>Ritmo</th><th>Farmacológico</th><th>Eléctrico</th></tr></thead><tbody>'+
   '<tr><td class="drug-name">FA</td><td>Control FC: β-bloq / diltiazem. Control ritmo: amiodarona.</td><td>Cardioversión sincronizada 120–200 J (inestable o electiva).</td></tr>'+
@@ -1677,21 +1698,22 @@ function cardioArr(){ return ''+
   '<tr><td class="drug-name">TV monomórfica</td><td>Estable: amiodarona 150 mg IV / procainamida.</td><td>Inestable con pulso: cardioversión sincronizada 100 J.</td></tr>'+
   '<tr><td class="drug-name">TV polimórfica / FV</td><td>FV: adrenalina + amiodarona. TdP: sulfato de Mg.</td><td><strong>Desfibrilación</strong> (no sincronizada).</td></tr>'+
   '</tbody></table></div>'+
-  '<div class="callout crit">Todo paciente <strong>inestable</strong> con taquiarritmia y pulso → cardioversión sincronizada. Sin pulso / FV → desfibrilar.</div></div>'+
+  '<div class="callout crit">Todo paciente <strong>inestable</strong> con taquiarritmia y pulso → cardioversión sincronizada. Sedar si está consciente y el tiempo lo permite. Sin pulso / FV → desfibrilar.</div></div>'+
+  acad('Taquicardia con pulso por QRS','<ul><li><strong>Estrecho regular:</strong> maniobras vagales; adenosina si corresponde.</li><li><strong>Estrecho irregular:</strong> considerar FA/flutter variable y otras causas; evitar adenosina terapéutica.</li><li><strong>Ancho regular:</strong> TV monomórfica hasta demostrar lo contrario; diferenciar TSV con aberrancia.</li><li><strong>Ancho irregular:</strong> considerar TV polimórfica o FA preexcitada; evitar bloqueadores del nodo AV si se sospecha preexcitación.</li></ul><div class="callout crit">Una taquicardia de QRS ancho debe considerarse TV hasta demostrar lo contrario cuando el contexto sea compatible.</div>')+
   '<div class="block"><h3>Bradiarritmias</h3><ul>'+
-  '<li><strong>Atropina</strong> 0.5–1 mg IV c/3–5 min (máx 3 mg).</li>'+
-  '<li>Refractaria: <strong>marcapasos transcutáneo</strong>, adrenalina o dopamina en perfusión.</li></ul></div>';
+  '<li><strong>Atropina</strong> 1 mg IV/IO c/3–5 min (máx total 3 mg).</li>'+
+  '<li>Refractaria: <strong>marcapasos transcutáneo</strong>, adrenalina o dopamina en perfusión.</li><li>Buscar causas reversibles y considerar precozmente marcapaseo en bloqueo infranodal/alto grado.</li></ul>'+guideRef('AHA CPR & ECC 2025')+'</div>';
 }
 function cardioHTA(){ return ''+
   '<div class="block"><h3>🩸 Crisis hipertensiva</h3>'+
   '<p><strong>Emergencia</strong>: TA muy elevada + <em>daño agudo de órgano diana</em> (SCA, EAP, disección, ACV, eclampsia, encefalopatía).</p>'+
-  '<p><strong>Urgencia</strong>: TA muy elevada <em>sin</em> daño agudo de órgano diana.</p></div>'+
+  '<p><strong>HTA severa asintomática</strong>: TA muy elevada <em>sin</em> daño agudo de órgano diana; confirmar medición, evaluar adherencia y contexto.</p><div class="callout warn">Una cifra aislada, sin daño agudo de órgano, no define emergencia hipertensiva.</div></div>'+
   '<div class="block"><h3>Objetivos de TA</h3><ul>'+
   '<li>General: reducir la <strong>PAM ~10–20% en la 1ª hora</strong>, luego a 160/100–110 en 2–6 h.</li>'+
   '<li><strong>Disección aórtica</strong>: PAS &lt;120 mmHg y FC &lt;60 en 20 min (β-bloqueo primero).</li>'+
   '<li><strong>ACV isquémico</strong>: permisivo; tratar si &gt;220/120 (o &gt;185/110 si fibrinólisis).</li>'+
   '<li><strong>Eclampsia</strong>: labetalol/hidralazina + sulfato de Mg.</li></ul>'+
-  '<div class="callout warn">La urgencia hipertensiva se maneja con fármacos <strong>orales</strong> y descenso gradual (horas-días), no IV rápido.</div></div>'+
+  '<div class="callout warn">La HTA severa asintomática requiere descenso gradual y seguimiento; evitar descenso IV rápido.</div></div>'+
   '<div class="block"><h3>Fármacos por contexto</h3><div class="table-wrap"><table style="min-width:520px"><thead><tr><th>Contexto</th><th>Fármaco de elección</th></tr></thead><tbody>'+
   '<tr><td>SCA / EAP</td><td class="drug-name">Nitroglicerina IV ± labetalol; furosemida en EAP</td></tr>'+
   '<tr><td>Disección aórtica</td><td class="drug-name">β-bloqueo (labetalol/esmolol) ± nitroprusiato</td></tr>'+
@@ -1702,24 +1724,31 @@ function cardioHTA(){ return ''+
 
 /* ---- Neuro ---- */
 function neuroHTML(){ return ''+
-  '<div class="block"><h3>🧠 ACV isquémico</h3>'+
+  '<div class="block"><h3>🧠 ACV isquémico — AHA/ASA 2026</h3>'+
   '<p>Déficit neurológico focal de inicio súbito. Prioridad: <strong>"time is brain"</strong> — TC sin contraste urgente para descartar hemorragia.</p>'+
   '<button class="btn-calc" style="max-width:280px" onclick="openCalc(\'nihss\')">🧮 Abrir NIHSS</button>'+
-  '<h4>Ventanas de reperfusión</h4><ul>'+
-  '<li><strong>Trombólisis IV (alteplasa/tenecteplasa)</strong>: hasta <strong>4.5 h</strong> del inicio.</li>'+
-  '<li><strong>Trombectomía mecánica</strong>: hasta 6 h (y 6–24 h en casos seleccionados por imagen de perfusión/mismatch).</li></ul>'+
+  '<h4>Reconocimiento</h4><ul><li>Registrar hora de inicio o <em>last known well</em>, glucemia y NIHSS.</li><li>Documentar anticoagulantes, cirugía/hemorragia reciente y funcionalidad basal.</li></ul>'+
+  '<h4>Imagen</h4><ul><li>TC sin contraste inicial; CTA ante sospecha de oclusión de gran vaso.</li><li>Perfusión o imagen avanzada cuando determine elegibilidad en ventana extendida/inicio desconocido.</li></ul>'+
+  '<h4>Ventana convencional</h4><ul>'+
+  '<li><strong>Trombólisis IV (alteplasa/tenecteplasa)</strong>: ≤<strong>4.5 h</strong> del inicio en pacientes elegibles.</li></ul>'+
+  '<h4>Ventana extendida / inicio desconocido</h4><ul>'+
+  '<li>Pacientes seleccionados mediante imagen avanzada pueden recibir trombólisis entre <strong>4.5–9 h</strong> o en <em>wake-up stroke</em>.</li></ul>'+
+  '<h4>Trombectomía mecánica</h4><ul>'+
+  '<li>Hasta 6 h y, en pacientes seleccionados por imagen, entre 6–24 h.</li><li>Incluir pacientes seleccionados con <em>large core</em>; un ASPECTS bajo no es una exclusión automática.</li></ul>'+
   '<h4>Criterios rt-PA (inclusión)</h4><ul>'+
   '<li>Dx de ACV isquémico con déficit medible, edad ≥18, inicio &lt;4.5 h.</li></ul>'+
   '<h4>Contraindicaciones principales</h4><ul>'+
-  '<li>Hemorragia en TC; TA &gt;185/110 no controlable; INR &gt;1.7 / anticoagulación; plaquetas &lt;100.000.</li>'+
+  '<li>Hemorragia en TC; TA &gt;185/110 no controlable; anticoagulación relevante; plaquetas &lt;100.000.</li>'+
   '<li>Cirugía mayor/trauma &lt;14 d, HDA/urinaria &lt;21 d, ACV o TCE grave &lt;3 meses, glucemia &lt;50 mg/dL.</li></ul>'+
-  '<div class="callout warn">Objetivo TA para trombólisis: &lt;185/110 (labetalol/nicardipino).</div></div>'+
+  '<div class="callout warn"><strong>Red flags/mimics:</strong> hemorragia, disección, hipoglucemia, convulsión con déficit postictal y anticoagulación.</div><div class="callout crit"><strong>Qué no hacer:</strong> no retrasar reperfusión por estudios innecesarios.</div>'+guideRef('AHA/ASA Acute Ischemic Stroke Guideline 2026')+'</div>'+
   '<div class="block"><h3>🩸 ACV hemorrágico</h3><ul>'+
   '<li><strong>Control de TA</strong>: si PAS 150–220 → objetivo ~140 mmHg (descenso seguro, evitar &lt;130).</li>'+
-  '<li><strong>Reversión de anticoagulación</strong>: warfarina → vit. K + CCP; ACOD → idarucizumab (dabigatrán) o andexanet/CCP (anti-Xa).</li>'+
-  '<li>Corregir plaquetas si &lt;100.000 o antiagregación con sangrado (uso selectivo).</li>'+
-  '<li><strong>Neurocirugía</strong>: hematoma cerebeloso &gt;3 cm o con deterioro/hidrocefalia; HIC lobar con efecto masa; drenaje ventricular si hidrocefalia.</li></ul>'+
-  '<div class="callout crit">Toda hemorragia con deterioro y midriasis: medidas anti-PIC (cabecera 30°, osmoterapia) y neurocirugía urgente.</div></div>'+
+  '<li><strong>Anticoagulación — reversión urgente:</strong> warfarina → vitamina K + PCC según protocolo; dabigatrán → idarucizumab cuando corresponda; inhibidores Xa → reversión específica o PCC según disponibilidad/protocolo.</li>'+
+  '<li><strong>Trombocitopenia</strong>: corregir según recuento, gravedad del sangrado y procedimiento previsto.</li>'+
+  '<li><strong>Antiagregación</strong>: no transfundir plaquetas de rutina solo por uso de aspirina.</li>'+
+  '<li><strong>Neurocirugía urgente</strong>: si se requiere, individualizar la reversión antiagregante con neurocirugía/hematología.</li>'+
+  '<li><strong>Soporte:</strong> controlar glucemia, temperatura y tratar convulsiones clínicas/electrográficas.</li><li><strong>Neurocirugía/neurointensivismo</strong> precoz en casos seleccionados; drenaje ventricular si hidrocefalia.</li></ul>'+
+  '<div class="callout warn"><strong>Qué no hacer:</strong> no transfundir plaquetas rutinariamente solo por aspirina ni usar anticonvulsivantes profilácticos de rutina sin indicación clínica.</div><div class="callout crit">Toda hemorragia con deterioro y midriasis: medidas anti-PIC y neurocirugía urgente.</div>'+guideRef('AHA/ASA Spontaneous ICH Guideline 2022')+'</div>'+
   '<div class="block"><h3>⚡ Status epiléptico</h3><p>Convulsión &gt;5 min o crisis recurrentes sin recuperación. Algoritmo por tiempo:</p>'+
   '<div class="table-wrap"><table style="min-width:540px"><thead><tr><th>Tiempo</th><th>Fase</th><th>Tratamiento</th></tr></thead><tbody>'+
   '<tr><td class="drug-name">0–5 min</td><td>Estabilización</td><td>ABC, O₂, glucemia, acceso IV, tiamina si procede.</td></tr>'+
@@ -1752,7 +1781,7 @@ function neuroHTML(){ return ''+
   '<h4>Manejo de la TA</h4><ul>'+
   '<li><strong>Sin trombólisis</strong>: permisivo; tratar solo si &gt;220/120.</li>'+
   '<li><strong>Con trombólisis / trombectomía</strong>: mantener &lt;185/110 antes y &lt;180/105 durante/24 h (labetalol o nicardipino).</li></ul>'+
-  '<h4>ASPECTS</h4><ul><li>Escala de 10 puntos en TC sin contraste del territorio de la ACM: se resta 1 por cada región con isquemia precoz. <strong>≥6</strong> orienta a mejor pronóstico/candidato a trombectomía; &lt;6 indica infarto extenso.</li></ul>'+
+  '<h4>ASPECTS</h4><ul><li>Escala de 10 puntos en TC sin contraste del territorio de la ACM: se resta 1 por cada región con isquemia precoz. Un puntaje bajo indica un núcleo isquémico más extenso, pero <strong>ASPECTS &lt;6 no es una exclusión automática</strong> para trombectomía; seleccionar integrando clínica e imagen.</li></ul>'+
   '<h4>Stroke mimics frecuentes</h4><ul><li>Hipoglucemia, crisis convulsiva con parálisis de Todd, migraña con aura, parálisis de Bell, encefalopatía/sepsis, tóxico-metabólico, trastorno funcional. Siempre glucemia capilar antes de asumir ACV.</li></ul></div>'+
   '<div class="block"><h3>🩸 Hemorragia subaracnoidea (HSA)</h3>'+
   '<h4>Escala de Hunt-Hess (clínica)</h4><ul>'+
@@ -1872,14 +1901,15 @@ function respHTML(){ return ''+
   '<li>UCI: β-lactámico + macrólido o + fluoroquinolona; cubrir Pseudomonas/SAMR según factores de riesgo.</li></ul></div>'+
   '<div class="block"><h3>🫁 Tromboembolismo pulmonar (TEP)</h3>'+
   '<button class="btn-calc" style="max-width:280px" onclick="openCalc(\'wellstep\')">🧮 Abrir Wells TEP</button>'+
-  '<h4>Algoritmo (ESC 2019)</h4><ul>'+
+  '<h4>Algoritmo diagnóstico (ESC 2019 — referencia histórica/complementaria)</h4><ul>'+
   '<li><strong>Inestable</strong> (shock/hipotensión) → AngioTC urgente o eco (VD dilatado) → <strong>reperfusión</strong>.</li>'+
   '<li><strong>Estable</strong> → probabilidad clínica (Wells/Geneva). Baja/intermedia: dímero-D (ajustado por edad); alta o dímero-D+ → AngioTC.</li></ul>'+
   '<h4>Estratificación de riesgo y tratamiento</h4><ul>'+
   '<li><strong>Alto riesgo</strong> (inestable): <strong>trombólisis</strong> sistémica (alteplasa 100 mg/2 h) o embolectomía.</li>'+
   '<li><strong>Riesgo intermedio-alto</strong> (VD+ y troponina+): anticoagulación + monitorización; trombólisis de rescate si deterioro.</li>'+
   '<li><strong>Bajo / intermedio-bajo</strong>: anticoagulación (HBPM/ACOD).</li></ul>'+
-  '<div class="callout crit">TEP con shock = trombólisis salvo contraindicación absoluta de sangrado.</div></div>'+
+  '<div class="callout crit">TEP con shock/fallo cardiopulmonar: activar estrategia de reperfusión y equipo experto según sangrado y recursos.</div><div class="callout warn"><strong>Qué no hacer:</strong> no pedir dímero D para intentar excluir TEP cuando la probabilidad clínica ya es alta.</div></div>'+
+  acad('Clasificación clínica AHA/ACC 2026','<p>'+authority('GUÍA')+' Categorías educativas; las subcategorías requieren consultar la guía original.</p><ul><li><strong>A:</strong> asintomático/menor gravedad.</li><li><strong>B:</strong> sintomático con baja gravedad.</li><li><strong>C:</strong> mayor gravedad clínica y/o biomarcadores o disfunción del VD.</li><li><strong>D:</strong> fallo cardiopulmonar incipiente.</li><li><strong>E:</strong> fallo cardiopulmonar con hipotensión persistente/alta gravedad.</li></ul><h4>Evaluación y tratamiento</h4><ul><li>Evaluar VD, troponina/BNP y lactato cuando corresponda.</li><li>Anticoagular si no existe contraindicación; preferir DOAC sobre antagonistas de vitamina K cuando el paciente sea elegible.</li><li>Reperfusión sistémica, por catéter o quirúrgica según categoría, riesgo hemorrágico y recursos.</li><li>Seguimiento de síntomas y limitación funcional durante al menos 1 año, contemplando CTEPD/CTEPH.</li></ul>'+guideRef('AHA/ACC Acute Pulmonary Embolism Guideline 2026'))+
   '<div class="block"><h3>🫁 Neumotórax espontáneo</h3>'+
   '<h4>Clasificación</h4><ul><li>Primario (sin enfermedad pulmonar) vs secundario (EPOC, etc., peor tolerado).</li></ul>'+
   '<h4>Manejo por tamaño (guía)</h4><ul>'+
@@ -1928,13 +1958,11 @@ function digestHTML(){ return ''+
   '<div class="block"><h3>🩸 Hemorragia digestiva alta (HDA)</h3>'+
   '<p>Sangrado proximal al ángulo de Treitz (hematemesis, melena). Estabilizar antes de la endoscopia.</p>'+
   '<h4>Scores de riesgo</h4><ul>'+
-  '<li><strong>Glasgow-Blatchford (GBS)</strong>: pre-endoscópico; GBS=0–1 permite manejo ambulatorio.</li>'+
+  '<li><strong>Glasgow-Blatchford (GBS)</strong> '+authority('SCORE VALIDADO')+': pre-endoscópico; GBS 0–1 identifica muy bajo riesgo y posible manejo ambulatorio en pacientes seleccionados. No sustituye el juicio clínico.</li>'+
   '<li><strong>Rockall</strong>: predice resangrado y mortalidad (completo tras endoscopia).</li></ul>'+
-  '<h4>Manejo</h4><ul>'+
-  '<li>2 vías de grueso calibre, cristaloides; transfundir con objetivo Hb ~7 g/dL (restrictivo).</li>'+
-  '<li><strong>IBP IV</strong> (bolo + perfusión) en HDA no varicosa.</li>'+
-  '<li>Sospecha de varices: <strong>somatostatina/octreótido</strong> + <strong>ATB</strong> (ceftriaxona) profiláctico.</li>'+
-  '<li><strong>Endoscopia</strong> &lt;24 h (precoz &lt;12 h si inestabilidad/varices).</li></ul>'+
+  '<h4>Reanimación y estudios</h4><ul><li>ABCDE, accesos venosos adecuados, hemograma, coagulación, función renal y pruebas pretransfusionales.</li><li>Fluidos/hemoderivados según perfusión, comorbilidad y sangrado; estrategia transfusional contextual.</li></ul>'+
+  '<h4>HDA no variceal</h4><ul><li>IBP según protocolo y endoscopia tras reanimación, habitualmente dentro de 24 h según estabilidad.</li></ul>'+
+  '<h4>Sospecha variceal</h4><ul><li>Iniciar vasoactivo + antibiótico según protocolo y coordinar endoscopia urgente una vez estabilizado.</li></ul>'+
   '<div class="callout warn">Corregir coagulopatía; considerar eritromicina IV pre-endoscopia para vaciar el estómago.</div></div>'+
   '<div class="block"><h3>🩸 Hemorragia digestiva baja (HDB)</h3><ul>'+
   '<li><strong>Dx diferencial</strong>: diverticular, angiodisplasia, colitis (isquémica/infecciosa/IBD), neoplasia, hemorroides.</li>'+
@@ -1985,7 +2013,8 @@ function renalHTML(){ return ''+
   '<h4>Corrección</h4><ul>'+
   '<li>Sintomática grave: <strong>SSH 3%</strong> en bolos de 100–150 mL, meta ↑ 4–6 mEq/L rápido.</li>'+
   '<li><strong>Límite: ≤ 8–10 mEq/L en 24 h</strong> (riesgo de mielinólisis pontina si corrección rápida).</li></ul>'+
-  '<div class="callout crit">Corrección excesiva → desmielinización osmótica. Controles seriados de natremia.</div></div>';
+  '<div class="callout crit">Corrección excesiva → desmielinización osmótica. Controles seriados de natremia.</div></div>'+
+  acad('Otras alteraciones electrolíticas críticas','<h4>Hipokalemia</h4><ul><li>Gravedad por nivel, síntomas, ECG y velocidad de caída; buscar ondas U, aplanamiento de T y arritmias.</li><li>Reponer potasio por vía y velocidad según gravedad/protocolo, con monitorización cuando sea IV; corregir magnesio concomitante.</li></ul><h4>Hipernatremia</h4><ul><li>Evaluar déficit de agua, volemia y duración. Corregir de forma gradual e individualizada, especialmente si es crónica o de duración desconocida.</li></ul><h4>Hipomagnesemia</h4><ul><li>Sospechar ante torsades, arritmias o hipokalemia refractaria; reponer magnesio y monitorizar según gravedad.</li></ul>');
 }
 
 /* ---- Infeccioso ---- */
@@ -1996,13 +2025,12 @@ function infecHTML(){ return ''+
   '<h4>Definiciones (Sepsis-3)</h4><ul>'+
   '<li><strong>Sepsis</strong>: disfunción orgánica (↑SOFA ≥2) por respuesta desregulada a la infección.</li>'+
   '<li><strong>Shock séptico</strong>: sepsis + necesidad de vasopresores para PAM ≥65 + lactato &gt;2 mmol/L pese a volumen.</li></ul>'+
-  '<h4>Bundle de la 1ª hora</h4><ol class="steps">'+
-  '<li>Medir <strong>lactato</strong> (repetir si &gt;2).</li>'+
-  '<li><strong>Hemocultivos</strong> antes de los ATB.</li>'+
-  '<li><strong>ATB de amplio espectro</strong> precoz.</li>'+
-  '<li><strong>Cristaloides 30 mL/kg</strong> si hipotensión o lactato ≥4.</li>'+
-  '<li><strong>Vasopresores</strong> si hipotensión persiste durante/tras la fluidoterapia (objetivo PAM ≥65).</li></ol>'+
-  '<div class="callout crit">Vasopresor de elección: <strong>noradrenalina</strong>. Añadir vasopresina/adrenalina si refractario; hidrocortisona en shock refractario.</div></div>'+
+  '<h4>Reconocimiento y estudios</h4><ol class="steps">'+
+  '<li>Sospechar infección + disfunción orgánica; medir lactato cuando esté indicado.</li>'+
+  '<li>Obtener hemocultivos/cultivos cuanto antes, idealmente antes de antibióticos, si no genera un retraso clínicamente importante.</li>'+
+  '<li>Usar NEWS2/NEWS, MEWS o SIRS como herramientas posibles de screening; qSOFA es pronóstico y <strong>no debe usarse como screening único ni para descartar</strong>.</li></ol>'+
+  '<h4>Tratamiento inmediato</h4><ul><li><strong>Antibióticos:</strong> timing según probabilidad de sepsis y presencia de shock; elegir por foco, exposiciones y epidemiología local. Desescalar con microbiología y controlar el foco.</li><li><strong>Fluidos:</strong> cristaloides, preferentemente balanceados cuando corresponda. En hipoperfusión/shock, 30 mL/kg iniciales son contextuales, con reevaluación frecuente y dinámica; no un dogma universal.</li><li><strong>Vasopresores:</strong> noradrenalina primera línea; objetivo inicial habitual PAM 65 mmHg, individualizable. Vasopresina como adyuvante cuando corresponda.</li></ul>'+
+  '<div class="callout crit"><strong>Red flags:</strong> shock refractario, hipoperfusión persistente, lactato en ascenso, oliguria o deterioro del sensorio.</div><div class="callout warn"><strong>Qué no hacer:</strong> no usar qSOFA para excluir sepsis ni continuar fluidos sin reevaluar respuesta y tolerancia.</div>'+guideRef('Surviving Sepsis Campaign 2026')+'</div>'+
   '<div class="block"><h3>🌡️ Neutropenia febril</h3><ul>'+
   '<li><strong>Definición</strong>: neutrófilos &lt;500 (o &lt;1000 en descenso) + temperatura ≥38.3 °C única o ≥38 °C sostenida 1 h.</li>'+
   '<li><strong>ATB empírico urgente (&lt;1 h)</strong>: monoterapia antipseudomónica — piperacilina-tazobactam, cefepima o meropenem.</li>'+
@@ -2175,6 +2203,7 @@ function cirugiaHTML(){ return ''+
 
 /* ---- Politraumatizado ---- */
 var ABCDE_STEPS=[
+  ['X — Hemorragia catastrófica','Control inmediato con compresión, torniquete o agente hemostático según localización; continuar ABCDE sin demora.'],
   ['A — Vía aérea con control cervical','Permeabilidad, cuerpos extraños, estabilización cervical (collarín/manual), IOT si GCS ≤8 o vía aérea comprometida.'],
   ['B — Ventilación','SatO₂, FR, auscultación y expansión; descartar neumotórax a tensión, hemotórax masivo, tórax inestable; O₂ alto flujo.'],
   ['C — Circulación con control de hemorragia','Comprimir sangrados externos, 2 vías gruesas, cristaloides/hemoderivados, FAST, identificar shock; ácido tranexámico precoz.'],
@@ -2186,10 +2215,11 @@ function politraumaHTML(){
     return '<li data-i="'+i+'"><input type="checkbox" id="abcde-'+i+'"><span><strong>'+s[0]+'</strong> — '+s[1]+'</span></li>';
   }).join('')+'</ol>';
   return ''+
-  '<div class="block"><h3>🚑 Evaluación primaria (ABCDE)</h3>'+
+  '<div class="block"><h3>🚑 Evaluación primaria (XABCDE)</h3>'+
   '<p>Checklist interactivo. Detectar y tratar lo que mata primero, en orden.</p>'+chk+'</div>'+
   '<div class="block"><h3>🔎 Evaluación secundaria</h3>'+
   '<p>Tras estabilizar el ABCDE: anamnesis <strong>AMPLIA</strong> (Alergias, Medicación, Patologías previas, Última ingesta, Ambiente/mecanismo) y examen <strong>de cabeza a pies</strong> sistemático (cráneo, cara, cuello, tórax, abdomen, pelvis, extremidades, espalda con log-roll, tacto rectal si indicado, exploración neurológica).</p></div>'+
+  '<div class="block"><h3>⚠️ Poblaciones de alto riesgo</h3><ul><li><strong>Anticoagulados:</strong> identificar fármaco y última dosis; umbral bajo para imagen, observación y reversión ante sangrado relevante.</li><li><strong>Adulto mayor:</strong> mecanismos aparentemente menores pueden causar lesión grave; considerar fragilidad, reserva fisiológica y presentación atípica.</li></ul></div>'+
   '<div class="block"><h3>🌬️ Vía aérea en trauma</h3><ul>'+
   '<li>Control cervical durante toda la manipulación.</li>'+
   '<li>Indicación de vía aérea definitiva: apnea, GCS ≤8, obstrucción, riesgo de aspiración, trauma facial/quemadura de vía aérea, insuf. respiratoria.</li>'+
@@ -2302,7 +2332,8 @@ function buildTools(){
   TOOLS_ORDER.forEach(function(id){ var c=CALCS[id];
     var card=document.createElement('div'); card.className='tool-card'; card.style.position='relative'; card.dataset.text=(c.title+' '+c.sub).toLowerCase();
     card.onclick=function(){openCalc(id);};
-    card.innerHTML='<span class="tc-icon">'+c.icon+'</span><span class="tc-title">'+c.title+'</span><span class="tc-sub">'+c.sub+'</span>'+favStarHTML('calc',id,c.title,'Calculadora');
+    var auth=(id==='qsofa'?'NO USAR AISLADAMENTE':(c.fields.every(function(f){return !f.type;})?'SCORE VALIDADO':'REFERENCIA PRÁCTICA'));
+    card.innerHTML='<span class="tc-icon">'+c.icon+'</span><span class="tc-title">'+c.title+authority(auth)+'</span><span class="tc-sub">'+c.sub+'</span>'+favStarHTML('calc',id,c.title,'Calculadora');
     g.appendChild(card);
   });
 }
@@ -2347,9 +2378,9 @@ function showPocusSub(id,init){
   var p=POCUS.filter(function(x){return x.id===id;})[0];
   Array.prototype.forEach.call(document.querySelectorAll('#pocusSubnav .subtab'),function(b){ b.classList.toggle('active', b.textContent===p.icon+' '+p.name); });
   var rich=pocusRich(id);
-  document.getElementById('pocusContent').innerHTML= rich ||
-    ('<div class="block"><h3>'+p.icon+' '+p.name+'</h3><p>'+p.desc+'</p>'+
+  var base=rich || ('<div class="block"><h3>'+p.icon+' '+p.name+'</h3><p>'+p.desc+'</p>'+
     '<h4>Ventanas / puntos a evaluar</h4><ul>'+p.ventanas.map(function(v){return '<li>'+v+'</li>';}).join('')+'</ul></div>');
+  document.getElementById('pocusContent').innerHTML=base+'<div class="callout warn"><strong>Limitaciones:</strong> POCUS es operador/ventana dependiente, admite falsos positivos y debe integrarse con clínica y estudios definitivos. En paro, usar solo en pausas planificadas sin prolongar compresiones.</div>';
   if(!init) resetSearch();
 }
 /* ═══════════════ v1.9 · POCUS — contenido clínico por protocolo ═══════════════ */
@@ -2382,8 +2413,7 @@ function pocusRich(id){
         '<li>Derrame pericárdico + colapso AD/VD → taponamiento.</li>'+
         '<li>Hiperdinámica con VD pequeño → shock distributivo/hipovolémico.</li></ul>',true)+
       S('🛢️','Fase 2 — The Tank (volumen)','<ul>'+
-        '<li><strong>VCI:</strong> &lt;2.1 cm + colapso &gt;50% → PVC baja, responde a volumen.</li>'+
-        '<li><strong>VCI:</strong> &gt;2.1 cm + colapso &lt;50% → PVC alta, no dar volumen.</li>'+
+        '<li><strong>VCI:</strong> tamaño y variación respiratoria pueden aportar contexto, pero aislados no predicen de forma fiable respuesta a fluidos.</li>'+
         '<li>Pleural: derrame bilateral → IC, sepsis, hipoalbuminemia.</li>'+
         '<li>Peritoneal: líquido libre → trauma, rotura, ascitis.</li></ul>')+
       S('🩸','Fase 3 — The Pipes (aorta y vasos)','<ul>'+
@@ -2406,7 +2436,7 @@ function pocusRich(id){
         '<li><strong>Perfil C</strong> (consolidación anterior): → neumonía.</li>'+
         '<li><strong>Perfil A/B</strong> (asimétrico): → neumonía, contusión.</li></ul>')+
       S('🚀','Líneas B (cohetes)','<p>Verticales, desde la pleura, borran las líneas A, llegan al borde de la pantalla y se mueven con la respiración → agua intersticial.</p>')+
-      S('🎯','Punto pulmonar','<p>Transición sliding/no sliding → <strong>patognomónico de neumotórax</strong> (especificidad 100%).</p>');
+      S('🎯','Punto pulmonar','<p>Transición sliding/no sliding: hallazgo muy específico de neumotórax cuando se obtiene e interpreta correctamente; integrarlo con clínica.</p>');
   }
   if(id==='fate'){
     return '<div class="callout"><strong>Indicación:</strong> evaluación cardíaca rápida en urgencia / paciente crítico.</div>'+
@@ -2425,7 +2455,7 @@ function pocusRich(id){
         '<li>FEVI severamente deprimida + shock → soporte inotrópico urgente.</li></ul>');
   }
   if(id==='cardiaco'){
-    return '<div class="callout"><strong>POCUS cardíaco específico</strong> — integrado a la RCP y al shock.</div>'+
+    return '<div class="callout"><strong>POCUS cardíaco específico</strong> — integrado a la RCP y al shock, solo durante pausas planificadas sin prolongar interrupciones.</div>'+
       S('⚡','AESP (actividad eléctrica sin pulso)','<ul>'+
         '<li>Corazón inmóvil → confirma paro real → continuar RCP.</li>'+
         '<li>Corazón en movimiento con AESP → causa tratable: hipovolemia, taponamiento, TEP masivo, neumotórax.</li></ul>',true)+
@@ -2442,7 +2472,8 @@ function pocusRich(id){
         '<li>D-sign en eje corto paraesternal.</li>'+
         '<li>Movimiento paradójico del septum.</li>'+
         '<li><strong>Signo de McConnell:</strong> aquinesia de pared libre del VD con ápex conservado (específico).</li>'+
-        '<li>TAPSE &lt;17 mm → disfunción del VD.</li></ul>');
+        '<li>TAPSE &lt;17 mm → disfunción del VD.</li></ul>')+
+      S('⚠️','Limitaciones','<ul><li>Operador y ventana dependientes; obesidad, ventilación y enfisema pueden limitar el estudio.</li><li>Existen falsos positivos: ningún hallazgo aislado sustituye la evaluación definitiva.</li><li>En paro, no prolongar pausas de compresiones para obtener imágenes.</li></ul>');
   }
   if(id==='vascular'){
     return S('🦵','TVP — compresión venosa','<ul>'+
@@ -2564,7 +2595,12 @@ function farmFilter(q,bodyId,noresId){
 }
 function farmEmergHTML(){
   var rows=DRUGS.map(function(d){
-    return '<tr data-text="'+esc((d.n+' '+d.ind).toLowerCase())+'"><td><span class="drug-name">'+d.n+'</span></td><td>'+d.ind+'</td><td>'+d.ad+'</td><td>'+d.pe+'</td><td>'+d.obs+'</td></tr>';
+    var hay=(d.n+' '+d.ind+' '+d.obs).toLowerCase(),badges='';
+    if(/adrenalina|noradrenalina|insulina|trombol|succinil|nitroprusiato/.test(hay))badges+=' <span title="Alto riesgo">⚠️</span>';
+    if(/arrit|qt|bradic|amiodarona|adenosina|digox/.test(hay))badges+=' <span title="Monitorización ECG">🫀</span>';
+    if(/anticoag|heparina|enoxaparina|alteplase|sangrado/.test(hay))badges+=' <span title="Riesgo hemorrágico">🩸</span>';
+    if(/renal|clcr|anuria/.test(hay))badges+=' <span title="Revisar función renal">🧪</span>';
+    return '<tr data-text="'+esc((d.n+' '+d.ind).toLowerCase())+'"><td><span class="drug-name">'+d.n+'</span>'+badges+'</td><td>'+d.ind+'</td><td>'+d.ad+'</td><td>'+d.pe+'</td><td>'+d.obs+'</td></tr>';
   }).join('');
   return '<div class="searchbox"><span class="ico">🔍</span><input id="drugSearch" placeholder="Buscar fármaco o indicación…" oninput="farmFilter(this.value,\'drugBody\',\'drug-nores\')"></div>'+
     '<div class="table-wrap"><table><thead><tr><th>Fármaco</th><th>Indicación</th><th>Dosis adulto</th><th>Dosis pediátrica</th><th>Observaciones</th></tr></thead><tbody id="drugBody">'+rows+'</tbody></table></div>'+
@@ -2636,6 +2672,12 @@ function calcISR(){
 }
 function maniobrasDetalleHTML(){
   var S=function(icon,title,body,open){ return pediSx(icon,title,body,open); };
+  var rcp=''+
+    '<div class="callout crit"><strong>RCP de alta calidad:</strong> minimizar pausas, permitir reexpansión completa, evitar ventilación excesiva y desfibrilar precozmente FV/TV sin pulso.</div>'+
+    '<h4>Algoritmo por ritmo</h4><ul><li><strong>FV/TV sin pulso:</strong> desfibrilación + RCP; adrenalina y amiodarona o lidocaína según algoritmo.</li><li><strong>AESP/asistolia:</strong> RCP + adrenalina; no desfibrilar; buscar causas reversibles.</li></ul>'+
+    '<h4>5H / 5T</h4><div class="table-wrap"><table style="min-width:520px"><thead><tr><th>5H</th><th>5T</th></tr></thead><tbody><tr><td>Hipovolemia</td><td>Tensión neumotórax</td></tr><tr><td>Hipoxia</td><td>Taponamiento cardíaco</td></tr><tr><td>H⁺ / acidosis</td><td>Toxinas</td></tr><tr><td>Hipo/hiperpotasemia y trastornos metabólicos</td><td>Trombosis pulmonar</td></tr><tr><td>Hipotermia</td><td>Trombosis coronaria</td></tr></tbody></table></div>'+
+    '<h4>Post-ROSC</h4><ul><li>Oxigenar evitando hiperoxia; ajustar ventilación y sostener presión/perfusión.</li><li>ECG de 12 derivaciones, búsqueda y tratamiento de la causa; considerar coronariografía cuando corresponda.</li><li>Control de temperatura según protocolo vigente y evaluación neurológica multimodal, no precoz ni con una única prueba.</li></ul>'+
+    '<div class="callout warn"><strong>Errores frecuentes / Qué no hacer:</strong> no suspender RCP por ETCO₂ aislado; no prolongar pausas por POCUS; no sustituir rutinariamente adrenalina por vasopresina.</div>'+guideRef('AHA CPR & ECC 2025');
   var isr=''+
     '<div class="callout"><strong>Indicaciones:</strong> hipoxemia refractaria, Glasgow ≤8, obstrucción de vía aérea, apnea, trabajo respiratorio extremo.</div>'+
     '<h4>Secuencia de los 7 pasos</h4><ol class="steps">'+
@@ -2712,7 +2754,8 @@ function maniobrasDetalleHTML(){
     '<h4>Análisis</h4><ul>'+
     '<li>Diagnóstica: enviar PMN, proteínas, cultivo, LDH.</li>'+
     '<li><strong>PBE:</strong> PMN &gt;250/mm³ → cefotaxima 2 g c/8h IV.</li></ul>';
-  return S('🫁','A · Intubación de secuencia rápida (ISR)',isr,true)+
+  return S('🫀','Paro cardíaco / ACLS 2025',rcp,true)+
+    S('🫁','A · Intubación de secuencia rápida (ISR)',isr)+
     S('🔪','B · Cricotiroidotomía de emergencia',crico)+
     S('⚡','C · Cardioversión eléctrica',cardiov)+
     S('🫀','D · Marcapaso transcutáneo',mcp)+
@@ -2725,7 +2768,8 @@ function openManiobra(id){
     '<div class="mat-list">'+m.mat.map(function(x){return '<span>'+x+'</span>';}).join('')+'</div>'+
     '<h4 style="font-size:.9rem;font-weight:700;margin:.9rem 0 .2rem">Pasos</h4>'+
     '<ol class="steps">'+m.pasos.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ol>'+
-    '<div class="callout warn" style="margin-top:.8rem"><strong>Observaciones / complicaciones:</strong> '+m.obs+'</div>';
+    '<div class="callout warn" style="margin-top:.8rem"><strong>Observaciones / complicaciones:</strong> '+m.obs+'</div>'+
+    '<div class="callout crit"><strong>Stop point de seguridad:</strong> detener y reevaluar ante pérdida de referencias anatómicas, resistencia inesperada, deterioro brusco o imposibilidad de confirmar la posición/resultado; activar ayuda experta o plan de rescate.</div>';
   showModal(m.icon+' '+m.name, html);
 }
 
@@ -2794,16 +2838,56 @@ function exportData(){
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(function(){URL.revokeObjectURL(url);},1500);
 }
+var IMPORT_MAX_BYTES=2*1024*1024;
+function importText(v,max){ return typeof v==='string'?v.slice(0,max||1000):''; }
+function newPatientId(){ return 'pt'+Date.now()+Math.random().toString(36).slice(2,10); }
+function importPatient(p){
+  if(!p||typeof p!=='object'||Array.isArray(p))throw new Error('Paciente inválido');
+  return {id:newPatientId(),nombre:importText(p.nombre,200),edad:importText(p.edad,20),sexo:importText(p.sexo,30),hora:importText(p.hora,20),motivo:importText(p.motivo,1000),dx:importText(p.dx,1000),notas:importText(p.notas,5000),estado:GUARDIA_ESTADOS.some(function(e){return e[0]===p.estado;})?p.estado:'en evaluación'};
+}
+function validateImport(d){
+  if(!d||typeof d!=='object'||Array.isArray(d))throw new Error('Raíz inválida');
+  if(!d.emergsmart_config&&!d.emergsmart_guardia&&!d.emergsmart_v1)throw new Error('Formato desconocido');
+  var out={};
+  if(d.emergsmart_config!==undefined){
+    if(!d.emergsmart_config||typeof d.emergsmart_config!=='object'||Array.isArray(d.emergsmart_config))throw new Error('Configuración inválida');
+    out.config={nombre:importText(d.emergsmart_config.nombre,200),especialidad:importText(d.emergsmart_config.especialidad,200),registro:importText(d.emergsmart_config.registro,100),institucion:importText(d.emergsmart_config.institucion,200),ciudad:importText(d.emergsmart_config.ciudad,200)};
+  }
+  if(d.emergsmart_guardia!==undefined){
+    var g=d.emergsmart_guardia;if(!g||typeof g!=='object'||Array.isArray(g)||!Array.isArray(g.activo)||!Array.isArray(g.historial)||g.activo.length>1000||g.historial.length>1000)throw new Error('Guardia inválida');
+    out.guardia={activo:g.activo.map(importPatient),historial:g.historial.map(function(t){
+      if(!t||typeof t!=='object'||Array.isArray(t)||!Array.isArray(t.pacientes)||t.pacientes.length>1000)throw new Error('Turno inválido');
+      return {fecha:importText(t.fecha,100),cerrado:importText(t.cerrado,100),medico:importText(t.medico,200),pacientes:t.pacientes.map(importPatient)};
+    })};
+  }
+  if(d.emergsmart_v1!==undefined){
+    var s=d.emergsmart_v1;if(!s||typeof s!=='object'||Array.isArray(s))throw new Error('Preferencias inválidas');
+    out.state={};
+    var tabs=['sistemas','sintomas','herramientas','pocus','farmacos','maniobras','toxicologia','guardia'];
+    out.state.tab=tabs.indexOf(s.tab)>-1?s.tab:'sistemas';
+    var allowedSubs={
+      sysSub:SISTEMAS.map(function(x){return x.id;}),
+      cardioSub:CARDIO_SUBS.map(function(x){return x[0];}),
+      pocusSub:POCUS.map(function(x){return x.id;}),
+      toxSub:TOX_SUBS.map(function(x){return x[0];}),
+      farmSub:FARM_SUBS.map(function(x){return x[0];})
+    };
+    Object.keys(allowedSubs).forEach(function(k){if(typeof s[k]==='string'&&allowedSubs[k].indexOf(s[k])>-1)out.state[k]=s[k];});
+    out.state.search=importText(s.search,200);
+  }
+  return out;
+}
 function importData(input){
   var file=input.files&&input.files[0]; if(!file)return;
+  if(file.size>IMPORT_MAX_BYTES){ alert('Archivo demasiado grande. El máximo permitido es 2 MB.'); input.value=''; return; }
   var reader=new FileReader();
   reader.onload=function(){
     try{
-      var d=JSON.parse(reader.result);
+      var d=validateImport(JSON.parse(reader.result));
       if(!confirm('Esto reemplazará la configuración, el turno activo y las preferencias actuales. ¿Continuar?')){ input.value=''; return; }
-      if(d.emergsmart_config&&typeof d.emergsmart_config==='object'){ medConfig={nombre:'',especialidad:'',registro:'',institucion:'',ciudad:''}; Object.assign(medConfig,d.emergsmart_config); saveConfig(); }
-      if(d.emergsmart_guardia&&typeof d.emergsmart_guardia==='object'){ guardia={activo:[],historial:[]}; if(Array.isArray(d.emergsmart_guardia.activo))guardia.activo=d.emergsmart_guardia.activo; if(Array.isArray(d.emergsmart_guardia.historial))guardia.historial=d.emergsmart_guardia.historial; saveGuardia(); }
-      if(d.emergsmart_v1&&typeof d.emergsmart_v1==='object'){ Object.assign(state,d.emergsmart_v1); saveState(); }
+      if(d.config){ medConfig=d.config; saveConfig(); }
+      if(d.guardia){ guardia=d.guardia; saveGuardia(); }
+      if(d.state){ Object.assign(state,d.state); saveState(); }
       buildAll();
       showMainTab(state.tab, document.querySelector('.main-tab[data-tab="'+state.tab+'"]'));
       alert('Datos importados correctamente.');
@@ -2822,12 +2906,13 @@ function renderGuardiaList(){
   var c=document.getElementById('guardiaList'); if(!c)return;
   if(!guardia.activo.length){ c.innerHTML='<div class="g-empty">No hay pacientes en el turno activo. Tocá "Nuevo paciente" para registrar.</div>'; return; }
   c.innerHTML=guardia.activo.map(function(p){
+    var idx=guardia.activo.indexOf(p);
     return '<div class="pt-card">'+
       '<div class="pt-head"><div><div class="pt-name">'+esc(p.nombre||'(sin nombre)')+'</div>'+
       '<div class="pt-meta">'+esc(p.edad||'—')+' años · '+esc(p.sexo||'—')+' · Ingreso '+esc(p.hora||'—')+'</div></div>'+
       '<div class="pt-actions"><span class="pt-status '+estadoClass(p.estado)+'">'+esc(p.estado||'en evaluación')+'</span>'+
-      '<button class="pt-mini" title="Editar" onclick="openGuardiaForm(\''+p.id+'\')">✏️</button>'+
-      '<button class="pt-mini del" title="Eliminar" onclick="deletePt(\''+p.id+'\')">🗑️</button></div></div>'+
+      '<button class="pt-mini" title="Editar" onclick="openGuardiaByIndex('+idx+')">✏️</button>'+
+      '<button class="pt-mini del" title="Eliminar" onclick="deletePtByIndex('+idx+')">🗑️</button></div></div>'+
       '<div class="pt-body">'+
       (p.motivo?'<div class="pt-row"><span class="pt-lbl">Motivo:</span> '+esc(p.motivo)+'</div>':'')+
       (p.dx?'<div class="pt-row"><span class="pt-lbl">Impresión dx:</span> '+esc(p.dx)+'</div>':'')+
@@ -2835,6 +2920,8 @@ function renderGuardiaList(){
       '</div></div>';
   }).join('');
 }
+function openGuardiaByIndex(idx){ var p=guardia.activo[idx]; if(p)openGuardiaForm(p.id); }
+function deletePtByIndex(idx){ var p=guardia.activo[idx]; if(p)deletePt(p.id); }
 function renderGuardiaHist(){
   var c=document.getElementById('guardiaHist'); if(!c)return;
   if(!guardia.historial.length){ c.innerHTML='<div class="g-empty">Sin turnos archivados todavía.</div>'; return; }
@@ -2883,7 +2970,7 @@ function savePt(){
     var p=guardia.activo.filter(function(x){return x.id===editingPtId;})[0];
     if(p)Object.assign(p,obj);
   }else{
-    obj.id='pt'+Date.now()+Math.floor(Math.random()*1000);
+    obj.id=newPatientId();
     guardia.activo.push(obj);
   }
   editingPtId=null; saveGuardia(); renderGuardiaList(); closeModal();
@@ -3273,6 +3360,9 @@ function irSistema(id,cardioSub){
   showSysSub(id);
 }
 function toggleSx(h){ var b=h.parentNode.querySelector('.sx-body'); if(b)b.classList.toggle('show'); var a=h.querySelector('.sx-arrow'); if(a)a.style.transform=b&&b.classList.contains('show')?'rotate(180deg)':''; }
+function authority(label){ return '<span class="authority">'+label+'</span>'; }
+function guideRef(source){ return '<div class="guide-ref">Fuente: '+source+'</div>'; }
+function acad(title,body){ return '<div class="block sx"><h3 class="sx-head" onclick="toggleSx(this)"><span>📚 '+title+'</span><span class="sx-arrow">▾</span></h3><div class="sx-body">'+body+'</div></div>'; }
 
 /* ---- Cardio: subpaneles nuevos ---- */
 function cardioShock(){ return ''+
@@ -3293,6 +3383,7 @@ function cardioShock(){ return ''+
   '<li><strong>Noradrenalina</strong>: vasopresor de 1ª línea (mejor perfil que la dopamina).</li>'+
   '<li><strong>Dobutamina</strong>: inotrópico si bajo gasto con TA aceptable; asociar a NA si hipotenso.</li>'+
   '<li><strong>Revascularización urgente</strong> (ICP) de la arteria culpable en el shock por IAM.</li>'+
+  '<li>Durante el shock, <strong>no realizar PCI rutinaria inmediata de todas las lesiones no culpables</strong>; individualizar procedimientos posteriores.</li>'+
   '<li>Soporte mecánico: <strong>BCIA</strong> (uso selectivo, no rutinario en IAM), Impella/ECMO-VA en casos seleccionados.</li></ul>'+
   '<h4>Causas mecánicas (buscar con eco)</h4><ul>'+
   '<li>CIV posinfarto, insuficiencia mitral aguda (rotura de músculo papilar), rotura de pared libre/taponamiento, IAM de VD.</li></ul>'+
@@ -3375,6 +3466,7 @@ function urologiaHTML(){ return ''+
 /* ---- Alergias ---- */
 function alergiasHTML(){ return ''+
   '<div class="block"><h3>🚨 Anafilaxia</h3>'+
+  '<div class="callout crit"><strong>ADRENALINA IM ES EL TRATAMIENTO DE PRIMERA LÍNEA.</strong></div>'+
   '<button class="btn-calc" style="max-width:340px" onclick="openCalc(\'adrenalina\')">🧮 Calcular adrenalina IM por peso</button>'+
   '<h4>Criterios diagnósticos (WAO 2020)</h4><ul>'+
   '<li>Inicio agudo con afectación de piel/mucosas + compromiso respiratorio o hipotensión; <strong>o</strong></li>'+
@@ -3383,8 +3475,9 @@ function alergiasHTML(){ return ''+
   '<li><strong>Adrenalina IM 0.01 mg/kg (máx 0.5 mg)</strong> 1:1000, cara anterolateral del muslo. Repetir c/5–15 min si no responde.</li>'+
   '<li>Decúbito con piernas elevadas (no incorporar bruscamente: "síndrome del ventrículo vacío").</li>'+
   '<li>O₂ alto flujo, acceso IV, cristaloides en bolo si hipotensión.</li>'+
-  '<li><strong>2ª línea</strong> (NO sustituyen a la adrenalina): antihistamínicos H1 (prurito/urticaria) y corticoides (fase tardía).</li></ul>'+
-  '<div class="callout crit">La adrenalina IM es el único tratamiento que salva la vida: no retrasarla por dar corticoides/antihistamínicos.</div></div>'+
+  '<li>Anticipar vía aérea difícil; broncodilatador inhalado como adyuvante si persiste broncoespasmo.</li>'+
+  '<li><strong>Adyuvantes</strong>: antihistamínicos H1 para síntomas cutáneos; los antihistamínicos y corticoides <strong>no sustituyen</strong> la adrenalina.</li></ul>'+
+  '<div class="callout warn"><strong>Errores frecuentes:</strong> retrasar adrenalina, administrar primero antihistamínicos, sentar/parar bruscamente al paciente hipotenso o confiar en corticoides para resolver la fase aguda.</div>'+guideRef('World Allergy Organization Anaphylaxis Guidance 2020')+'</div>'+
   '<div class="block"><h3>💔 Shock anafiláctico refractario</h3><ul>'+
   '<li>Sin respuesta a 2–3 dosis IM → <strong>adrenalina IV en infusión</strong> 0.05–0.1 µg/kg/min titulada (monitorización).</li>'+
   '<li><strong>Noradrenalina</strong>/vasopresina si persiste hipotenso; reposición agresiva de volumen (extravasación capilar).</li>'+
@@ -3569,9 +3662,22 @@ function toxEspecificas(){
     ['❤️','Digoxina','<ul><li>Náuseas, visión amarilla, arritmias (bradiarritmias, ESV, TV bidireccional), hiperK⁺ (agudo, marcador de gravedad).</li><li><strong>Anticuerpos antidigoxina (DigiFab)</strong>: arritmia grave/inestable, K⁺ &gt;5 (agudo), ingesta masiva o nivel muy alto. Evitar el calcio IV en la hiperK⁺ por digoxina.</li></ul>'],
     ['⚗️','Metanol / etilenglicol','<ul><li>Acidosis metabólica con anión gap alto + <strong>osmol gap elevado</strong>; metanol → ceguera; etilenglicol → cristales de oxalato, IRA.</li><li><strong>Fomepizol</strong> (inhibidor de la alcohol-deshidrogenasa); etanol como alternativa. <strong>Hemodiálisis</strong> urgente si acidosis grave, nivel alto o daño de órgano.</li><li>Coadyuvantes: folato (metanol), tiamina/piridoxina (etilenglicol).</li></ul><button class="btn-calc" style="max-width:250px" onclick="openCalc(\'aniongap\')">🧮 Anión gap</button> <button class="btn-calc" style="max-width:250px" onclick="openCalc(\'osmolgap\')">🧮 Osmol gap</button>']
   ];
+  var toxSafety={
+    'Organofosforados':'ECG, gases y secreciones/ventilación. Error: infradosificar atropina por perseguir la FC. UCI si broncorrea, debilidad, hipoxia o necesidad de dosis repetidas.',
+    'Benzodiacepinas':'Glucemia, ventilación y coingestas. Error: usar flumazenil sin descartar dependencia/proconvulsivantes. Ingreso si depresión respiratoria, coma o coingesta.',
+    'Opiáceos':'Ventilación, glucemia, ECG según opioide y respuesta a naloxona. Error: buscar despertar completo en vez de ventilación. Ingreso si recurrencia, opioide prolongado o necesidad de infusión.',
+    'Paracetamol':'Nivel temporizado, AST/ALT, INR, creatinina y gases si grave. Error: esperar el nivel cuando la indicación de NAC es clara. Centro experto/UCI si acidosis, encefalopatía o fallo hepático.',
+    'Antidepresivos tricíclicos':'ECG seriado, QRS y aVR; gases/electrolitos. Error: usar antiarrítmicos Ia/Ic. UCI si QRS ancho, arritmia, shock, convulsión o alteración de conciencia.',
+    'Cocaína / estimulantes':'ECG, temperatura, troponina/CK y función renal según clínica. Error: no tratar hipertermia/agitación precozmente. UCI si hipertermia, isquemia, arritmia, shock o convulsiones.',
+    'Monóxido de carbono':'COHb por cooximetría, gases, ECG/troponina y evaluación neurológica. Error: confiar en pulsioximetría normal. Consulta hiperbárica/ingreso según gravedad, embarazo y evolución.',
+    'Betabloqueantes':'ECG, glucemia, electrolitos y perfusión. Error: demorar soporte hemodinámico en shock. UCI si bradicardia, bloqueo, hipotensión o tratamiento de alta dosis.',
+    'Calcioantagonistas':'ECG, glucemia, calcio/electrolitos y perfusión. Error: retrasar insulina a altas dosis en toxicidad grave. UCI si bloqueo, shock o necesidad de vasopresores.',
+    'Digoxina':'ECG continuo, K⁺, función renal y nivel interpretado según tiempo. Error: decidir solo por un nivel aislado. UCI/antídoto si arritmia grave, hiperK⁺ aguda o inestabilidad.',
+    'Metanol / etilenglicol':'Gases, anión/osmol gap, función renal, calcio y nivel si disponible. Error: esperar confirmación en un cuadro compatible grave. UCI/toxicología y diálisis si acidosis, daño orgánico o deterioro.'
+  };
   return items.map(function(s){
     return '<div class="block sx"><h3 class="sx-head" onclick="toggleSx(this)"><span>'+s[0]+' '+s[1]+'</span><span class="sx-arrow">▾</span></h3>'+
-      '<div class="sx-body">'+s[2]+'</div></div>';
+      '<div class="sx-body">'+s[2]+(toxSafety[s[1]]?'<div class="callout warn"><strong>Seguridad / disposición:</strong> '+toxSafety[s[1]]+'</div>':'')+'</div></div>';
   }).join('');
 }
 var ANTIDOTOS=[
