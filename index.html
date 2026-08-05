@@ -359,6 +359,60 @@
   .fld textarea:focus{outline:none;border-color:var(--teal)}
   .fld-row{display:flex;gap:.6rem}
   .fld-row .fld{flex:1}
+  /* ── Alta clínica + Guardados + Diagnósticos (EmergSmart) ── */
+  .app-content{padding-bottom:72px!important}
+  .pt-vitals{display:flex;flex-wrap:wrap;gap:.4rem;margin:.3rem 0}
+  .pt-vital{background:var(--surface2);border:1px solid var(--border2);border-radius:999px;padding:.08rem .55rem;font-size:.74rem;color:var(--muted)}
+  .pt-vital b{color:var(--text);font-weight:700}
+  .pt-btn-alta{background:var(--teal);color:#04211d;border:1px solid var(--teal);border-radius:var(--rs);padding:0 .7rem;height:32px;font-size:.82rem;font-weight:700;cursor:pointer}
+  .pt-btn-pdf{background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:var(--rs);width:32px;height:32px;font-size:.95rem;cursor:pointer}
+  .pt-btn-pdf:hover{border-color:var(--teal)}
+  .alta-panel{margin-top:.7rem;padding:.8rem;background:var(--teal-dim2);border:1px solid var(--teal);border-radius:var(--rs)}
+  .alta-lbl{display:block;font-size:.76rem;font-weight:800;color:var(--teal);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.3px}
+  .alta-panel textarea{width:100%;box-sizing:border-box;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:.55rem .7rem;color:var(--text);font-size:.88rem;font-family:inherit;resize:vertical;min-height:56px}
+  .alta-panel textarea:focus{outline:none;border-color:var(--teal)}
+  .alta-acciones{display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap}
+  .alta-ok{background:var(--teal);color:#04211d;border:none;border-radius:var(--rs);padding:.5rem .9rem;font-weight:700;font-size:.85rem;cursor:pointer}
+  .alta-cancel{background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:var(--rs);padding:.5rem .9rem;font-weight:600;font-size:.85rem;cursor:pointer}
+  #esBarra{position:fixed;left:0;right:0;bottom:0;min-height:52px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;z-index:400;box-shadow:0 -3px 14px rgba(0,0,0,.25);padding:.5rem .75rem}
+  #esBarra button{background:var(--teal);color:#04211d;border:none;border-radius:999px;padding:.6rem 1.5rem;font-weight:800;font-size:.9rem;cursor:pointer}
+  #esBarra button.activo{background:var(--amber);color:#3a2a00}
+  #esSeccion{position:fixed;left:0;right:0;top:0;bottom:52px;background:var(--bg);z-index:395;display:none;flex-direction:column}
+  .sg-header{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.9rem 1.1rem;background:var(--surface);border-bottom:1px solid var(--border)}
+  .sg-titulo{font-weight:800;color:var(--teal);font-size:1rem}
+  .sg-close{background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:var(--rs);width:34px;height:34px;font-size:1rem;cursor:pointer}
+  .sg-filtros{display:flex;gap:.5rem;padding:.75rem 1.1rem;flex-wrap:wrap;background:var(--surface);border-bottom:1px solid var(--border)}
+  .sg-filtros input{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:.5rem .7rem;color:var(--text);font-size:.86rem}
+  .sg-filtros input[type="text"]{flex:1;min-width:160px}
+  .sg-filtros input:focus{outline:none;border-color:var(--teal)}
+  #sgLista{padding:.9rem 1.1rem;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:.5rem}
+  .sg-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+  .sg-head{display:flex;align-items:center;gap:.5rem;padding:.65rem .8rem;cursor:pointer}
+  .sg-head:hover{background:var(--surface2)}
+  .sg-nombre{font-weight:700;flex-shrink:0}
+  .sg-meta{color:var(--muted);font-size:.8rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sg-caret{color:var(--teal);font-size:.7rem}
+  .sg-det{padding:.2rem .8rem .8rem;border-top:1px dashed var(--border2);background:var(--surface2)}
+  .sg-campo{font-size:.84rem;margin:.32rem 0}
+  .sg-campo b{color:var(--muted);font-weight:600}
+  .sg-acc{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.7rem}
+  .sg-acc button{border:none;border-radius:var(--rs);padding:.45rem .7rem;font-size:.8rem;font-weight:700;cursor:pointer}
+  .sg-b-ver{background:var(--surface3);color:var(--text)}
+  .sg-b-edit{background:var(--teal);color:#04211d}
+  .sg-b-pdf{background:var(--surface3);color:var(--text)}
+  .sg-b-star{background:var(--surface3);color:var(--text)}
+  .sg-b-star.activo{background:var(--amber-dim);color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber)}
+  .sg-b-del{background:var(--red-dim);color:var(--red)}
+  .badge-interesante{display:inline-block;background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber);border-radius:999px;padding:.1rem .5rem;font-size:.7rem;font-weight:800}
+  #diagFrec{margin-top:1.4rem}
+  .df-title{font-size:.95rem;font-weight:800;color:var(--teal);margin:.6rem 0 .7rem}
+  .df-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem}
+  .df-name{width:34%;font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .df-barwrap{flex:1;background:var(--surface2);border-radius:999px;height:14px;overflow:hidden}
+  .df-bar{height:100%;background:linear-gradient(90deg,var(--teal),#22d3ee);border-radius:999px}
+  .df-val{width:78px;text-align:right;font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+  .mg-campo{font-size:.88rem;margin:.4rem 0}
+  .mg-campo b{color:var(--muted);font-weight:600}
   /* checklist ABCDE */
   .chk{list-style:none;margin:.4rem 0}
   .chk li{padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.9rem;display:flex;align-items:flex-start;gap:.55rem;cursor:pointer}
@@ -534,6 +588,7 @@
         <button class="g-btn g-btn-amber" onclick="cerrarTurno()">📦 Cerrar turno</button>
       </div>
       <div id="guardiaList"></div>
+      <div id="diagFrec"></div>
       <h3 class="g-hist-title">🗂️ Historial de turnos</h3>
       <div id="guardiaHist"></div>
     </section>
@@ -548,6 +603,25 @@
 
   </main>
   </div><!-- /app-body -->
+
+  <!-- ═════ BARRA FIJA GUARDADOS ═════ -->
+  <div id="esBarra">
+    <button id="esBarraBtn" onclick="toggleSeccionGuardados()">📋 Guardados (<span id="esBarraCount">0</span>)</button>
+  </div>
+
+  <!-- ═════ SECCIÓN GUARDADOS (dados de alta) ═════ -->
+  <div id="esSeccion">
+    <div class="sg-header">
+      <span class="sg-titulo">📋 Pacientes guardados (dados de alta)</span>
+      <button class="sg-close" onclick="cerrarSeccionGuardados()" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="sg-filtros">
+      <input type="text" id="sgBuscar" placeholder="🔍 Buscar nombre, diagnóstico..." oninput="renderSeccionGuardados()">
+      <input type="date" id="sgDesde" onchange="renderSeccionGuardados()" title="Desde">
+      <input type="date" id="sgHasta" onchange="renderSeccionGuardados()" title="Hasta">
+    </div>
+    <div id="sgLista"></div>
+  </div>
 
   <footer class="app-footer">EmergSmart © Dr. M. Dos Santos | EasyMed Suite</footer>
 </div>
@@ -574,6 +648,9 @@ var medConfig={nombre:'',especialidad:'',registro:'',institucion:'',ciudad:''};
 /* Guardia: turno activo + historial de turnos archivados */
 var guardia={activo:[],historial:[]};
 var editingPtId=null;
+var altaPtId=null;
+var sgExpandId=null;
+var ES_GUARD_KEY='es_guardados';
 
 /* ---------- persistencia ---------- */
 function loadState(){ try{ var s=JSON.parse(localStorage.getItem(STATE_KEY)||'{}'); Object.assign(state,s); }catch(e){} }
@@ -3116,22 +3193,235 @@ function importData(input){
 var GUARDIA_ESTADOS=[['en evaluación','st-eval'],['pendiente','st-pend'],['resuelto','st-resu'],['derivado','st-deri'],['internado','st-inte']];
 function estadoClass(e){ for(var i=0;i<GUARDIA_ESTADOS.length;i++){ if(GUARDIA_ESTADOS[i][0]===e)return GUARDIA_ESTADOS[i][1]; } return 'st-eval'; }
 function nowHM(){ var d=new Date(),p=function(n){return String(n).padStart(2,'0');}; return p(d.getHours())+':'+p(d.getMinutes()); }
-function buildGuardia(){ renderGuardiaList(); renderGuardiaHist(); }
+function buildGuardia(){ renderGuardiaList(); renderGuardiaHist(); renderDiagFrec(); actualizarBarraGuardados(); }
+
+/* ════ SIGNOS VITALES / HELPERS ════ */
+function vitalsHTML(p){
+  var v=[];
+  if(p.pa)v.push('<span class="pt-vital">PA <b>'+esc(p.pa)+'</b></span>');
+  if(p.fc)v.push('<span class="pt-vital">FC <b>'+esc(p.fc)+'</b></span>');
+  if(p.sato2)v.push('<span class="pt-vital">SatO₂ <b>'+esc(p.sato2)+'%</b></span>');
+  if(p.temp)v.push('<span class="pt-vital">T° <b>'+esc(p.temp)+'</b></span>');
+  return v.length? '<div class="pt-vitals">'+v.join('')+'</div>' : '';
+}
+function esToast(msg){
+  var t=document.getElementById('esToast');
+  if(!t){ t=document.createElement('div'); t.id='esToast'; t.style.cssText='position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--teal);color:#04211d;padding:.6rem 1.2rem;border-radius:999px;font-size:.85rem;font-weight:800;z-index:500;box-shadow:0 6px 20px rgba(0,0,0,.35);transition:opacity .3s;opacity:0'; document.body.appendChild(t); }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._to); t._to=setTimeout(function(){ t.style.opacity='0'; },2800);
+}
+function esFecha(s){ if(!s)return '—'; if(/^\d{4}-\d{2}-\d{2}$/.test(s)){ var a=s.split('-'); return a[2]+'/'+a[1]+'/'+a[0]; } var d=new Date(s); return isNaN(d)?String(s):d.toLocaleDateString('es-AR'); }
+function esFechaHora(s){ if(!s)return '—'; var d=new Date(s); return isNaN(d)?String(s):d.toLocaleDateString('es-AR')+' '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}); }
+
+/* ════ GUARDADOS (ALTA CLÍNICA) ════ */
+function getGuardados(){ try{ return JSON.parse(localStorage.getItem(ES_GUARD_KEY)||'[]')||[]; }catch(e){ return []; } }
+function setGuardados(arr){ try{ localStorage.setItem(ES_GUARD_KEY, JSON.stringify(arr)); }catch(e){} }
+
+function abrirAlta(id){ altaPtId=id; renderGuardiaList(); var t=document.getElementById('altaNotas'); if(t){ t.focus(); t.scrollIntoView({behavior:'smooth',block:'center'}); } }
+function cancelarAlta(){ altaPtId=null; renderGuardiaList(); }
+function confirmarAlta(id){
+  var p=guardia.activo.filter(function(x){return x.id===id;})[0]; if(!p)return;
+  var notas=(document.getElementById('altaNotas')||{}).value||'';
+  var rec={}; for(var k in p){ if(Object.prototype.hasOwnProperty.call(p,k)) rec[k]=p[k]; }
+  rec.guardadoId='es'+Date.now()+Math.random().toString(36).slice(2,8);
+  rec.horaIngreso=p.hora||'';
+  rec.fechaAlta=new Date().toISOString();
+  rec.altaNotas=notas.trim();
+  rec.interesante=false;
+  var arr=getGuardados(); arr.push(rec); setGuardados(arr);
+  guardia.activo=guardia.activo.filter(function(x){return x.id!==id;});
+  altaPtId=null; saveGuardia();
+  renderGuardiaList(); renderDiagFrec(); actualizarBarraGuardados();
+  esToast('🏥 Paciente dado de alta y guardado');
+}
+
+/* ════ BARRA + SECCIÓN GUARDADOS ════ */
+function actualizarBarraGuardados(){ var el=document.getElementById('esBarraCount'); if(el)el.textContent=getGuardados().length; }
+function toggleSeccionGuardados(){
+  var s=document.getElementById('esSeccion'); if(!s)return;
+  if(s.style.display==='flex'){ cerrarSeccionGuardados(); }
+  else{ s.style.display='flex'; var b=document.getElementById('esBarraBtn'); if(b)b.classList.add('activo'); renderSeccionGuardados(); }
+}
+function cerrarSeccionGuardados(){ var s=document.getElementById('esSeccion'); if(s)s.style.display='none'; var b=document.getElementById('esBarraBtn'); if(b)b.classList.remove('activo'); }
+function toggleSgExpand(id){ sgExpandId=(sgExpandId===id?null:id); renderSeccionGuardados(); }
+function renderSeccionGuardados(){
+  var arr=getGuardados();
+  var q=(document.getElementById('sgBuscar').value||'').toLowerCase().trim();
+  var desde=document.getElementById('sgDesde').value;
+  var hasta=document.getElementById('sgHasta').value;
+  var list=arr.slice();
+  if(q)list=list.filter(function(p){ return (p.nombre||'').toLowerCase().indexOf(q)>=0 || (p.dx||'').toLowerCase().indexOf(q)>=0; });
+  if(desde)list=list.filter(function(p){ return String(p.fechaAlta||'').slice(0,10)>=desde; });
+  if(hasta)list=list.filter(function(p){ return String(p.fechaAlta||'').slice(0,10)<=hasta; });
+  list.sort(function(a,b){ return String(b.fechaAlta||'').localeCompare(String(a.fechaAlta||'')); });
+  var cont=document.getElementById('sgLista');
+  if(!arr.length){ cont.innerHTML='<div class="g-empty">No hay pacientes dados de alta todavía.</div>'; return; }
+  if(!list.length){ cont.innerHTML='<div class="g-empty">Sin resultados para el filtro.</div>'; return; }
+  cont.innerHTML=list.map(function(p){
+    var abierto=p.guardadoId===sgExpandId;
+    var altaStr=esFechaHora(p.fechaAlta);
+    var det='';
+    if(abierto){
+      det='<div class="sg-det">'+
+        '<div class="sg-campo"><b>Estado:</b> '+esc(p.estado||'—')+'</div>'+
+        '<div class="sg-campo"><b>Sexo:</b> '+esc(p.sexo||'—')+'</div>'+
+        '<div class="sg-campo"><b>Motivo:</b> '+esc(p.motivo||'—')+'</div>'+
+        '<div class="sg-campo"><b>Impresión dx:</b> '+esc(p.dx||'—')+'</div>'+
+        '<div class="sg-campo"><b>Signos vitales:</b> PA '+esc(p.pa||'—')+' · FC '+esc(p.fc||'—')+' · SatO₂ '+esc(p.sato2||'—')+' · T° '+esc(p.temp||'—')+'</div>'+
+        '<div class="sg-campo"><b>Notas:</b> '+esc(p.notas||'—')+'</div>'+
+        '<div class="sg-campo"><b>Notas al alta:</b> '+esc(p.altaNotas||'—')+'</div>'+
+        '<div class="sg-campo"><b>Ingreso:</b> '+esc(p.horaIngreso||'—')+'</div>'+
+        '<div class="sg-campo"><b>Alta:</b> '+altaStr+'</div>'+
+        '<div class="sg-acc">'+
+          '<button class="sg-b-ver" onclick="verGuardado(\''+p.guardadoId+'\')">👁️ Ver</button>'+
+          '<button class="sg-b-edit" onclick="editarGuardado(\''+p.guardadoId+'\')">✏️ Editar</button>'+
+          '<button class="sg-b-pdf" onclick="pdfGuardado(\''+p.guardadoId+'\')">📄 PDF</button>'+
+          '<button class="sg-b-star '+(p.interesante?'activo':'')+'" onclick="toggleInteresante(\''+p.guardadoId+'\')">⭐ Interesante</button>'+
+          '<button class="sg-b-del" onclick="eliminarGuardado(\''+p.guardadoId+'\')">🗑️ Eliminar</button>'+
+        '</div></div>';
+    }
+    return '<div class="sg-row"><div class="sg-head" onclick="toggleSgExpand(\''+p.guardadoId+'\')">'+
+      '<span class="sg-nombre">'+esc(p.nombre||'(sin nombre)')+'</span>'+
+      '<span class="sg-meta">'+esc(p.edad||'—')+' años · '+esc(p.dx||'—')+' · alta '+altaStr+'</span>'+
+      (p.interesante?'<span class="badge-interesante">⭐ Interesante</span>':'')+
+      '<span class="pt-status '+estadoClass(p.estado)+'">'+esc(p.estado||'—')+'</span>'+
+      '<span class="sg-caret">'+(abierto?'▾':'▸')+'</span>'+
+      '</div>'+det+'</div>';
+  }).join('');
+}
+function toggleInteresante(id){ var arr=getGuardados(); var r=arr.filter(function(x){return x.guardadoId===id;})[0]; if(!r)return; r.interesante=!r.interesante; setGuardados(arr); renderSeccionGuardados(); }
+function eliminarGuardado(id){
+  var arr=getGuardados(); var r=arr.filter(function(x){return x.guardadoId===id;})[0]; if(!r)return;
+  if(!confirm('¿Eliminar de Guardados a '+(r.nombre||'este paciente')+'? Esta acción no se puede deshacer.'))return;
+  setGuardados(arr.filter(function(x){return x.guardadoId!==id;}));
+  if(sgExpandId===id)sgExpandId=null;
+  actualizarBarraGuardados(); renderSeccionGuardados(); renderDiagFrec();
+}
+function verGuardado(id){
+  var r=getGuardados().filter(function(x){return x.guardadoId===id;})[0]; if(!r)return;
+  var html='<div class="mg-campo"><b>Nombre:</b> '+esc(r.nombre||'—')+'</div>'+
+    '<div class="mg-campo"><b>Edad:</b> '+esc(r.edad||'—')+' años · <b>Sexo:</b> '+esc(r.sexo||'—')+'</div>'+
+    '<div class="mg-campo"><b>Estado:</b> '+esc(r.estado||'—')+'</div>'+
+    '<div class="mg-campo"><b>Motivo:</b> '+esc(r.motivo||'—')+'</div>'+
+    '<div class="mg-campo"><b>Impresión dx:</b> '+esc(r.dx||'—')+'</div>'+
+    '<div class="mg-campo"><b>Signos vitales:</b> PA '+esc(r.pa||'—')+' · FC '+esc(r.fc||'—')+' · SatO₂ '+esc(r.sato2||'—')+' · T° '+esc(r.temp||'—')+'</div>'+
+    '<div class="mg-campo"><b>Notas:</b> '+esc(r.notas||'—')+'</div>'+
+    '<div class="mg-campo"><b>Notas al alta:</b> '+esc(r.altaNotas||'—')+'</div>'+
+    '<div class="mg-campo"><b>Ingreso:</b> '+esc(r.horaIngreso||'—')+' · <b>Alta:</b> '+esFechaHora(r.fechaAlta)+'</div>'+
+    '<button class="btn-calc" onclick="pdfGuardado(\''+id+'\')">📄 Descargar PDF</button>';
+  showModal('👁️ '+esc(r.nombre||'Paciente'), html);
+}
+function editarGuardado(id){
+  var r=getGuardados().filter(function(x){return x.guardadoId===id;})[0]; if(!r)return;
+  var estOpts=GUARDIA_ESTADOS.map(function(e){return '<option '+(r.estado===e[0]?'selected':'')+' value="'+e[0]+'">'+e[0]+'</option>';}).join('');
+  var html='<div class="fld"><label>Nombre</label><input id="mg-nombre" value="'+esc(r.nombre||'')+'"></div>'+
+    '<div class="fld-row"><div class="fld"><label>Edad</label><input id="mg-edad" value="'+esc(r.edad||'')+'"></div>'+
+    '<div class="fld"><label>Estado</label><select id="mg-estado">'+estOpts+'</select></div></div>'+
+    '<div class="fld"><label>Impresión diagnóstica</label><input id="mg-dx" value="'+esc(r.dx||'')+'"></div>'+
+    '<div class="fld"><label>Motivo</label><input id="mg-motivo" value="'+esc(r.motivo||'')+'"></div>'+
+    '<div class="fld-row"><div class="fld"><label>PA</label><input id="mg-pa" value="'+esc(r.pa||'')+'"></div>'+
+    '<div class="fld"><label>FC</label><input id="mg-fc" value="'+esc(r.fc||'')+'"></div>'+
+    '<div class="fld"><label>SatO₂</label><input id="mg-sato2" value="'+esc(r.sato2||'')+'"></div>'+
+    '<div class="fld"><label>Temp</label><input id="mg-temp" value="'+esc(r.temp||'')+'"></div></div>'+
+    '<div class="fld"><label>Notas</label><textarea id="mg-notas">'+esc(r.notas||'')+'</textarea></div>'+
+    '<div class="fld"><label>Notas al alta</label><textarea id="mg-altanotas">'+esc(r.altaNotas||'')+'</textarea></div>'+
+    '<button class="btn-calc" onclick="guardarEdicionGuardado(\''+id+'\')">💾 Guardar cambios</button>';
+  showModal('✏️ Editar guardado', html);
+}
+function guardarEdicionGuardado(id){
+  var arr=getGuardados(); var r=arr.filter(function(x){return x.guardadoId===id;})[0]; if(!r)return;
+  r.nombre=document.getElementById('mg-nombre').value.trim();
+  r.edad=document.getElementById('mg-edad').value.trim();
+  r.estado=document.getElementById('mg-estado').value;
+  r.dx=document.getElementById('mg-dx').value.trim();
+  r.motivo=document.getElementById('mg-motivo').value.trim();
+  r.pa=document.getElementById('mg-pa').value.trim();
+  r.fc=document.getElementById('mg-fc').value.trim();
+  r.sato2=document.getElementById('mg-sato2').value.trim();
+  r.temp=document.getElementById('mg-temp').value.trim();
+  r.notas=document.getElementById('mg-notas').value.trim();
+  r.altaNotas=document.getElementById('mg-altanotas').value.trim();
+  setGuardados(arr); closeModal(); renderSeccionGuardados(); renderDiagFrec(); esToast('✅ Cambios guardados');
+}
+
+/* ════ PDF (paciente activo / guardado con Alta clínica) ════ */
+function _pdfPaciente(p, conAlta){
+  if(!(window.jspdf&&window.jspdf.jsPDF)){ alert('No se pudo cargar el generador de PDF (sin conexión).'); return; }
+  var jsPDF=window.jspdf.jsPDF; var doc=new jsPDF({unit:'mm',format:'a4'});
+  var W=doc.internal.pageSize.getWidth(), M=14, y=16;
+  var d=new Date(), pad=function(n){return String(n).padStart(2,'0');};
+  var ahora=pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+  doc.setFontSize(16); doc.setFont(undefined,'bold'); doc.setTextColor(20,184,166);
+  doc.text('EmergSmart — Ficha de paciente', M, y); y+=8;
+  doc.setTextColor(40,40,40); doc.setFontSize(13); doc.text(String(p.nombre||'—'), M, y); y+=6;
+  doc.setDrawColor(200,200,200); doc.line(M,y,W-M,y); y+=6;
+  doc.setFontSize(10); doc.setFont(undefined,'normal');
+  function campo(l,v){ doc.setFont(undefined,'bold'); doc.setTextColor(90,90,90); doc.text(l,M,y);
+    doc.setFont(undefined,'normal'); doc.setTextColor(30,30,30);
+    var ls=doc.splitTextToSize(String(v==null||v===''?'—':v), W-M-40); doc.text(ls,M+34,y); y+=Math.max(6,ls.length*5); }
+  campo('Edad / Sexo', (p.edad||'—')+' años · '+(p.sexo||'—'));
+  campo('Estado', p.estado||'—');
+  campo('Hora ingreso', p.hora||p.horaIngreso||'—');
+  campo('Motivo', p.motivo);
+  campo('Impresión dx', p.dx);
+  campo('Signos vitales', 'PA '+(p.pa||'—')+'  ·  FC '+(p.fc||'—')+'  ·  SatO2 '+(p.sato2||'—')+'  ·  T '+(p.temp||'—'));
+  campo('Notas', p.notas);
+  if(conAlta && p.fechaAlta){
+    y+=3; doc.setFont(undefined,'bold'); doc.setFontSize(12); doc.setTextColor(20,184,166);
+    doc.text('Alta clínica', M, y); y+=2; doc.setDrawColor(20,184,166); doc.line(M,y,W-M,y); y+=6;
+    doc.setFontSize(10); doc.setTextColor(30,30,30);
+    campo('Ingreso', p.horaIngreso||p.hora||'—');
+    campo('Alta', esFechaHora(p.fechaAlta));
+    campo('Notas al alta', p.altaNotas);
+  }
+  var ph=doc.internal.pageSize.getHeight();
+  doc.setFontSize(8); doc.setTextColor(120,120,120);
+  doc.text('EmergSmart · '+ahora+' · Use adecuado juicio clínico.', M, ph-10);
+  doc.save('emergsmart_'+String(p.nombre||'paciente').replace(/\s+/g,'_')+'_'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'.pdf');
+}
+function pdfActivo(id){ var p=guardia.activo.filter(function(x){return x.id===id;})[0]; if(p)_pdfPaciente(p,false); }
+function pdfGuardado(id){ var r=getGuardados().filter(function(x){return x.guardadoId===id;})[0]; if(r)_pdfPaciente(r,true); }
+
+/* ════ DIAGNÓSTICOS FRECUENTES ════ */
+function renderDiagFrec(){
+  var c=document.getElementById('diagFrec'); if(!c)return;
+  var counts={}, total=0;
+  var fuentes=guardia.activo.concat(getGuardados());
+  fuentes.forEach(function(p){ var d=(p.dx||'').trim(); if(!d)return; var k=d.toLowerCase(); if(!counts[k])counts[k]={label:d,n:0}; counts[k].n++; total++; });
+  var arr=Object.keys(counts).map(function(k){return counts[k];}).sort(function(a,b){return b.n-a.n;}).slice(0,8);
+  if(!arr.length){ c.innerHTML='<h3 class="df-title">📊 Diagnósticos frecuentes</h3><div class="g-empty">Sin diagnósticos registrados aún.</div>'; return; }
+  var max=arr[0].n;
+  c.innerHTML='<h3 class="df-title">📊 Diagnósticos frecuentes</h3>'+arr.map(function(o){
+    var pct=total?Math.round(o.n/total*100):0;
+    var w=max?Math.round(o.n/max*100):0;
+    return '<div class="df-row"><div class="df-name" title="'+esc(o.label)+'">'+esc(o.label)+'</div>'+
+      '<div class="df-barwrap"><div class="df-bar" style="width:'+w+'%"></div></div>'+
+      '<div class="df-val">'+pct+'% ('+o.n+')</div></div>';
+  }).join('');
+}
 function renderGuardiaList(){
   var c=document.getElementById('guardiaList'); if(!c)return;
   if(!guardia.activo.length){ c.innerHTML='<div class="g-empty">No hay pacientes en el turno activo. Tocá "Nuevo paciente" para registrar.</div>'; return; }
   c.innerHTML=guardia.activo.map(function(p){
     var idx=guardia.activo.indexOf(p);
+    var alta = altaPtId===p.id ? ('<div class="alta-panel"><label class="alta-lbl">Notas al alta</label>'+
+      '<textarea id="altaNotas" placeholder="Condición al egreso, indicaciones, seguimiento..."></textarea>'+
+      '<div class="alta-acciones"><button class="alta-ok" onclick="confirmarAlta(\''+p.id+'\')">✅ Confirmar alta</button>'+
+      '<button class="alta-cancel" onclick="cancelarAlta()">Cancelar</button></div></div>') : '';
     return '<div class="pt-card">'+
       '<div class="pt-head"><div><div class="pt-name">'+esc(p.nombre||'(sin nombre)')+'</div>'+
       '<div class="pt-meta">'+esc(p.edad||'—')+' años · '+esc(p.sexo||'—')+' · Ingreso '+esc(p.hora||'—')+'</div></div>'+
       '<div class="pt-actions"><span class="pt-status '+estadoClass(p.estado)+'">'+esc(p.estado||'en evaluación')+'</span>'+
       '<button class="pt-mini" title="Editar" onclick="openGuardiaByIndex('+idx+')">✏️</button>'+
-      '<button class="pt-mini del" title="Eliminar" onclick="deletePtByIndex('+idx+')">🗑️</button></div></div>'+
+      '<button class="pt-mini del" title="Eliminar" onclick="deletePtByIndex('+idx+')">🗑️</button>'+
+      '<button class="pt-btn-pdf" title="PDF" onclick="pdfActivo(\''+p.id+'\')">📄</button>'+
+      '<button class="pt-btn-alta" title="Dar de alta" onclick="abrirAlta(\''+p.id+'\')">🏥 Alta</button></div></div>'+
       '<div class="pt-body">'+
+      vitalsHTML(p)+
       (p.motivo?'<div class="pt-row"><span class="pt-lbl">Motivo:</span> '+esc(p.motivo)+'</div>':'')+
       (p.dx?'<div class="pt-row"><span class="pt-lbl">Impresión dx:</span> '+esc(p.dx)+'</div>':'')+
       (p.notas?'<div class="pt-row"><span class="pt-lbl">Notas:</span> '+esc(p.notas)+'</div>':'')+
+      alta+
       '</div></div>';
   }).join('');
 }
@@ -3165,6 +3455,10 @@ function openGuardiaForm(id){
     '<div class="fld"><label>Hora ingreso</label><input id="g-hora" value="'+esc(p?p.hora:nowHM())+'" placeholder="HH:MM"></div></div>'+
     '<div class="fld"><label>Motivo de consulta</label><input id="g-motivo" value="'+esc(p?p.motivo:'')+'" placeholder="Motivo"></div>'+
     '<div class="fld"><label>Impresión diagnóstica</label><input id="g-dx" value="'+esc(p?p.dx:'')+'" placeholder="Dx presuntivo"></div>'+
+    '<div class="fld-row"><div class="fld"><label>PA (mmHg)</label><input id="g-pa" value="'+esc(p?p.pa:'')+'" placeholder="120/80"></div>'+
+    '<div class="fld"><label>FC (lpm)</label><input id="g-fc" value="'+esc(p?p.fc:'')+'" placeholder="80"></div></div>'+
+    '<div class="fld-row"><div class="fld"><label>SatO₂ (%)</label><input id="g-sato2" value="'+esc(p?p.sato2:'')+'" placeholder="98"></div>'+
+    '<div class="fld"><label>Temp (°C)</label><input id="g-temp" value="'+esc(p?p.temp:'')+'" placeholder="36.5"></div></div>'+
     '<div class="fld"><label>Notas libres</label><textarea id="g-notas" placeholder="Evolución, indicaciones, pendientes…">'+esc(p?p.notas:'')+'</textarea></div>'+
     '<div class="fld"><label>Estado</label><select id="g-estado">'+estOpts+'</select></div>'+
     '<button class="btn-calc" onclick="savePt()">'+(id?'Guardar cambios':'Agregar paciente')+'</button>';
@@ -3178,6 +3472,10 @@ function savePt(){
     hora:document.getElementById('g-hora').value.trim(),
     motivo:document.getElementById('g-motivo').value.trim(),
     dx:document.getElementById('g-dx').value.trim(),
+    pa:document.getElementById('g-pa').value.trim(),
+    fc:document.getElementById('g-fc').value.trim(),
+    sato2:document.getElementById('g-sato2').value.trim(),
+    temp:document.getElementById('g-temp').value.trim(),
     notas:document.getElementById('g-notas').value.trim(),
     estado:document.getElementById('g-estado').value
   };
@@ -3188,12 +3486,12 @@ function savePt(){
     obj.id=newPatientId();
     guardia.activo.push(obj);
   }
-  editingPtId=null; saveGuardia(); renderGuardiaList(); closeModal();
+  editingPtId=null; saveGuardia(); renderGuardiaList(); renderDiagFrec(); closeModal();
 }
 function deletePt(id){
   if(!confirm('¿Eliminar este paciente del turno activo?'))return;
   guardia.activo=guardia.activo.filter(function(x){return x.id!==id;});
-  saveGuardia(); renderGuardiaList();
+  saveGuardia(); renderGuardiaList(); renderDiagFrec();
 }
 function cerrarTurno(){
   if(!guardia.activo.length){ alert('No hay pacientes en el turno activo para archivar.'); return; }
