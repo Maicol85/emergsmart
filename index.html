@@ -127,6 +127,48 @@
   .hdr-btn:hover .ib-label{color:var(--text)}
   @media(max-width:480px){ .hdr-btn .ib-label{display:none} .hdr-btn{min-width:36px;padding:6px 5px} .app-header{padding:0 .6rem} .header-actions{gap:.25rem} }
 
+  /* ══════════ Header ☰ / ⋯ (v2 nav) ══════════ */
+  .hdr-left{display:flex;align-items:center;gap:.55rem}
+  .hdr-menu{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:var(--rs);width:38px;height:38px;font-size:1.2rem;line-height:1;display:flex;align-items:center;justify-content:center;transition:border-color .15s,background .15s}
+  .hdr-menu:hover{border-color:var(--teal);background:var(--surface3)}
+  .kebab-wrap{position:relative}
+  .kebab-menu{display:none;position:absolute;right:0;top:44px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.55);min-width:220px;z-index:5200;padding:6px}
+  .kebab-menu.show{display:block;animation:fade .15s}
+  .kebab-item{display:flex;align-items:center;gap:.65rem;width:100%;background:none;border:none;color:var(--text);padding:10px 12px;border-radius:7px;font-size:.9rem;text-align:left;cursor:pointer}
+  .kebab-item:hover{background:var(--surface2)}
+  .kebab-item .ki-ico{width:20px;text-align:center;font-size:1.02rem;flex:0 0 auto}
+  .kebab-sep{height:1px;background:var(--border);margin:5px 6px}
+
+  /* ══════════ Drawer lateral (secciones) ══════════ */
+  .drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:4900}
+  .drawer-overlay.show{display:block}
+  .main-nav.drawer{position:fixed;top:0;left:0;height:100vh;width:260px;max-width:84vw;z-index:5000;
+    transform:translateX(-100%);transition:transform .22s ease;flex:0 0 auto;flex-direction:column;align-items:stretch;
+    background:var(--surface);border-right:1px solid var(--border);box-shadow:2px 0 18px rgba(0,0,0,.45);overflow-y:auto;padding:0}
+  .main-nav.drawer.open{transform:translateX(0)}
+  .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+  .drawer-head .dh-title{font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:.5rem}
+  .drawer-head .dh-close{background:none;border:none;color:var(--muted);font-size:1.15rem;cursor:pointer;width:30px;height:30px;border-radius:6px}
+  .drawer-head .dh-close:hover{background:var(--surface2);color:var(--text)}
+  .main-nav.drawer .main-tab{width:100%;height:auto;justify-content:flex-start;gap:.65rem;padding:13px 18px;font-size:14px;
+    border-left:2px solid transparent;border-bottom:none;white-space:nowrap}
+  .main-nav.drawer .main-tab.active{color:var(--teal);background:var(--teal-dim);border-left:2px solid var(--teal);border-bottom:none}
+  .main-nav.drawer .mt-label{display:inline}
+
+  /* ══════════ Grilla de sistemas (launcher) ══════════ */
+  #sysBack{display:none;align-items:center;gap:.4rem;background:transparent;border:1px solid var(--border2);color:var(--muted);
+    border-radius:6px;padding:.4rem .8rem;font-size:.82rem;margin-bottom:1rem;cursor:pointer}
+  #sysBack:hover{border-color:var(--teal);color:var(--text)}
+  .sys-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+  .sys-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;
+    background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.15rem .6rem;cursor:pointer;
+    color:var(--text);transition:border-color .15s,background .15s,transform .12s}
+  .sys-card:hover{border-color:var(--teal);background:var(--teal-dim2);transform:translateY(-2px)}
+  .sys-card .sc-ico{font-size:1.9rem;line-height:1}
+  .sys-card .sc-name{font-size:.85rem;font-weight:500;text-align:center;letter-spacing:-.1px}
+  .sys-card.is-section{border-style:dashed}
+  @media(max-width:600px){ .sys-grid{grid-template-columns:repeat(2,1fr);gap:.65rem} .sys-card{padding:1rem .5rem;border-radius:12px} .sys-card .sc-ico{font-size:1.7rem} }
+
   /* Global search bar */
   #searchBar{display:none;background:var(--surface2);border-bottom:1px solid var(--border);padding:.6rem 1.1rem;position:sticky;top:48px;z-index:99}
   #searchBar.show{display:block}
@@ -357,18 +399,28 @@
 <!-- ══════════ APP ══════════ -->
 <div id="app">
   <header class="app-header">
-    <div class="brand"><span class="logo">🚨</span> Emerg<span class="em">Smart</span></div>
+    <div class="hdr-left">
+      <button class="hdr-menu" onclick="toggleDrawer()" title="Secciones" aria-label="Abrir secciones">☰</button>
+      <div class="brand"><span class="logo">🚨</span> Emerg<span class="em">Smart</span></div>
+    </div>
     <div class="header-actions">
       <span id="medBadge" class="med-badge" title="Médico configurado"></span>
-      <button id="installBtn" class="icon-btn" style="display:none;width:auto;padding:0 .7rem;gap:.35rem;background:var(--teal);color:#04211d;border-color:var(--teal);font-weight:700;font-size:.82rem" onclick="pwaInstall()" title="Instalar EmergSmart">📲 Instalar</button>
-      <button class="hdr-btn" onclick="toggleSearch()" title="Buscar (Ctrl+F)">🔍<span class="ib-label">Buscar</span></button>
-      <button class="hdr-btn" id="themeBtn" onclick="toggleTheme()" title="Tema claro/oscuro"><span class="ib-ico" id="themeIco">🌙</span><span class="ib-label">Tema</span></button>
-      <button class="hdr-btn" onclick="openFavoritos()" title="Favoritos">⭐<span class="ib-label">Favoritos</span></button>
-      <button class="hdr-btn" onclick="exportTabPDF()" title="Exportar PDF de esta pestaña">📄<span class="ib-label">PDF</span></button>
-      <button class="hdr-btn" onclick="openConfig()" title="Configuración">⚙️<span class="ib-label">Config</span></button>
-      <button class="hdr-btn" onclick="exportData()" title="Exportar datos (JSON)">⬇️<span class="ib-label">Exportar</span></button>
-      <button class="hdr-btn" onclick="document.getElementById('importFile').click()" title="Importar datos (JSON)">⬆️<span class="ib-label">Importar</span></button>
-      <button class="hdr-btn" onclick="logoutApp()" title="Cerrar sesión">🚪<span class="ib-label">Salir</span></button>
+      <div class="kebab-wrap">
+        <button class="hdr-menu" onclick="toggleKebab(event)" title="Más opciones" aria-label="Más opciones">⋯</button>
+        <div class="kebab-menu" id="kebabMenu">
+          <button class="kebab-item" onclick="kebabDo(toggleSearch)"><span class="ki-ico">🔍</span>Buscar</button>
+          <button class="kebab-item" id="themeBtn" onclick="kebabDo(toggleTheme)"><span class="ki-ico" id="themeIco">🌙</span>Día / Noche</button>
+          <button class="kebab-item" onclick="kebabDo(openFavoritos)"><span class="ki-ico">⭐</span>Favoritos</button>
+          <button class="kebab-item" onclick="kebabDo(exportTabPDF)"><span class="ki-ico">📄</span>PDF de esta pestaña</button>
+          <button class="kebab-item" onclick="kebabDo(openConfig)"><span class="ki-ico">⚙️</span>Configuración (médico / centro)</button>
+          <div class="kebab-sep"></div>
+          <button class="kebab-item" onclick="kebabDo(exportData)"><span class="ki-ico">⬇️</span>Exportar datos</button>
+          <button class="kebab-item" onclick="closeKebab();document.getElementById('importFile').click()"><span class="ki-ico">⬆️</span>Importar datos</button>
+          <button class="kebab-item" id="installBtn" style="display:none" onclick="kebabDo(pwaInstall)"><span class="ki-ico">📲</span>Instalar app</button>
+          <div class="kebab-sep"></div>
+          <button class="kebab-item" onclick="kebabDo(logoutApp)"><span class="ki-ico">🚪</span>Cerrar sesión</button>
+        </div>
+      </div>
     </div>
   </header>
   <input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(this)">
@@ -383,21 +435,28 @@
   </div>
 
   <div class="app-body">
-  <nav class="main-nav" id="mainNav">
-    <button class="main-tab active" data-tab="sistemas"    onclick="showMainTab('sistemas',this)">🫀 <span class="mt-label">Sistemas</span></button>
-    <button class="main-tab"        data-tab="sintomas"    onclick="showMainTab('sintomas',this)">🔎 <span class="mt-label">Síntomas</span></button>
-    <button class="main-tab"        data-tab="herramientas" onclick="showMainTab('herramientas',this)">🧮 <span class="mt-label">Herramientas</span></button>
-    <button class="main-tab"        data-tab="pocus"       onclick="showMainTab('pocus',this)">📡 <span class="mt-label">POCUS</span></button>
-    <button class="main-tab"        data-tab="farmacos"    onclick="showMainTab('farmacos',this)">💊 <span class="mt-label">Fármacos</span></button>
-    <button class="main-tab"        data-tab="maniobras"   onclick="showMainTab('maniobras',this)">🩺 <span class="mt-label">Maniobras</span></button>
-    <button class="main-tab"        data-tab="toxicologia" onclick="showMainTab('toxicologia',this)">☠️ <span class="mt-label">Toxicología</span></button>
-    <button class="main-tab"        data-tab="guardia"     onclick="showMainTab('guardia',this)">📋 <span class="mt-label">Guardia</span></button>
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+  <nav class="main-nav drawer" id="mainNav">
+    <div class="drawer-head">
+      <span class="dh-title">🚨 Secciones</span>
+      <button class="dh-close" onclick="closeDrawer()" title="Cerrar" aria-label="Cerrar">✕</button>
+    </div>
+    <button class="main-tab active" data-tab="sistemas"    onclick="showMainTab('sistemas',this);closeDrawer()">🫀 <span class="mt-label">Sistemas</span></button>
+    <button class="main-tab"        data-tab="sintomas"    onclick="showMainTab('sintomas',this);closeDrawer()">🔎 <span class="mt-label">Síntomas</span></button>
+    <button class="main-tab"        data-tab="herramientas" onclick="showMainTab('herramientas',this);closeDrawer()">🧮 <span class="mt-label">Herramientas</span></button>
+    <button class="main-tab"        data-tab="pocus"       onclick="showMainTab('pocus',this);closeDrawer()">📡 <span class="mt-label">POCUS</span></button>
+    <button class="main-tab"        data-tab="farmacos"    onclick="showMainTab('farmacos',this);closeDrawer()">💊 <span class="mt-label">Fármacos</span></button>
+    <button class="main-tab"        data-tab="maniobras"   onclick="showMainTab('maniobras',this);closeDrawer()">🩺 <span class="mt-label">Maniobras</span></button>
+    <button class="main-tab"        data-tab="toxicologia" onclick="showMainTab('toxicologia',this);closeDrawer()">☠️ <span class="mt-label">Toxicología</span></button>
+    <button class="main-tab"        data-tab="guardia"     onclick="showMainTab('guardia',this);closeDrawer()">📋 <span class="mt-label">Guardia</span></button>
   </nav>
 
   <main class="app-content">
 
     <!-- ═════ SISTEMAS ═════ -->
     <section class="panel active" id="panel-sistemas">
+      <div class="sys-grid" id="sysGrid"></div>
+      <button id="sysBack" onclick="backToSysGrid()">← Volver a sistemas</button>
       <div class="subnav" id="sysSubnav"></div>
       <div id="sysContent"></div>
     </section>
@@ -1349,6 +1408,29 @@ var CLINICAL_LIBRARY=[
 function buildAll(){ renderMedBadge(); buildSistemas(); buildSintomas(); buildTools(); buildPocus(); buildDrugs(); buildManiobras(); buildGuardia(); buildToxicologia(); }
 
 /* ---- Sistemas ---- */
+/* Grilla launcher ordenada por frecuencia en emergencia (20 sistemas + 2 secciones) */
+var SYS_GRID_ORDER=['cardio','neuro','respiratorio','infeccioso','politrauma','digestivo',
+  'renal','__tox','__farm','pediatria','obstetricia','gineco','traumatologia','cirugia','orl',
+  'derma','oftalmo','urologia','geriatria','saludmental','trauma','alergias'];
+function sysById(id){ return SISTEMAS.filter(function(x){return x.id===id;})[0]; }
+function renderSysGrid(){
+  var g=document.getElementById('sysGrid'); if(!g)return; var html='';
+  SYS_GRID_ORDER.forEach(function(key){
+    var icon,name,act,cls='sys-card';
+    if(key==='__tox'){ icon='☠️'; name='Toxicología'; act="goSection('toxicologia')"; cls+=' is-section'; }
+    else if(key==='__farm'){ icon='💊'; name='Medicamentos'; act="goSection('farmacos')"; cls+=' is-section'; }
+    else{ var s=sysById(key); if(!s)return; icon=s.icon; name=s.name; act="showSysSub('"+key+"')"; }
+    html+='<button class="'+cls+'" onclick="'+act+'"><span class="sc-ico">'+icon+'</span><span class="sc-name">'+esc(name)+'</span></button>';
+  });
+  g.innerHTML=html;
+}
+function goSection(id){ closeDrawer(); showMainTab(id, qtab(id)); }
+function backToSysGrid(){
+  var g=document.getElementById('sysGrid'), b=document.getElementById('sysBack'),
+      n=document.getElementById('sysSubnav'), c=document.getElementById('sysContent');
+  if(g)g.style.display=''; if(b)b.style.display='none'; if(n)n.style.display='none'; if(c)c.style.display='none';
+  window.scrollTo(0,0);
+}
 function buildSistemas(){
   var nav=document.getElementById('sysSubnav'); nav.innerHTML='';
   SISTEMAS.forEach(function(s){
@@ -1356,11 +1438,18 @@ function buildSistemas(){
     b.textContent=s.icon+' '+s.name; b.onclick=function(){showSysSub(s.id);};
     nav.appendChild(b);
   });
-  showSysSub(state.sysSub,true);
+  renderSysGrid();
+  backToSysGrid();
 }
 function showSysSub(id,init){
   state.sysSub=id; saveState();
   var s=SISTEMAS.filter(function(x){return x.id===id;})[0];
+  if(!s) return;
+  /* pasar de la grilla launcher al contenido del sistema */
+  var g=document.getElementById('sysGrid'); if(g)g.style.display='none';
+  var bk=document.getElementById('sysBack'); if(bk)bk.style.display='inline-flex';
+  var nv=document.getElementById('sysSubnav'); if(nv)nv.style.display='';
+  var cc=document.getElementById('sysContent'); if(cc)cc.style.display='';
   Array.prototype.forEach.call(document.querySelectorAll('#sysSubnav .subtab'),function(b){ b.classList.toggle('active', b.textContent===s.icon+' '+s.name); });
   var c=document.getElementById('sysContent');
   if(id==='cardio'){ c.innerHTML=cardioHTML(); wireCardio(); }
@@ -2873,8 +2962,27 @@ function showMainTab(id,btn){
   if(btn)btn.classList.add('active');
   Array.prototype.forEach.call(document.querySelectorAll('.panel'),function(p){p.classList.remove('active');});
   document.getElementById('panel-'+id).classList.add('active');
+  if(id==='sistemas' && typeof backToSysGrid==='function'){ backToSysGrid(); }
   resetSearch(); window.scrollTo(0,0);
 }
+
+/* ---------- Drawer (☰) y menú (⋯) ---------- */
+function toggleDrawer(){
+  var n=document.getElementById('mainNav'), o=document.getElementById('drawerOverlay');
+  var open=n.classList.toggle('open'); if(o)o.classList.toggle('show',open);
+}
+function closeDrawer(){
+  var n=document.getElementById('mainNav'), o=document.getElementById('drawerOverlay');
+  if(n)n.classList.remove('open'); if(o)o.classList.remove('show');
+}
+function toggleKebab(e){ if(e)e.stopPropagation(); var m=document.getElementById('kebabMenu'); if(m)m.classList.toggle('show'); }
+function closeKebab(){ var m=document.getElementById('kebabMenu'); if(m)m.classList.remove('show'); }
+function kebabDo(fn){ closeKebab(); try{ if(typeof fn==='function') fn(); }catch(e){} }
+document.addEventListener('click', function(e){
+  var w=e.target.closest ? e.target.closest('.kebab-wrap') : null;
+  if(!w) closeKebab();
+});
+document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeKebab(); closeDrawer(); } });
 
 /* ---- Global search (filtra tab activo) ---- */
 function toggleSearch(){
