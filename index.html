@@ -355,6 +355,37 @@
   .acc-head:hover{background:var(--surface3)}
   .acc-body{display:none;padding:.9rem 1rem}
   .acc-body.show{display:block}
+  /* ── Guardia: cards tipo + acordeón (v2) ── */
+  .g-typecards{display:flex;gap:.7rem;margin-bottom:1rem}
+  .g-typecard{flex:1;display:flex;align-items:center;gap:.6rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.7rem .9rem}
+  .g-typecard.amb{border-left:3px solid var(--teal)}
+  .g-typecard.int{border-left:3px solid var(--amber)}
+  .g-typecard .g-tc-ic{font-size:1.35rem;line-height:1}
+  .g-typecard .g-tc-lbl{flex:1;font-size:.85rem;font-weight:600;color:var(--muted)}
+  .g-typecard .g-tc-n{font-size:1.5rem;font-weight:800;color:var(--text)}
+  .g-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+  .g-form-grid .g-col2{grid-column:1 / -1}
+  .fld-inline{display:flex;gap:.4rem}
+  .fld-inline input{flex:1;min-width:0}
+  .fld-inline select{flex:0 0 auto;width:auto}
+  .pt-collapse{width:100%;text-align:left;background:none;border:none;color:var(--text);display:flex;align-items:center;gap:.6rem;padding:.55rem .2rem;cursor:pointer;flex-wrap:wrap}
+  .pt-c-name{font-weight:700;font-size:.92rem}
+  .pt-c-meta{color:var(--muted);font-size:.8rem;flex:1}
+  .pt-caret{color:var(--muted2)}
+  .pt-actions-row{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.7rem}
+  .pt-actions-row .g-btn{padding:.45rem .7rem;font-size:.8rem}
+  .g-btn.del{border-color:var(--red);color:var(--red)}
+  .g-btn.del:hover{background:var(--red-dim)}
+  .g-btn-alta{background:var(--green);border-color:var(--green);color:#04211d}
+  .g-btn-alta:hover{filter:brightness(1.08)}
+  .sg-tipo{display:inline-block;padding:.1rem .5rem;border-radius:999px;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.3px}
+  .sg-tipo.tipo-consulta{background:var(--surface3);color:var(--muted)}
+  .sg-tipo.tipo-alta{background:var(--green-dim);color:var(--green)}
+  @media(max-width:768px){
+    .g-typecards{flex-direction:column}
+    .g-form-grid{grid-template-columns:1fr}
+    .g-form-grid .g-col2{grid-column:auto}
+  }
   .fld textarea{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:.6rem .7rem;color:var(--text);font-size:.9rem;font-family:inherit;resize:vertical;min-height:60px}
   .fld textarea:focus{outline:none;border-color:var(--teal)}
   .fld-row{display:flex;gap:.6rem}
@@ -518,14 +549,14 @@
       <span class="dh-title">🚨 Secciones</span>
       <button class="dh-close" onclick="closeDrawer()" title="Cerrar" aria-label="Cerrar">✕</button>
     </div>
-    <button class="main-tab active" data-tab="sistemas"    onclick="showMainTab('sistemas',this);closeDrawer()">🫀 <span class="mt-label">Sistemas</span></button>
+    <button class="main-tab active" data-tab="guardia"     onclick="showMainTab('guardia',this);closeDrawer()">📋 <span class="mt-label">Guardia</span></button>
+    <button class="main-tab"        data-tab="sistemas"    onclick="showMainTab('sistemas',this);closeDrawer()">🫀 <span class="mt-label">Sistemas</span></button>
     <button class="main-tab"        data-tab="sintomas"    onclick="showMainTab('sintomas',this);closeDrawer()">🔎 <span class="mt-label">Síntomas</span></button>
     <button class="main-tab"        data-tab="herramientas" onclick="showMainTab('herramientas',this);closeDrawer()">🧮 <span class="mt-label">Herramientas</span></button>
     <button class="main-tab"        data-tab="pocus"       onclick="showMainTab('pocus',this);closeDrawer()">📡 <span class="mt-label">POCUS</span></button>
     <button class="main-tab"        data-tab="farmacos"    onclick="showMainTab('farmacos',this);closeDrawer()">💊 <span class="mt-label">Fármacos</span></button>
     <button class="main-tab"        data-tab="maniobras"   onclick="showMainTab('maniobras',this);closeDrawer()">🩺 <span class="mt-label">Maniobras</span></button>
     <button class="main-tab"        data-tab="toxicologia" onclick="showMainTab('toxicologia',this);closeDrawer()">☠️ <span class="mt-label">Toxicología</span></button>
-    <button class="main-tab"        data-tab="guardia"     onclick="showMainTab('guardia',this);closeDrawer()">📋 <span class="mt-label">Guardia</span></button>
   </nav>
 
   <main class="app-content">
@@ -582,11 +613,12 @@
     <section class="panel" id="panel-guardia">
       <h2 class="sec">Guardia — Registro de pacientes</h2>
       <p class="sec-desc">Registro rápido del turno activo. Se guarda en este dispositivo. Generá el pase de guardia en PDF.</p>
+      <div class="g-typecards" id="gTypeCards"></div>
       <div class="guardia-actions">
-        <button class="g-btn g-btn-teal" onclick="openGuardiaForm()">➕ Nuevo paciente</button>
         <button class="g-btn" onclick="pasePDF()">📄 Pase de guardia PDF</button>
         <button class="g-btn g-btn-amber" onclick="cerrarTurno()">📦 Cerrar turno</button>
       </div>
+      <div id="guardiaAcc"></div>
       <div id="guardiaList"></div>
       <div id="diagFrec"></div>
       <h3 class="g-hist-title">🗂️ Historial de turnos</h3>
@@ -623,7 +655,7 @@
     <div id="sgLista"></div>
   </div>
 
-  <footer class="app-footer">EmergSmart © Dr. M. Dos Santos | EasyMed Suite</footer>
+  <footer class="app-footer">EmergSmart © Dr. M. Dos Santos | CeiboMed</footer>
 </div>
 
 <!-- ══════════ MODAL GENÉRICO ══════════ -->
@@ -642,7 +674,7 @@ var LOGIN_KEY='emergsmart_login_expira', LOGIN_TTL=8*60*60*1000;
 var STATE_KEY='emergsmart_v1';
 var CONFIG_KEY='emergsmart_config';
 var GUARDIA_KEY='emergsmart_guardia';
-var state={tab:'sistemas',sysSub:'cardio',cardioSub:'sca',pocusSub:'fast',toxSub:'general',farmSub:'emergencia',search:''};
+var state={tab:'guardia',sysSub:'cardio',cardioSub:'sca',pocusSub:'fast',toxSub:'general',farmSub:'emergencia',search:''};
 /* Config del médico */
 var medConfig={nombre:'',especialidad:'',registro:'',institucion:'',ciudad:''};
 /* Guardia: turno activo + historial de turnos archivados */
@@ -976,6 +1008,23 @@ var CALCS={
       if(s<=3){t='Bajo riesgo (MACE ~1.7%)';c='green';} else if(s<=6){t='Riesgo moderado (MACE ~16.6%) — observación/pruebas';c='amber';} else {t='Alto riesgo (MACE ~50%) — estrategia invasiva';c='red';}
       return{score:s+' / 10',interp:t,cls:c}; }},
 
+  timi:{title:'TIMI (IAMSEST)', icon:'❤️', sub:'Riesgo en angina inestable / IAMSEST',
+    fields:[
+      {id:'t_age',label:'Edad ≥ 65 años',opts:[['0','No'],['1','Sí']]},
+      {id:'t_rf',label:'≥ 3 factores de riesgo CV',opts:[['0','No'],['1','Sí']]},
+      {id:'t_sten',label:'Estenosis coronaria ≥ 50% conocida',opts:[['0','No'],['1','Sí']]},
+      {id:'t_st',label:'Desviación del ST en ECG de presentación',opts:[['0','No'],['1','Sí']]},
+      {id:'t_ang',label:'≥ 2 episodios anginosos en últimas 24 h',opts:[['0','No'],['1','Sí']]},
+      {id:'t_aas',label:'Uso de AAS en los últimos 7 días',opts:[['0','No'],['1','Sí']]},
+      {id:'t_mark',label:'Marcadores cardíacos elevados',opts:[['0','No'],['1','Sí']]}
+    ],
+    calc:function(v){ var s=v.t_age+v.t_rf+v.t_sten+v.t_st+v.t_ang+v.t_aas+v.t_mark; var t,c;
+      if(s<=2){ t='Bajo riesgo — manejo conservador'; c='green'; }
+      else if(s<=4){ t='Riesgo intermedio — estrategia invasiva temprana'; c='amber'; }
+      else { t='Alto riesgo — estrategia invasiva urgente'; c='red'; }
+      t+=' · Ref: Antman EM et al. JAMA 2000.';
+      return{score:s+' / 7',interp:t,cls:c}; }},
+
   wellstep:{title:'Wells TEP', icon:'🫁', sub:'Probabilidad de tromboembolismo pulmonar',
     fields:[
       {id:'w_dvt',label:'Signos clínicos de TVP',opts:[['0','No'],['3','Sí']]},
@@ -990,6 +1039,22 @@ var CALCS={
       if(s<2){t='Baja probabilidad — considerar dímero-D';c='green';} else if(s<=6){t='Probabilidad moderada — dímero-D / AngioTC';c='amber';} else {t='Alta probabilidad — AngioTC';c='red';}
       t+=' · (dos niveles: ≤4 "TEP improbable" → dímero-D)';
       return{score:s.toFixed(1)+' pts',interp:t,cls:c}; }},
+
+  perc:{title:'PERC Rule', icon:'🫁', sub:'Descarta TEP si prob. pre-test baja (Wells ≤4)',
+    fields:[
+      {id:'p_age',label:'Edad < 50 años',opts:[['0','Sí (< 50)'],['1','No (≥ 50)']]},
+      {id:'p_fc',label:'FC < 100 lpm',opts:[['0','Sí (< 100)'],['1','No (≥ 100)']]},
+      {id:'p_sat',label:'SatO₂ ≥ 95%',opts:[['0','Sí (≥ 95%)'],['1','No (< 95%)']]},
+      {id:'p_hemo',label:'Sin hemoptisis',opts:[['0','Sin hemoptisis'],['1','Hemoptisis presente']]},
+      {id:'p_estr',label:'Sin estrógenos exógenos',opts:[['0','No usa'],['1','Usa estrógenos']]},
+      {id:'p_prev',label:'Sin TVP/TEP previo',opts:[['0','Sin antecedente'],['1','TVP/TEP previo']]},
+      {id:'p_edema',label:'Sin edema unilateral de pierna',opts:[['0','Sin edema'],['1','Edema unilateral']]},
+      {id:'p_cir',label:'Sin cirugía/trauma con hospitalización < 4 semanas',opts:[['0','No'],['1','Sí']]}
+    ],
+    calc:function(v){ var s=v.p_age+v.p_fc+v.p_sat+v.p_hemo+v.p_estr+v.p_prev+v.p_edema+v.p_cir; var t,c;
+      if(s===0){ t='PERC negativo — TEP descartado (usar solo con probabilidad pre-test baja, Wells ≤4). Ref: Kline JA et al. J Thromb Haemost 2004.'; c='green'; }
+      else { t='PERC positivo ('+s+' criterio/s no cumplido/s) — continuar con dímero D. Ref: Kline JA et al. J Thromb Haemost 2004.'; c='amber'; }
+      return{score:(8-s)+' / 8 cumplidos',interp:t,cls:c}; }},
 
   wellstvp:{title:'Wells TVP', icon:'🦵', sub:'Probabilidad de trombosis venosa profunda',
     fields:[
@@ -1457,7 +1522,7 @@ var CALCS={
       else{t='Riesgo elevado: endoscopía urgente e ingreso.';c=(s>=7?'red':'amber');}
       return{score:s+' pts', interp:t, cls:c}; }}
 };
-var TOOLS_ORDER=['heart','wellstep','wellstvp','geneva','curb65','glasgow','nihss','sofa','qsofa','killip','alvarado','ranson','bisap','parkland','iss','rts','lrinec','apache2','stewart','sedoinf','vtpbw','adrenalina','o2traslado','cthead','centor','rankin','abcd2','blatchford'];
+var TOOLS_ORDER=['heart','timi','wellstep','perc','wellstvp','geneva','curb65','glasgow','nihss','sofa','qsofa','killip','alvarado','ranson','bisap','parkland','iss','rts','lrinec','apache2','stewart','sedoinf','vtpbw','adrenalina','o2traslado','cthead','centor','rankin','abcd2','blatchford'];
 
 /* Capa docente: no interviene en ninguna fórmula ni modifica el resultado calculado. */
 var CALC_GUIDANCE={
@@ -1706,7 +1771,10 @@ function geriatriaHTML(){
   var beersRows=BEERS.map(function(b){ return '<tr><td><span class="drug-name">'+b[0]+'</span></td><td>'+b[1]+'</td><td>'+b[2]+'</td></tr>'; }).join('');
   var s2=''+
     '<p>Fármacos a evitar (o usar con cautela) en &gt;65 años y su alternativa preferida.</p>'+
-    '<div class="table-wrap"><table style="min-width:640px"><thead><tr><th>Fármaco</th><th>Riesgo</th><th>Alternativa preferida</th></tr></thead><tbody>'+beersRows+'</tbody></table></div>';
+    '<div class="table-wrap"><table style="min-width:640px"><thead><tr><th>Fármaco</th><th>Riesgo</th><th>Alternativa preferida</th></tr></thead><tbody>'+beersRows+'</tbody></table></div>'+
+    '<h4>Con precaución</h4><ul><li>Tramadol (convulsiones, caídas) · ISRS (hiponatremia, sangrado GI) · digoxina &gt;0.125 mg/día (toxicidad) · IBP crónicos (C. difficile).</li></ul>'+
+    '<h4>Ajuste obligatorio</h4><ul><li>Opioides: reducir 25–50% la dosis inicial. Benzodiacepinas (si se usan): dosis mínima y duración mínima.</li></ul>'+
+    '<div class="callout warn">Ref: AGS Beers Criteria 2023.</div>';
   var s3=''+
     '<h4>Diagnóstico</h4><p>Inicio agudo + curso fluctuante + inatención + (pensamiento desorganizado o alteración del nivel de conciencia).</p>'+
     '<div class="callout"><strong>CAM (Confusion Assessment Method):</strong> requiere criterios 1 + 2 + (3 o 4).</div>'+
@@ -1774,12 +1842,12 @@ function saludMentalHTML(){
     '<li>No confrontar ni invadir el espacio personal.</li>'+
     '<li>Ofrecer una salida verbal ("¿qué le está pasando?").</li>'+
     '<li>Seguridad visible pero no amenazante.</li></ul>'+
+    '<div class="callout"><strong>Escala RASS</strong> — objetivo <strong>RASS 0 a −1</strong> (calmado y despierto; no sobresedar).</div>'+
     '<h4>Abordaje farmacológico — escalón</h4><ul>'+
-    '<li><strong>Leve:</strong> lorazepam 1-2 mg VO/IM O haloperidol 2.5-5 mg IM.</li>'+
-    '<li><strong>Moderado:</strong> haloperidol 5 mg IM + lorazepam 2 mg IM.</li>'+
-    '<li><strong>Grave/refractario:</strong> midazolam 5 mg IM (inicio rápido) o ketamina 4 mg/kg IM (disociativa, preserva vía aérea).</li>'+
+    '<li><strong>Leve-moderada (RASS +1/+2):</strong> lorazepam 1-2 mg VO/IM, o haloperidol 5 mg IM + lorazepam 2 mg IM, u <strong>olanzapina 10 mg IM</strong> (NO combinar olanzapina con benzodiacepinas).</li>'+
+    '<li><strong>Grave (RASS +3/+4):</strong> midazolam 5 mg IM (inicio rápido); o ketamina 4-5 mg/kg IM si falla lo anterior (disociativa, preserva vía aérea). La contención física solo como puente, nunca sola.</li>'+
     '<li>Monitorizar FC, PA, SatO₂ y nivel de conciencia.</li></ul>'+
-    '<div class="callout warn">Evitar haloperidol en: QT largo, Parkinson e intoxicación por anticolinérgicos.</div>';
+    '<div class="callout warn">Contraindicaciones: haloperidol en QTc prolongado/Parkinson · olanzapina+BZD (depresión respiratoria) · ketamina con precaución en HTA severa. Ref: BETA Project — AAEP 2012.</div>';
   var s3=''+
     '<div class="callout"><strong>Preguntar directamente NO aumenta el riesgo.</strong></div>'+
     '<h4>Evaluación del riesgo</h4><ul>'+
@@ -1852,7 +1920,12 @@ function wireCardio(){
 function cardioSCA(){ return ''+
   '<div class="block"><h3>❤️ Síndrome coronario agudo (SCA)</h3>'+
   '<p>'+authority('GUÍA')+' Integrar clínica, ECG y biomarcadores; activar reperfusión sin demoras evitables.</p>'+
-  '<button class="btn-calc" style="max-width:280px" onclick="openCalc(\'heart\')">🧮 Abrir HEART score</button></div>'+
+  '<button class="btn-calc" style="max-width:280px" onclick="openCalc(\'heart\')">🧮 Abrir HEART score</button> '+
+  '<button class="btn-calc" style="max-width:280px" onclick="openCalc(\'timi\')">🧮 Abrir TIMI (IAMSEST)</button>'+
+  '<h4 style="margin-top:.6rem">GRACE — riesgo hospitalario</h4>'+
+  '<ul><li><strong>&lt;108</strong> bajo (&lt;1% mortalidad) · <strong>108–140</strong> intermedio (1–3%) · <strong>&gt;140</strong> alto (&gt;3%). Por su complejidad, usar la calculadora online.</li></ul>'+
+  '<a class="btn-calc" style="max-width:340px;display:inline-block;text-align:center;text-decoration:none" href="https://www.mdcalc.com/calc/1099/grace-acs-risk-mortality-calculator" target="_blank" rel="noopener">🔗 Calculadora GRACE (MDCalc)</a>'+
+  guideRef('TIMI: Antman et al. JAMA 2000 · GRACE: Eagle et al. JAMA 2004')+'</div>'+
   acad('Evaluación inicial','<ul><li>ECG de 12 derivaciones precoz; repetir ECG si persiste sospecha con trazado inicial no diagnóstico.</li><li>Troponina cardíaca de alta sensibilidad cuando esté disponible.</li><li>Considerar V7–V9 ante sospecha de infarto posterior y V3R–V4R en IAM inferior con posible compromiso de VD.</li></ul>')+
   '<div class="block"><h3>🩺 SCASEST — algoritmo 0h/1h (ESC 2023)</h3>'+
   '<p>Troponina ultrasensible (Tn-us) seriada + estratificación <strong>GRACE/TIMI</strong>.</p><ul>'+
@@ -2148,7 +2221,8 @@ function respHTML(){ return ''+
   '<li>Ingreso en sala: β-lactámico (ceftriaxona/amoxi-clav) + macrólido, o una fluoroquinolona respiratoria.</li>'+
   '<li>UCI: β-lactámico + macrólido o + fluoroquinolona; cubrir Pseudomonas/SAMR según factores de riesgo.</li></ul></div>'+
   '<div class="block"><h3>🫁 Tromboembolismo pulmonar (TEP)</h3>'+
-  '<button class="btn-calc" style="max-width:280px" onclick="openCalc(\'wellstep\')">🧮 Abrir Wells TEP</button>'+
+  '<button class="btn-calc" style="max-width:280px" onclick="openCalc(\'wellstep\')">🧮 Abrir Wells TEP</button> '+
+  '<button class="btn-calc" style="max-width:280px" onclick="openCalc(\'perc\')">🧮 Abrir PERC (descartar TEP)</button>'+
   '<h4>Algoritmo diagnóstico (ESC 2019 — referencia histórica/complementaria)</h4><ul>'+
   '<li><strong>Inestable</strong> (shock/hipotensión) → AngioTC urgente o eco (VD dilatado) → <strong>reperfusión</strong>.</li>'+
   '<li><strong>Estable</strong> → probabilidad clínica (Wells/Geneva). Baja/intermedia: dímero-D (ajustado por edad); alta o dímero-D+ → AngioTC.</li></ul>'+
@@ -3227,12 +3301,40 @@ function confirmarAlta(id){
   rec.horaIngreso=p.hora||'';
   rec.fechaAlta=new Date().toISOString();
   rec.altaNotas=notas.trim();
+  rec.registroTipo='alta';
   rec.interesante=false;
   var arr=getGuardados(); arr.push(rec); setGuardados(arr);
   guardia.activo=guardia.activo.filter(function(x){return x.id!==id;});
   altaPtId=null; saveGuardia();
   renderGuardiaList(); renderDiagFrec(); actualizarBarraGuardados();
   esToast('🏥 Paciente dado de alta y guardado');
+}
+/* 💾 Guardar consulta: archiva una copia en Guardados (tipo consulta) sin dar de alta */
+function guardarConsulta(id){
+  var p=guardia.activo.filter(function(x){return x.id===id;})[0]; if(!p)return;
+  var rec={}; for(var k in p){ if(Object.prototype.hasOwnProperty.call(p,k)) rec[k]=p[k]; }
+  rec.guardadoId='es'+Date.now()+Math.random().toString(36).slice(2,8);
+  rec.horaIngreso=p.hora||'';
+  rec.fechaAlta=new Date().toISOString();
+  rec.altaNotas='';
+  rec.registroTipo='consulta';
+  rec.interesante=false;
+  var arr=getGuardados(); arr.push(rec); setGuardados(arr);
+  renderDiagFrec(); actualizarBarraGuardados();
+  esToast('💾 Consulta guardada en Guardados');
+}
+/* 📋 Ver ficha del paciente activo */
+function verFicha(id){
+  var p=guardia.activo.filter(function(x){return x.id===id;})[0]; if(!p)return;
+  var html='<div class="mg-campo"><b>Nombre:</b> '+esc(p.nombre||'—')+'</div>'+
+    '<div class="mg-campo"><b>Tipo:</b> '+(p.tipo==='internado'?'🛏️ Internado':'🏥 Ambulatorio')+(p.cama?(' · <b>Cama/Sector:</b> '+esc(p.cama)):'')+'</div>'+
+    '<div class="mg-campo"><b>Edad:</b> '+esc(p.edad||'—')+' '+esc(p.edadUnidad||'años')+' · <b>Sexo:</b> '+esc(p.sexo||'—')+'</div>'+
+    '<div class="mg-campo"><b>Estado:</b> '+esc(p.estado||'—')+' · <b>Ingreso:</b> '+esc(p.hora||'—')+'</div>'+
+    '<div class="mg-campo"><b>Motivo:</b> '+esc(p.motivo||'—')+'</div>'+
+    '<div class="mg-campo"><b>Diagnóstico:</b> '+esc(p.dx||'—')+'</div>'+
+    '<div class="mg-campo"><b>Signos vitales:</b> PA '+esc(p.pa||'—')+' · FC '+esc(p.fc||'—')+' · SatO₂ '+esc(p.sato2||'—')+' · T° '+esc(p.temp||'—')+'</div>'+
+    '<div class="mg-campo"><b>Notas:</b> '+esc(p.notas||'—')+'</div>';
+  showModal('📋 Ficha — '+esc(p.nombre||'paciente'), html);
 }
 
 /* ════ BARRA + SECCIÓN GUARDADOS ════ */
@@ -3280,9 +3382,11 @@ function renderSeccionGuardados(){
           '<button class="sg-b-del" onclick="eliminarGuardado(\''+p.guardadoId+'\')">🗑️ Eliminar</button>'+
         '</div></div>';
     }
+    var regTipo=(p.registroTipo==='consulta')?'consulta':'alta';
     return '<div class="sg-row"><div class="sg-head" onclick="toggleSgExpand(\''+p.guardadoId+'\')">'+
       '<span class="sg-nombre">'+esc(p.nombre||'(sin nombre)')+'</span>'+
-      '<span class="sg-meta">'+esc(p.edad||'—')+' años · '+esc(p.dx||'—')+' · alta '+altaStr+'</span>'+
+      '<span class="sg-tipo '+(regTipo==='consulta'?'tipo-consulta':'tipo-alta')+'">'+regTipo+'</span>'+
+      '<span class="sg-meta">'+esc(p.edad||'—')+' años · '+esc(p.dx||'—')+' · '+regTipo+' '+altaStr+'</span>'+
       (p.interesante?'<span class="badge-interesante">⭐ Interesante</span>':'')+
       '<span class="pt-status '+estadoClass(p.estado)+'">'+esc(p.estado||'—')+'</span>'+
       '<span class="sg-caret">'+(abierto?'▾':'▸')+'</span>'+
@@ -3399,31 +3503,88 @@ function renderDiagFrec(){
       '<div class="df-val">'+pct+'% ('+o.n+')</div></div>';
   }).join('');
 }
+/* ════ ACORDEÓN DE GUARDIA (ambulatorio / internado) ════ */
+var guardiaFormOpen=true, guardiaActivosOpen=true, expandedPtId=null;
+var EDAD_UNIDADES=['años','meses','días'];
+function renderGuardiaCounts(){
+  var c=document.getElementById('gTypeCards'); if(!c)return;
+  var amb=guardia.activo.filter(function(p){return (p.tipo||'ambulatorio')!=='internado';}).length;
+  var int=guardia.activo.filter(function(p){return p.tipo==='internado';}).length;
+  c.innerHTML='<div class="g-typecard amb"><span class="g-tc-ic">🏥</span><span class="g-tc-lbl">Ambulatorio</span><span class="g-tc-n">'+amb+'</span></div>'+
+    '<div class="g-typecard int"><span class="g-tc-ic">🛏️</span><span class="g-tc-lbl">Internado</span><span class="g-tc-n">'+int+'</span></div>';
+}
+function guardiaFormBody(p){
+  var sexOpts=['','Masculino','Femenino','Otro'].map(function(s){return '<option '+((p&&p.sexo===s)||(!p&&s==='')?'selected':'')+' value="'+s+'">'+(s||'—')+'</option>';}).join('');
+  var estOpts=GUARDIA_ESTADOS.map(function(e){return '<option '+(p&&p.estado===e[0]?'selected':'')+' value="'+e[0]+'">'+e[0]+'</option>';}).join('');
+  var uOpts=EDAD_UNIDADES.map(function(u){return '<option '+((p&&p.edadUnidad===u)||(!p&&u==='años')?'selected':'')+' value="'+u+'">'+u+'</option>';}).join('');
+  var tipo=(p&&p.tipo)||'ambulatorio';
+  var tipoOpts='<option value="ambulatorio"'+(tipo==='ambulatorio'?' selected':'')+'>🏥 Ambulatorio</option><option value="internado"'+(tipo==='internado'?' selected':'')+'>🛏️ Internado</option>';
+  return ''+
+    '<div class="g-form-grid">'+
+    '<div class="fld"><label>Tipo</label><select id="g-tipo" onchange="toggleCama()">'+tipoOpts+'</select></div>'+
+    '<div class="fld"><label>Nombre</label><input id="g-nombre" value="'+esc(p?p.nombre:'')+'" placeholder="Nombre del paciente"></div>'+
+    '<div class="fld"><label>Edad</label><div class="fld-inline"><input id="g-edad" value="'+esc(p?p.edad:'')+'" inputmode="decimal" placeholder="ej. 45"><select id="g-edadu">'+uOpts+'</select></div></div>'+
+    '<div class="fld"><label>Sexo</label><select id="g-sexo">'+sexOpts+'</select></div>'+
+    '<div class="fld"><label>Hora ingreso</label><input id="g-hora" value="'+esc(p?p.hora:nowHM())+'" placeholder="HH:MM"></div>'+
+    '<div class="fld"><label>Estado</label><select id="g-estado">'+estOpts+'</select></div>'+
+    '<div class="fld g-col2"><label>Diagnóstico</label><input id="g-dx" value="'+esc(p?p.dx:'')+'" placeholder="Dx presuntivo"></div>'+
+    '<div class="fld g-col2"><label>Motivo de consulta</label><textarea id="g-motivo" placeholder="Motivo de consulta">'+esc(p?p.motivo:'')+'</textarea></div>'+
+    '<div class="fld"><label>Presión arterial</label><input id="g-pa" value="'+esc(p?p.pa:'')+'" placeholder="120/80 mmHg"></div>'+
+    '<div class="fld"><label>FC</label><input id="g-fc" value="'+esc(p?p.fc:'')+'" inputmode="decimal" placeholder="bpm"></div>'+
+    '<div class="fld"><label>SatO₂ %</label><input id="g-sato2" value="'+esc(p?p.sato2:'')+'" inputmode="decimal" placeholder="%"></div>'+
+    '<div class="fld"><label>Temperatura °C</label><input id="g-temp" value="'+esc(p?p.temp:'')+'" inputmode="decimal" placeholder="°C"></div>'+
+    '<div class="fld g-col2" id="g-cama-wrap" style="display:'+(tipo==='internado'?'block':'none')+'"><label>Cama / Sector</label><input id="g-cama" value="'+esc(p?p.cama:'')+'" placeholder="ej: Sala 2 / Moderados / CTI"></div>'+
+    '<div class="fld g-col2"><label>Notas</label><textarea id="g-notas" placeholder="Evolución, indicaciones, pendientes…">'+esc(p?p.notas:'')+'</textarea></div>'+
+    '</div>'+
+    '<button class="btn-calc" onclick="savePt()">'+(p?'💾 Guardar cambios':'➕ Agregar paciente')+'</button>'+
+    (p?'<button class="g-btn" style="margin-top:.5rem" onclick="cancelEdit()">Cancelar edición</button>':'');
+}
+function toggleCama(){ var t=document.getElementById('g-tipo'), w=document.getElementById('g-cama-wrap'); if(t&&w)w.style.display=(t.value==='internado'?'block':'none'); }
+function cancelEdit(){ editingPtId=null; renderGuardiaList(); }
+function toggleGuardiaSection(which){ if(which==='form')guardiaFormOpen=!guardiaFormOpen; else guardiaActivosOpen=!guardiaActivosOpen; renderGuardiaList(); }
+function toggleActivo(id){ expandedPtId=(expandedPtId===id?null:id); renderGuardiaList(); }
+function editPtInline(id){ editingPtId=id; guardiaFormOpen=true; expandedPtId=null; renderGuardiaList(); var el=document.getElementById('g-nombre'); if(el){ el.focus(); el.scrollIntoView({behavior:'smooth',block:'center'}); } }
 function renderGuardiaList(){
-  var c=document.getElementById('guardiaList'); if(!c)return;
-  if(!guardia.activo.length){ c.innerHTML='<div class="g-empty">No hay pacientes en el turno activo. Tocá "Nuevo paciente" para registrar.</div>'; return; }
-  c.innerHTML=guardia.activo.map(function(p){
-    var idx=guardia.activo.indexOf(p);
-    var alta = altaPtId===p.id ? ('<div class="alta-panel"><label class="alta-lbl">Notas al alta</label>'+
-      '<textarea id="altaNotas" placeholder="Condición al egreso, indicaciones, seguimiento..."></textarea>'+
-      '<div class="alta-acciones"><button class="alta-ok" onclick="confirmarAlta(\''+p.id+'\')">✅ Confirmar alta</button>'+
-      '<button class="alta-cancel" onclick="cancelarAlta()">Cancelar</button></div></div>') : '';
-    return '<div class="pt-card">'+
-      '<div class="pt-head"><div><div class="pt-name">'+esc(p.nombre||'(sin nombre)')+'</div>'+
-      '<div class="pt-meta">'+esc(p.edad||'—')+' años · '+esc(p.sexo||'—')+' · Ingreso '+esc(p.hora||'—')+'</div></div>'+
-      '<div class="pt-actions"><span class="pt-status '+estadoClass(p.estado)+'">'+esc(p.estado||'en evaluación')+'</span>'+
-      '<button class="pt-mini" title="Editar" onclick="openGuardiaByIndex('+idx+')">✏️</button>'+
-      '<button class="pt-mini del" title="Eliminar" onclick="deletePtByIndex('+idx+')">🗑️</button>'+
-      '<button class="pt-btn-pdf" title="PDF" onclick="pdfActivo(\''+p.id+'\')">📄</button>'+
-      '<button class="pt-btn-alta" title="Dar de alta" onclick="abrirAlta(\''+p.id+'\')">🏥 Alta</button></div></div>'+
-      '<div class="pt-body">'+
-      vitalsHTML(p)+
-      (p.motivo?'<div class="pt-row"><span class="pt-lbl">Motivo:</span> '+esc(p.motivo)+'</div>':'')+
-      (p.dx?'<div class="pt-row"><span class="pt-lbl">Impresión dx:</span> '+esc(p.dx)+'</div>':'')+
-      (p.notas?'<div class="pt-row"><span class="pt-lbl">Notas:</span> '+esc(p.notas)+'</div>':'')+
-      alta+
-      '</div></div>';
-  }).join('');
+  renderGuardiaCounts();
+  var c=document.getElementById('guardiaAcc'); if(!c)return;
+  var editP=editingPtId?guardia.activo.filter(function(x){return x.id===editingPtId;})[0]:null;
+  var formTitle=editP?('✏️ Editando: '+esc(editP.nombre||'paciente')):'➕ Paciente nuevo';
+  var s1='<div class="acc-item"><button class="acc-head" onclick="toggleGuardiaSection(\'form\')"><span>'+formTitle+'</span><span>'+(guardiaFormOpen?'▾':'▸')+'</span></button>'+
+    '<div class="acc-body'+(guardiaFormOpen?' show':'')+'">'+(guardiaFormOpen?guardiaFormBody(editP):'')+'</div></div>';
+  var n=guardia.activo.length, rows;
+  if(!n){ rows='<div class="g-empty">No hay pacientes en el turno activo.</div>'; }
+  else{
+    rows=guardia.activo.map(function(p){
+      var open=expandedPtId===p.id;
+      var tipoIc=(p.tipo==='internado')?'🛏️':'🏥';
+      var alta = altaPtId===p.id ? ('<div class="alta-panel"><label class="alta-lbl">Notas al alta</label>'+
+        '<textarea id="altaNotas" placeholder="Condición al egreso, indicaciones, seguimiento..."></textarea>'+
+        '<div class="alta-acciones"><button class="alta-ok" onclick="confirmarAlta(\''+p.id+'\')">✅ Confirmar alta</button>'+
+        '<button class="alta-cancel" onclick="cancelarAlta()">Cancelar</button></div></div>') : '';
+      var body = open ? ('<div class="pt-body">'+vitalsHTML(p)+
+        (p.cama?'<div class="pt-row"><span class="pt-lbl">Cama/Sector:</span> '+esc(p.cama)+'</div>':'')+
+        (p.motivo?'<div class="pt-row"><span class="pt-lbl">Motivo:</span> '+esc(p.motivo)+'</div>':'')+
+        (p.dx?'<div class="pt-row"><span class="pt-lbl">Diagnóstico:</span> '+esc(p.dx)+'</div>':'')+
+        (p.notas?'<div class="pt-row"><span class="pt-lbl">Notas:</span> '+esc(p.notas)+'</div>':'')+
+        '<div class="pt-actions-row">'+
+          '<button class="g-btn" onclick="editPtInline(\''+p.id+'\')">✏️ Editar</button>'+
+          '<button class="g-btn del" onclick="deletePt(\''+p.id+'\')">🗑️ Eliminar</button>'+
+          '<button class="g-btn" onclick="pdfActivo(\''+p.id+'\')">📄 PDF</button>'+
+          '<button class="g-btn g-btn-teal" onclick="guardarConsulta(\''+p.id+'\')">💾 Guardar</button>'+
+          '<button class="g-btn g-btn-alta" onclick="abrirAlta(\''+p.id+'\')">🏥 Alta</button>'+
+          '<button class="g-btn" onclick="verFicha(\''+p.id+'\')">📋 Ver ficha</button>'+
+        '</div>'+alta+'</div>') : '';
+      return '<div class="pt-card"><button class="pt-collapse" onclick="toggleActivo(\''+p.id+'\')">'+
+        '<span class="pt-c-name">'+tipoIc+' '+esc(p.nombre||'(sin nombre)')+'</span>'+
+        '<span class="pt-c-meta">'+esc(p.edad||'—')+' '+esc(p.edadUnidad||'años')+' · '+esc(p.sexo||'—')+'</span>'+
+        '<span class="pt-status '+estadoClass(p.estado)+'">'+esc(p.estado||'en evaluación')+'</span>'+
+        '<span class="pt-caret">'+(open?'▾':'▸')+'</span></button>'+body+'</div>';
+    }).join('');
+  }
+  var s2='<div class="acc-item"><button class="acc-head" onclick="toggleGuardiaSection(\'activos\')"><span>🗂️ Pacientes activos ('+n+')</span><span>'+(guardiaActivosOpen?'▾':'▸')+'</span></button>'+
+    '<div class="acc-body'+(guardiaActivosOpen?' show':'')+'">'+(guardiaActivosOpen?rows:'')+'</div></div>';
+  c.innerHTML=s1+s2;
+  var gl=document.getElementById('guardiaList'); if(gl)gl.innerHTML='';
 }
 function openGuardiaByIndex(idx){ var p=guardia.activo[idx]; if(p)openGuardiaForm(p.id); }
 function deletePtByIndex(idx){ var p=guardia.activo[idx]; if(p)deletePt(p.id); }
@@ -3464,29 +3625,38 @@ function openGuardiaForm(id){
     '<button class="btn-calc" onclick="savePt()">'+(id?'Guardar cambios':'Agregar paciente')+'</button>';
   showModal((id?'✏️ Editar paciente':'➕ Nuevo paciente'), html);
 }
+function gv(id){ var el=document.getElementById(id); return el?el.value.trim():''; }
 function savePt(){
+  var tipo=(document.getElementById('g-tipo')||{}).value||'ambulatorio';
   var obj={
-    nombre:document.getElementById('g-nombre').value.trim(),
-    edad:document.getElementById('g-edad').value.trim(),
-    sexo:document.getElementById('g-sexo').value,
-    hora:document.getElementById('g-hora').value.trim(),
-    motivo:document.getElementById('g-motivo').value.trim(),
-    dx:document.getElementById('g-dx').value.trim(),
-    pa:document.getElementById('g-pa').value.trim(),
-    fc:document.getElementById('g-fc').value.trim(),
-    sato2:document.getElementById('g-sato2').value.trim(),
-    temp:document.getElementById('g-temp').value.trim(),
-    notas:document.getElementById('g-notas').value.trim(),
-    estado:document.getElementById('g-estado').value
+    tipo:tipo,
+    nombre:gv('g-nombre'),
+    edad:gv('g-edad'),
+    edadUnidad:(document.getElementById('g-edadu')||{}).value||'años',
+    sexo:(document.getElementById('g-sexo')||{}).value||'',
+    hora:gv('g-hora'),
+    motivo:gv('g-motivo'),
+    dx:gv('g-dx'),
+    pa:gv('g-pa'),
+    fc:gv('g-fc'),
+    sato2:gv('g-sato2'),
+    temp:gv('g-temp'),
+    notas:gv('g-notas'),
+    cama:(tipo==='internado'?gv('g-cama'):''),
+    estado:(document.getElementById('g-estado')||{}).value||'en evaluación'
   };
+  if(!obj.nombre){ esToast('⚠️ Ingresá el nombre del paciente'); return; }
   if(editingPtId){
     var p=guardia.activo.filter(function(x){return x.id===editingPtId;})[0];
     if(p)Object.assign(p,obj);
+    editingPtId=null;
   }else{
     obj.id=newPatientId();
     guardia.activo.push(obj);
+    guardiaActivosOpen=true;
   }
-  editingPtId=null; saveGuardia(); renderGuardiaList(); renderDiagFrec(); closeModal();
+  saveGuardia(); renderGuardiaList(); renderDiagFrec();
+  esToast('✅ Paciente guardado en el turno');
 }
 function deletePt(id){
   if(!confirm('¿Eliminar este paciente del turno activo?'))return;
@@ -3801,7 +3971,7 @@ function obstetriciaHTML(){ return ''+
   '<tr><td class="drug-name">Hidralazina IV</td><td>5–10 mg IV c/20 min.</td></tr>'+
   '<tr><td class="drug-name">Nifedipina VO</td><td>10 mg VO, repetir c/20–30 min.</td></tr>'+
   '</tbody></table></div>'+
-  '<div class="callout crit">CONTRAINDICADOS: IECA y ARA-II (teratógenos). Objetivo de TA: sistólica 140–155 y diastólica 90–105 (evitar descensos bruscos que comprometan la perfusión placentaria).</div></div>'+
+  '<div class="callout crit">CONTRAINDICADOS: IECA y ARA-II (teratógenos). Nifedipina VO (NO sublingual). Objetivo de TA &lt;160/110 (no descender por debajo de 140/90; evitar descensos bruscos que comprometan la perfusión placentaria). Ref: ACOG Practice Bulletin 222, 2020.</div></div>'+
   '<div class="block"><h3>🩸 Hemorragia obstétrica</h3>'+
   '<h4>Anteparto — Placenta previa</h4><ul>'+
   '<li>Sangrado indoloro, rojo rutilante, en 2.º-3.er trimestre. <strong>NO realizar tacto vaginal</strong> hasta descartar previa por eco.</li>'+
@@ -3900,7 +4070,20 @@ function cardioShock(){ return ''+
   '<li>Soporte mecánico: <strong>BCIA</strong> (uso selectivo, no rutinario en IAM), Impella/ECMO-VA en casos seleccionados.</li></ul>'+
   '<h4>Causas mecánicas (buscar con eco)</h4><ul>'+
   '<li>CIV posinfarto, insuficiencia mitral aguda (rotura de músculo papilar), rotura de pared libre/taponamiento, IAM de VD.</li></ul>'+
-  '<div class="callout crit">Shock cardiogénico + soplo nuevo = complicación mecánica hasta descartarla (eco urgente + cirugía).</div></div>'; }
+  '<div class="callout crit">Shock cardiogénico + soplo nuevo = complicación mecánica hasta descartarla (eco urgente + cirugía).</div></div>'+
+  '<div class="block"><h3>🩸 Algoritmo general del shock</h3>'+
+  '<h4>Reconocimiento</h4><ul>'+
+  '<li>PAS &lt;90 o PAM &lt;65 mmHg + hipoperfusión (conciencia↓, piel fría, oliguria, lactato &gt;2).</li></ul>'+
+  '<h4>Clasificación y manejo</h4>'+
+  '<div class="callout"><strong>💧 Hipovolémico</strong> — VCI colapsada · piel fría · taquicardia.<br>→ SF 500 mL IV · identificar y controlar la pérdida.<br>→ Si hemorrágico: ratio <strong>1:1:1</strong> (GR:PFC:plaquetas).</div>'+
+  '<div class="callout"><strong>🦠 Distributivo — séptico</strong> — VCI colapsada · vasodilatación · fiebre.<br>→ Cultivos → <strong>ATB empírico en &lt;1 h</strong>.<br>→ Noradrenalina 0.1–0.3 µg/kg/min (vasopresor de 1.ª línea).<br>→ Hidrocortisona 200 mg/día si refractario.</div>'+
+  '<div class="callout"><strong>⚠️ Distributivo — anafiláctico</strong><br>→ <strong>Adrenalina 0.5 mg IM inmediata</strong>.<br>→ SF 1–2 L IV · corticoides · antihistamínicos.</div>'+
+  '<div class="callout"><strong>💔 Cardiogénico</strong> — VCI dilatada · VI/VD deprimida.<br>→ Evitar fluidos agresivos.<br>→ Dobutamina 2–10 µg/kg/min.<br>→ Consulta a hemodinamia urgente.</div>'+
+  '<div class="callout"><strong>⛔ Obstructivo</strong> — VCI dilatada · VI conservada.<br>→ TEP masivo → alteplase 100 mg/2 h.<br>→ Taponamiento → pericardiocentesis urgente.<br>→ Neumotórax a tensión → descompresión inmediata 2.° EIC LMC.</div>'+
+  '<h4>Monitorización</h4><ul>'+
+  '<li>Objetivo <strong>PAM ≥65 mmHg</strong> · diuresis ≥0.5 mL/kg/h.</li>'+
+  '<li>Lactato de control a las 2 h · evaluar respuesta a fluidos.</li></ul>'+
+  '<div class="callout warn">Ref: Surviving Sepsis Campaign 2021.</div></div>'; }
 function cardioECG(){ return ''+
   '<div class="block"><h3>📈 Lectura sistemática del ECG</h3><ol class="steps">'+
   '<li><strong>Frecuencia</strong>: 300 / nº de cuadros grandes entre R-R (o 1500 / cuadros chicos).</li>'+
@@ -4384,7 +4567,7 @@ function exportTabPDF(){
     }
     var pages=pdf.internal.getNumberOfPages();
     for(var p=1;p<=pages;p++){ pdf.setPage(p); pdf.setFontSize(7.5); pdf.setTextColor(140,140,140);
-      pdf.text('EmergSmart © Dr. M. Dos Santos · EasyMed Suite — apoyo a la decisión clínica, no sustituye el juicio médico.',margin,ph-4);
+      pdf.text('EmergSmart © Dr. M. Dos Santos · CeiboMed — apoyo a la decisión clínica, no sustituye el juicio médico.',margin,ph-4);
       pdf.text(p+'/'+pages,pw-margin-9,ph-4);
     }
     pdf.save('EmergSmart_'+tabName.replace(/[^a-zA-Z0-9]+/g,'_')+'.pdf');
